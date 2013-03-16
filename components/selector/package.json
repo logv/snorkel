@@ -1,0 +1,7 @@
+{
+  "main" : "selector",
+  "helpers": [],
+  "style": "selector.css",
+  "styles": [],
+  "template": "selector.html.erb"
+}

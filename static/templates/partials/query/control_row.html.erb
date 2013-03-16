@@ -1,0 +1,20 @@
+<% set_default("space", false); %>
+<% set_default("hidden", false); %>
+
+<div class="control-group <% if (hidden) { %> <%= "hidden" %> <% } %>" >
+
+<% if (space) { %>
+<div style="margin-top: 20px">
+<% } %>
+
+  <label class="control-label" for="<%= name %>">
+    <%= label %>
+   </label>
+   <div class="controls" name="<%= name %>">
+     <%= component %>
+   </div>
+  </div>
+
+<% if (space) { %>
+</div>
+<% } %>

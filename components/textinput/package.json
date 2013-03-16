@@ -1,0 +1,7 @@
+{
+  "main" : "textinput",
+  "helpers": [],
+  "style": "textinput.css",
+  "styles": [],
+  "template": "textinput.html.erb"
+}

@@ -1,0 +1,24 @@
+{
+  "name": "snorkel",
+    "description": "node.js realtime analytics prototype",
+    "version": "0.0.2",
+    "private": true,
+    "dependencies": {
+      "express": "3.x",
+      "socket.io": "0.9.x",
+      "cheerio" : "0.10.x",
+      "module-grapher": "x",
+      "passport": "x",
+      "passport-local": "x",
+      "mongodb" : "x",
+      "connect-mongo" : "x",
+      "longjohn" : "x",
+      "Faker" : "x",
+      "async" : "x",
+      "less" : "x",
+      "hashids" : "x",
+      "amqp" : "x",
+      "htpasswd" : "x"
+    }
+}
+

@@ -1,0 +1,25 @@
+<div class="container-fluid max-height no-scroll">
+  <div class="row-fluid max-height no-select">
+
+    <div class="action_buttons clearfix">
+      <a href="#" class="mlm btn pane_toggle btn-success"><span class="name">Query</span></a>
+      <a href="#user_dialog" class="btn btn-info" style="position: absolute; right: 5px; " data-toggle="modal"> Settings </a>
+    </div>
+
+    <div class="below" id="query_sidebar">
+      <%= render_query_sidebar() %>
+    </div>
+
+    <div id="query_content_wrapper">
+      <div id="query_content" class="above clearfix">
+        <%= render_query_content() %>
+      </div>
+    </div>
+
+  </div>
+
+  <%= render_template("helpers/user_status.html.erb") %>
+
+  <%= add_socket() %>
+</div>
+

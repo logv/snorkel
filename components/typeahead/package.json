@@ -1,0 +1,7 @@
+{
+  "main" : "typeahead",
+  "helpers": [],
+  "style": "typeahead.css",
+  "styles": [],
+  "template": "typeahead.html.erb"
+}

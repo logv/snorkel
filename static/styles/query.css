@@ -1,0 +1,392 @@
+.hidden { display: none; }
+
+#page_header {
+  @media (max-width: 767px) {
+    display: none;
+  }
+}
+
+body {
+  @media (min-width: 768px) {
+    overflow-y: hidden;
+  }
+}
+
+.action_buttons {
+  background-color: #202030;
+  position: fixed;
+  left: 0px;
+  top: 0px;
+  width: 100%;
+  max-width: 100%;
+  cursor: pointer;
+  overflow: hidden;
+  height: 40px;
+  line-height: 40px;
+  font-weight: bold;
+  padding-top: 8px;
+  z-index: 1020; /* Stay above the query queue sidebar, damnit */
+
+  .graph_quick_links a {
+    width: 8%;
+  }
+
+  /* portrait ipads, desktops, etc */
+  @media (min-width: 768px) {
+    display: none;
+  }
+
+  /* phone and down */
+  @media (max-width: 767px) {
+    display: visible;
+    zoom: 1.25;
+  }
+
+  .pane_toggle {
+    font-weight: bold;
+    display: inline-block;
+    width: 60px;
+  }
+
+  .pane_toggle:hover {
+    opacity: 0.9;
+  }
+}
+
+.above {
+  z-index: 100;
+}
+
+.below {
+  z-index: 10;
+}
+
+#query_content {
+  background-color: #fff;
+
+  > *:first-child {
+    margin-top: 60px;
+  }
+
+  /* landscape tablet, desktop and up */
+  @media (min-width: 768px) {
+    height: 100%;
+    margin-left: 350px;
+    overflow-y: scroll;
+
+    visibility: visible !important;
+    /* to account for the header positioning, we add margin to our inner child */
+  }
+
+  @media (max-width: 767px) {
+    margin-left: 0px;
+    position: absolute;
+    min-width: 100%;
+    min-height: 100%;
+    left: 0;
+    top: 0;
+
+  }
+
+  table thead { font-weight: bold; }
+
+  table.table-bordered { border: 0px; }
+
+  .delta {
+    float: left;
+    font-color: #888;
+    font-size: 80%; }
+
+  .throbber {
+    font-size: 24px;
+    margin-top: 240px;
+    text-align: center; }
+
+  /* Table formatting helpers */
+  .compare_cell {
+    border-top: 1px dashed #aaa;
+    margin: 5px;
+    padding: 0px;
+    text-align: right; }
+
+  .value_cell {
+    margin: 5px;
+    text-align: right; }
+}
+
+/* Gotta be less intrusive when we are below things */
+#query_content.below {
+  position: fixed;
+  height: 100%;
+}
+
+#query_sidebar.below {
+  /* Landscape phone to portrait tablet */
+  @media (max-width: 767px) {
+    height: 100%;
+    padding: 0px;
+    top: 0;
+    left: 0;
+    z-index: 90;
+    overflow: hidden;
+
+    .go_button_wrapper {
+      display: none;
+    }
+  }
+
+}
+/* The two pane layout is really a fixed pane layout, with the left pane being
+ * fixed position and the right pane having a fixed margin (that is the size of
+ * the left pane)
+ *
+ * The left pane is #query_sidebar, right pane is #main_table
+*/
+#query_sidebar {
+  background-color: #f5f5f5;
+  float: left;
+  padding-left: 30px;
+  padding-right: 10px;
+  width: 310px;
+  visibility: visible !important;
+
+  #filters_box { position: relative; }
+
+
+  .go_button {
+    margin-top: 5px;
+  }
+
+
+  /* landscape tablet, desktop and up */
+  @media (min-width: 768px) {
+    position: fixed;
+    top: 50px;
+    left: 0;
+    max-height: 100%;
+    min-height: 100%;
+    height: 100%;
+    overflow-y: scroll;
+
+    > *:first-child {
+      margin-top: 20px;
+    }
+    .go_button {
+      float: right;
+    }
+    .filter_op {
+      min-width: 50px;
+    }
+
+    width: 310px;
+    .span2 { width: 140px; }
+
+    #filter_textarea { width: 300px; }
+
+
+    .filter_value {
+      margin-top: 5px;
+      width: 300px;
+    }
+
+    .form-horizontal .control-label {
+      padding-right: 10px;
+      padding-top: 5px;
+      width: 80px; }
+
+    .form-horizontal .controls {
+      display: block;
+      float: left;
+      margin-left: 10px; }
+  }
+
+  /* Landscape phone to portrait tablet */
+  @media (max-width: 767px) {
+    position: absolute;
+    top: 0px;
+    left: 0;
+    padding: 0px;
+    padding-left: 3%;
+    padding-right: 2%;
+    width: 95%;
+    text-align: left;
+    zoom: 150%;
+    margin-left: 0px;
+    margin-right: 0px;
+    overflow-x: hidden;
+
+    > *:first-child {
+      margin-top: 60px;
+    }
+
+
+    .span2 { width: 100%; }
+    .form-horizontal .controls {
+      float: left;
+      width: 70%;
+      margin-left: 0px;
+      display: block; }
+
+    .chzn-container {
+      width: 100% !important;
+    }
+
+    .form-horizontal .control-label {
+      padding-right: 10px;
+      padding-top: 5px;
+      margin-left: 0px;
+      text-align: left;
+      font-weight: bold;
+      width: 25%; }
+
+    .filter_op {
+      width: 20%;
+      min-width: 40px;
+      margin-bottom: 10px;
+    }
+
+    .span2.filter_field {
+      width: 40%;
+      float: left;
+      margin-bottom: 10px;
+    }
+
+    .aux_go_button_wrapper {
+      display: none;
+    }
+
+    /* Make the go button huge and at the bottom in big displays */
+    .go_button_wrapper {
+      width: 100%;
+      background-color: #202030;
+      position: fixed;
+      bottom: -5px;
+      z-index: 200;
+      width: 100%;
+      left: 0px;
+      padding-bottom: 13px;
+    }
+
+    .go_button {
+      margin-left: 5px;
+      margin-right: 5px;
+      margin-top: 8px;
+      display: block;
+    }
+  }
+
+  form { border-radius: 0px; }
+
+  .tab-content { overflow: visible; }
+
+  > form { padding: 19px; }
+
+  #filters .filter_op {
+    margin-left: 9px;
+  }
+
+  .form-horizontal select { margin-top: 5px; }
+
+  .chzn-choices .search-choice {
+    font-weight: bold;
+    width: 100px; }
+
+  .form-horizontal .control-group { margin-bottom: 0px; }
+
+  #summary {
+     margin-top: 15px;
+     max-width: 300px; }
+}
+
+#user_dialog {
+
+  /* phone and down */
+  @media (max-width: 767px) {
+    .modal-body {
+      max-height: 250px;
+    }
+  }
+
+}
+
+.delta {
+  padding: 2px;
+}
+
+.per_grow {
+
+  font-weight: bold;
+  
+  &.maybe {
+    background-color: #FFDDD9;
+  }
+
+  &.kinda {
+    background-color: #FFA7A9;
+    color: #666;
+  }
+
+  &.sorta {
+    background-color: #5C0002;
+    color: #fefefe;
+  }
+
+  &.probably {
+    background-color: #94090D;
+    color: #fefefe;
+  }
+
+  &.definitely {
+    background-color: #D40D12;
+    color: #fefefe;
+  }
+
+  &.oh_shit {
+    background-color: #FF1D23;
+    color: #fefefe;
+  }
+
+  &.panic {
+    background-color: #FF1D23;
+    color: #fefefe;
+  }
+
+}
+
+
+.per_shrink {
+  font-weight: bold;
+
+  &.maybe {
+    color: #0AA;
+  }
+
+  &.kinda {
+    background-color: #D0E4F2;
+  }
+
+  &.sorta {
+    background-color: #85a5cc;
+    color: #fefefe;
+  }
+
+  &.probably {
+    background-color: #4a6491;
+    color: #fefefe;
+  }
+
+  &.definitely {
+    background-color: #30395C;
+    color: #fefefe;
+  }
+
+  &.oh_shit {
+    background-color: #1A1F2B;
+    color: #fefefe;
+  }
+
+  &.panic {
+    background-color: #1A1F2B;
+    color: #fefefe;
+  }
+}

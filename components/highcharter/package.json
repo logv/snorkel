@@ -1,0 +1,7 @@
+{
+  "main" : "highcharter",
+  "helpers": [ "vendor/highcharts" ],
+  "style": "highcharter.css",
+  "styles": [],
+  "template": "highcharter.html.erb"
+}

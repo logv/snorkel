@@ -1,0 +1,9 @@
+<script type="text/javascript">
+  (function() {
+    var call_details = <%= json_data %>;
+    bootloader.call(
+      call_details.module,
+      call_details.func,
+      call_details.args);
+  })();
+</script>

@@ -1,0 +1,21 @@
+<div class="container-fluid">
+  <div class="row-fluid mtl mbl">
+    <div class="offset8 span4 clearfix ">
+      <div class="mll lfloat"><%= render_button1() %></div>
+      <div class="mll lfloat"><%= render_button2() %></div>
+    </div>
+
+  </div>
+
+  <div class="row-fluid mtl">
+    <%= render_sidebar() %>
+    <%= render_partial("kitten/kitten_content.html.erb") %>
+    <%= render_partial("kitten/kitten_list.html.erb", {
+        render_logout_button: render_logout_button,
+        username: username
+      }) %>
+  </div>
+
+
+  <%= add_socket() %>
+</div>

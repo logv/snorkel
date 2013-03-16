@@ -1,0 +1,22 @@
+{
+  "files" : [
+    "client/js/prelude.js"
+  ],
+  "vendor" : [
+    "static/scripts/vendor/underscore.js",
+    "static/scripts/vendor/backbone.js",
+    "static/scripts/vendor/jquery.min.js",
+    "static/scripts/vendor/jquery.deserialize.js",
+    "static/scripts/vendor/jquery-deparam.js",
+    "static/scripts/vendor/bootstrap.min.js",
+    "static/scripts/vendor/fastclick.js",
+    "static/scripts/vendor/strtotime.js"
+  ],
+  "styles" : [
+    "static/styles/bootstrap/bootstrap.cosmo.min.css",
+    "static/styles/box.css",
+    "static/styles/scrollers.css",
+    "static/styles/bootstrap/overrides.css",
+    "static/styles/bootstrap/responsive.css"
+  ]
+}

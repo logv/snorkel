@@ -1,0 +1,39 @@
+<% set_default("show_user_status", true); %>
+<% set_default("tabs", false); %>
+<% add_stylesheet("header") %>
+
+<div class="navbar navbar-fixed-top">
+  <div class="navbar-inner">
+    <a class="brand" href="/" style="padding-right: 0px"><b>snorkel</b> </a>
+    <img
+      class="pull-left"
+      style="width: 32px; height: 32px; margin-top: 5px;"
+      src="/images/snorkle_icon.png">
+    </img>
+
+    <% if (tabs) { %>
+      <div class="pull-left clearfix mtl mll tabs">
+        <%= tabs() %>
+      </div>
+    <% } %>
+
+    <% if (show_user_status) { %>
+      <ul class="nav pull-right mrl">
+      <% if (username) { %>
+          <!-- TODO: Replace this with an actual component? -->
+          <li class="">
+            <a href="#user_dialog" class="navbar-text" data-toggle="modal" style="padding: 0px">
+              <i class="icon-user icon-white"></i><%= username %>
+            </a>
+          </li>
+      <% } else { %>
+        <!-- TODO: Replace this with an actual component? -->
+        <li class="mrl">
+            <a href="/login?next=/query"><i class="icon-user icon-white"></i>Log In</a>
+        </li>
+
+      <% } %>
+      </ul>
+    <% } %>
+  </div>
+</div>

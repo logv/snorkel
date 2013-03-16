@@ -1,0 +1,9 @@
+<div class="hidden multiselect-container mtm">
+  <select class="chzn-select" name="<%= name %>" class="span2" multiple="multiple" data-placeholder=" ">
+    <% _.each(options, function(label, value) { %>
+        <option value="<%= value %>">
+          <%= label %>
+        </option>
+    <% }) %>
+  </select>
+</div>

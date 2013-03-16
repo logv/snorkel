@@ -1,0 +1,47 @@
+<% add_stylesheet("query.css") %>
+
+<div class="clearfix">
+  <div class="clearfix inner">
+    <div id="query_settings" class="">
+      <form class="form-horizontal max-height">
+        <div>
+          <div class="go_button_wrapper">
+            <%= render_go_button() %>
+          </div>
+
+          <div id="controls">
+            <fieldset class="inputs">
+              <%= render_controls() %>
+            </fieldset>
+          </div>
+
+          <hr />
+
+          <div id="filters" name="filters">
+            <div class="clearfix">
+              <h2>Filters </h2>
+            </div>
+            <%= render_filters() %>
+          </div>
+          <div class="mtm mbm" style="text-align: right;">
+            <small>
+              <span href="" name="compare" class="btn btn-link compare_filter">Add comparison filters</span>
+            </small>
+          </div>
+
+          <hr />
+
+          <div class="clearfix mtl aux_go_button_wrapper">
+            <%= render_aux_button() %>
+          </div>
+
+          <div id="query_stats">
+            <%= render_stats() %>
+          </div>
+        </div>
+      </form>
+    </div>
+
+
+  </div>
+</div>

@@ -1,0 +1,53 @@
+<div class="container-fluid" style="padding-top: 60px" >
+  <div class="span12 row-fluid">
+    <h1><b><a href="/query">snorkel</a></b>: don't <b>drown</b> in your data. </h1>
+  </div>
+
+  <div class="span6 row-fluid">
+    <h2>(even if it is kiddie pool sized ;)</h2>
+  </div>
+
+  <div class="span12 row-fluid">
+    <div class="span4">
+      <h2>Features</h2>
+      <ul>
+        <li>Analyze hundreds of megabytes of data</li>
+        <li>Realtime drilldowns</li>
+        <li>Powerful comparison queries</li>
+        <li>100% uncommented Node.JS</li>
+      </ul>
+      <h2>Drawbacks</h2>
+      <ul>
+        <li>Limited retention time</li>
+        <li>No JOIN operations</li>
+        <li>Snorkel won't fix the problems it finds</li>
+      </ul>
+    </div>
+
+    <div class="span6">
+      <div>
+      <h2>Highlevel</h2>
+        <p>
+          <b>snorkel</b> answers questions about the <b>here</b> and <b>now</b>.
+          You can think of snorkel like an <a
+          href="http://en.wikipedia.org/wiki/Online_analytical_processing">OLAP</a>
+          with amnesia. Snorkel stores <b>raw samples</b> in <b>datasets</b> and
+          dynamically slices and aggregates them in real time. As the samples
+          age, they will <b>automatically expire</b>, keeping query times snappy.
+
+        </p>
+
+      <h2>When do I sample data?</h2>
+        <p>
+          Typically, datasets tend to hold a few weeks worth of information. If
+          you find that your samples are not sticking around for long enough,
+          you should consider <b>sampling</b> the data down and adding a
+          <b>weight</b> or <b>sample_rate</b> field that represents that
+          sample's weight. Snorkel does the right thing and
+          will account for the sample rate when doing its aggregations.
+        </p>
+      </div>
+    </div>
+  </div>
+
+</div>

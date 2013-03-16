@@ -1,0 +1,10 @@
+<div class="span2 clearfix rfloat mtl">
+  <!-- TODO: add delegate_behavior helpers -->
+  <% if (username) { %>
+    <div>Logged in as <%= username %>. </div>
+    <div class="mtl clearfix"><%= render_logout_button() %> </div>
+  <% } %>
+
+  <div class="">New Kitties:</div>
+  <div id="kitten_list"> </div>
+</div>

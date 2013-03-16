@@ -1,0 +1,7 @@
+{
+  "main" : "timeago",
+  "helpers": ["vendor/jquery.timeago" ],
+  "style": "timeago.css",
+  "styles": [],
+  "template": "timeago.html.erb"
+}

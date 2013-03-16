@@ -1,0 +1,15 @@
+/* mmmmm... phones */
+@media (max-width: 768px) {
+  #user_dialog.modal {
+    width: 400px;
+    margin: 0px;
+    left: 5%;
+    width: 90%;
+  }
+
+  #user_dialog.modal .modal-body {
+    padding: 50px;
+    text-align: center;
+  }
+}
+

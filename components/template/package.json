@@ -1,0 +1,7 @@
+{
+  "main" : "TEMPLATE",
+  "helpers": [],
+  "style": "TEMPLATE.css",
+  "styles": [],
+  "template": "TEMPLATE.html.erb"
+}

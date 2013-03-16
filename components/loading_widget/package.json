@@ -1,0 +1,7 @@
+{
+  "main" : "loading_widget",
+  "helpers": [],
+  "style": "loading_widget.css",
+  "styles": [],
+  "template": "loading_widget.html.erb"
+}

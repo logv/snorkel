@@ -1,0 +1,10 @@
+{
+  "/": "home",
+  "/home": "home",
+  "/hello" : "hello",
+  "/kitten": "kitten",
+  "/login" : "login",
+  "/pkg" : "bootloader",
+  "/query" : "query",
+  "/data" : "data"
+}

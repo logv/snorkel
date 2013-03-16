@@ -1,0 +1,12 @@
+.max-height { max-height: 100%; }
+ 
+ 
+.navbar .brand { font-weight: bold; }
+ 
+ 
+.navbar .container { width: 100%; }
+ 
+ 
+.no-scroll { overflow-y: hidden; overflow-x: hidden }
+ 
+ 

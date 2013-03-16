@@ -1,0 +1,31 @@
+<script src="/socket.io/socket.io.js"></script>
+<script>
+
+  var ua = navigator.userAgent.toLowerCase();
+  var isAndroid = ua.indexOf("android") > -1;
+
+  function init_socket() { 
+    var socket = io.connect('//<%= host %>/<%= name %>');
+
+    bootloader.install_socket("<%= name %>", socket);
+    socket.on('init', function (data) {
+      console.log(data);
+    });
+  }
+
+  if (isAndroid) {
+    // TODO: be smarter about when to initialize sockets.
+    // For android browser, we add a delay after page onload,
+    // so the spinner stops immediately
+    $(function() {
+      _.delay(init_socket, 100);
+    });
+
+    // Also turn off effects, while we're here.
+    jQuery.fx.off = true;
+
+  } else {
+    init_socket();
+  }
+</script>
+

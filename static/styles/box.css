@@ -1,0 +1,51 @@
+.mtm {
+  margin-top: 5px;
+}
+
+.mlm {
+  margin-left: 5px
+}
+
+.mam {
+  margin: 5px
+}
+
+.mbm {
+  margin-bottom: 5px;
+}
+
+.mtl {
+  margin-top: 10px;
+}
+
+.mll {
+  margin-left: 10px
+}
+
+.mal {
+  margin: 10px
+}
+
+.mbl {
+  margin-bottom: 10px;
+}
+
+.lfloat {
+  float: left;
+}
+
+.rfloat {
+  float: right;
+}
+
+.pal {
+  padding: 10px;
+}
+
+.pam {
+  padding: 5px;
+}
+
+.pas {
+  padding: 2px;
+}

@@ -1,0 +1,12 @@
+<% set_default("selected", false) %>
+
+<select name="<%= name %>" class="span2">
+  <% _.each(options, function(label, value) { %>
+      <option value="<%= value %>" 
+      <% if (selected && selected == value) { %>
+        selected="true"
+      <% } %>>
+      <%= label %>
+      </option>
+  <% }) %>
+</select>

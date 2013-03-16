@@ -1,0 +1,7 @@
+{
+  "main" : "tablesorter",
+  "helpers": ["vendor/jquery.tablesorter.min"],
+  "style": "tablesorter.css",
+  "styles": [],
+  "template": "tablesorter.html.erb"
+}
