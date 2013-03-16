@@ -107,6 +107,10 @@ var DistView = BaseView.extend({
         series.dashStyle = "LongDash";
       });
     }
+
+    if (!this.data.count && (!this.data || !this.data.count)) {
+      return "No Samples";
+    }
   },
 
   render: function() {

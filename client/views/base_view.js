@@ -30,7 +30,17 @@ var BaseView = window.Backbone.View.extend({
   },
 
   query_finished: function() {
-    this.finalize();
+
+    var error;
+    try {
+      error = this.finalize();
+    } catch (e) { error = e; console.error(e); }
+
+    // If finalize throws an error...
+    if (error) {
+      jank.trigger("query:no_samples");
+      return;
+    }
 
     if (this._unrendered) {
       this.$el.empty();

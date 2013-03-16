@@ -15,6 +15,10 @@ function row_key(group_by, result) {
 
 var TableView = BaseView.extend({
   finalize: function() {
+    if (!this.data.results.length) {
+      return "No Samples";
+    }
+
     var group_by = _.clone(this.data.parsed.dims);
     var cols = _.clone(this.data.parsed.cols);
 

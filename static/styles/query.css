@@ -156,7 +156,10 @@ body {
   .helpover {
     display: inline-block;
     color: #dadada;
-    float: left;
+    float: right;
+    cursor: pointer;
+    padding-top: 5px;
+    height: 28px;
   }
 
   .control-group:hover .helpover {
@@ -234,6 +237,7 @@ body {
       float: left;
       width: 65%;
       margin-left: 0px;
+      margin-right: 0px;
       display: block; }
 
     .chzn-container {
@@ -241,12 +245,11 @@ body {
     }
 
     .form-horizontal .control-label {
-      padding-right: 10px;
       padding-top: 5px;
       margin-left: 0px;
-      text-align: right;
+      text-align: left;
       font-weight: bold;
-      width: 30%; }
+      width: 25%; }
 
     .filter_op {
       width: 20%;
@@ -398,4 +401,11 @@ body {
     background-color: #1A1F2B;
     color: #fefefe;
   }
+}
+
+#query_sidebar .popover.bottom .arrow {
+  top: -15px;
+}
+#query_sidebar .popover.top .arrow {
+  bottom: -15px;
 }

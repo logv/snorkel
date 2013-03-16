@@ -82,6 +82,13 @@ var TimeView = BaseView.extend({
         series.dashStyle = "LongDash";
       });
     }
+
+    var data = this.data.concat(this.compare_data || []);
+
+    if (!data.length) {
+      return "No samples";
+    }
+
   },
 
   // TODO: figure out rendering strategy. For now, we hold the graph until both
@@ -90,8 +97,10 @@ var TimeView = BaseView.extend({
     // render with this.series
     var _hovered;
 
+    var data = this.data.concat(this.compare_data || []);
+
     var options = {
-      series: this.data.concat(this.compare_data || []),
+      series: data,
       chart: {
         zoomType: "x"
       },

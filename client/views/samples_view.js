@@ -63,6 +63,12 @@ var SamplesView = BaseView.extend({
     };
   },
 
+  finalize: function() {
+    if (!this.data.rows.length) {
+      return "No Samples";
+    }
+  },
+
   render: function() {
     var table = helpers.build_table(this.data.headers, this.data.rows);
 

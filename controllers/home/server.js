@@ -14,9 +14,8 @@ function index() {
 
 
   var template_str = template.render("controllers/home.html.erb", {});
-  var header_str = template.render("helpers/header.html.erb", { });
 
-  page.render({ content: template_str, header: header_str });
+  page.render({ content: template_str });
 }
 
 module.exports = {

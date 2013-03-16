@@ -124,13 +124,26 @@ function insert_error(err) {
   errorEl.append($("<h1 class='span2'>Doh.</h1>"));
   errorEl.append($("<div class='clearfix' />"));
   errorEl.append($("<hr />"));
-  errorEl.append($("<h2 class='span2'>").html(err.name));
-  errorEl.append($("<h3 class='span10'>").html(err.errmsg));
+  errorEl.append($("<h2 class='span12'>").html(err.name));
+  errorEl.append($("<h3 class='span12'>").html(err.errmsg));
 
   console.log(errorEl);
 
   $(_container).append(errorEl);
 }
+
+function no_samples(error) {
+  insert_error({
+    name: "No Samples Found",
+    errmsg: error || "Your query returned no samples, try expanding the time range or removing some filters."
+  });
+}
+
+jank.on("query:no_samples", function() {
+  console.log("NO SAMPLES");
+  no_samples();
+});
+
 
 var graphs = {};
 var compare_data = {};
