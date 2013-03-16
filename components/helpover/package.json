@@ -1,0 +1,7 @@
+{
+  "main" : "helpover",
+  "helpers": [],
+  "style": "helpover.css",
+  "styles": [],
+  "template": "helpover.html.erb"
+}

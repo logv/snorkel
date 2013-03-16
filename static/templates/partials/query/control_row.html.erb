@@ -1,3 +1,5 @@
+
+<% set_default("help_link", ""); %>
 <% set_default("space", false); %>
 <% set_default("hidden", false); %>
 
@@ -8,11 +10,18 @@
 <% } %>
 
   <label class="control-label" for="<%= name %>">
+    <% if (help_link) { %>
+     <%= help_link %>
+    <% } else { %>
+      <div style='margin-left: 15px' class='pull-left' >&nbsp;</div>
+    <% } %>
+
     <%= label %>
    </label>
    <div class="controls" name="<%= name %>">
      <%= component %>
    </div>
+
   </div>
 
 <% if (space) { %>

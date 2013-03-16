@@ -13,14 +13,56 @@ var BLACKLIST = require_root("controllers/query/filters").BLACKLIST;
 var GROUPABLE_TYPE = "string";
 var AGGREGABLE_TYPE = "integer";
 
+
+var HELP_STRINGS = {
+  "start" : {
+    content: "all samples newer than the start time will be aggregated"
+  },
+  "end" : {
+    content: "all samples that are from before the end time will be aggregated"
+  },
+  "compare" : {
+    content: "re-run this query, but with the start and end time shifted by this amount. the final results are compared to the original query and summarized "
+  },
+  "group_by" : {
+    content: "groups the data into several sub groups before calculating the final metric"
+  },
+  "max_results" : {
+    content: "after grouping the data, select a limit to the number of results we want to see. The higher this number, the slower the query (and graph drawing) will be. By default, snorkel will pick a reasonable number. "
+  },
+  "field" : {
+    content: "use this field to calculate the final metric"
+  },
+  "fieldset" : {
+    content: "use these fields when calculating the final metric"
+  },
+  "agg" : {
+    content: "summarizes the samples in each group into one aggregate number for the integer fields selected"
+  },
+  "time_bucket" : {
+    content: ""
+  },
+  "hist_bucket" : {
+    content: "histograms are a tricky thing. the bucket size will influence the shape of the histogram, so try out a few when examining data."
+  }
+};
+
 function add_control(control_name, control_label, component, options) {
 
   options = options || {};
+
+  var help_link;
+  var help_str = HELP_STRINGS[control_name];
+  if (help_str) {
+    help_link = $C("helpover", { title: help_str.title, content: help_str.content }).toString();
+  }
+
   var html = template.partial("query/control_row.html.erb", {
     name: control_name,
     label: control_label,
     component: component.toString(),
-    space: options.space
+    space: options.space,
+    help_link: help_link
   });
 
 
@@ -117,7 +159,7 @@ function get_time_inputs() {
 
   var start_row = add_control("start", "Start", start_time.toString());
   var end_row = add_control("end", "End", end_time.toString());
-  var compare_row = add_control("compare", "Compare Against", compare_time.toString());
+  var compare_row = add_control("compare", "Against", compare_time.toString());
 
   var control_box = $("<div />");
 
@@ -152,7 +194,7 @@ function get_time_bucket_row() {
   var opts = {};
   _.each(time_bucket_opts, function(bucket, name) { opts[bucket] = name; });
   var max_results_input = $C("selector", { name: "time_bucket", options: opts });
-  return add_control("time_bucket", "Granularity", max_results_input.toString());
+  return add_control("time_bucket", "Time Slice", max_results_input.toString());
 }
 
 var hist_bucket_opts = [
@@ -192,7 +234,7 @@ function get_aggregate_row() {
       "$count" : "Count"
     }
   });
-  var aggregate_row = add_control("agg", "Aggregate", agg_selector.toString(), { space: true });
+  var aggregate_row = add_control("agg", "Metric", agg_selector.toString(), { space: true });
   return $(aggregate_row);
 }
 

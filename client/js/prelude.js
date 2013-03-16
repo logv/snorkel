@@ -1,11 +1,16 @@
 // Keep it small
 (function() {
   function hideAddressBar() {
-    if (document.documentElement.scrollHeight<window.outerHeight/window.devicePixelRatio) {
-      document.documentElement.style.height=(window.outerHeight/window.devicePixelRatio)+'px';
-    }
 
-    setTimeout(window.scrollTo(1,1),0);
+    var width = (window.innerWidth > 0) ? window.innerWidth : screen.width;
+    if (width < 768) {
+      if (document.documentElement.scrollHeight<window.outerHeight/window.devicePixelRatio) {
+        document.documentElement.style.height=(window.outerHeight/window.devicePixelRatio)+'px';
+      }
+
+      setTimeout(window.scrollTo(1,1),0);
+
+    }
   }
 
   $(function() {

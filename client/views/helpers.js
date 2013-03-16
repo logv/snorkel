@@ -15,13 +15,20 @@ var COLORS = [
 ];
 
 
+function countToSize(count) {
+    var sizes = ['', 'K', 'M', 'G' ];
+    if (count === 0) { return 'n/a'; }
+    var i = parseInt(Math.floor(Math.log(count) / Math.log(1000)), 10);
+    return Math.round(count / Math.pow(1000, i) * 100, 2) / 100 + '' + sizes[i];
+}
+
 // from comments in http://codeaid.net/javascript/convert-size-in-bytes-to-human-readable-format-(javascript)
 function bytesToSize(bytes) {
     var sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
     if (bytes === 0) { return 'n/a'; }
-    var i = parseInt(Math.floor(Math.log(bytes) / Math.log(1024)));
+    var i = parseInt(Math.floor(Math.log(bytes) / Math.log(1024)), 10);
     return Math.round(bytes / Math.pow(1024, i), 2) + ' ' + sizes[i];
-};
+}
 
 module.exports = {
 
@@ -98,6 +105,8 @@ module.exports = {
 
   byte_format: bytesToSize,
 
+  count_format: countToSize,
+
   build_table: function(headers, rows) {
     // TODO: data formatting / munging goes on where?
     // How configurable is group by order?
@@ -161,13 +170,13 @@ module.exports = {
   build_compare_cell: function(col_value, compare_value) {
     var cell = $("<div>");
     var val_div = $("<div class='value_cell'>")
-      .html(this.number_format(col_value));
+      .html(this.count_format(col_value));
 
     cell.append(val_div);
 
     if (typeof compare_value !== "undefined") {
       var comp_div = $("<div class='compare_cell'>")
-        .html(this.number_format(compare_value));
+        .html(this.count_format(compare_value));
 
       var delta_suffix = "%";
       var delta = parseInt((compare_value - col_value) / col_value * 10000, 10) / 100;

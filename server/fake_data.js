@@ -37,27 +37,27 @@ var perf_schema = {
 
 var perf_schema = [
   {
-    range: [0, 15000],
+    dist: [4000, 1000],
     type: "integer",
     name: "tti"
   },
   {
-    range: [0, 300000],
+    dist: [300000, 100000],
     type: "integer",
     name: "css_bytes"
   },
   {
-    range: [500, 35000],
+    dist: [35000, 10000],
     type: "integer",
     name: "e2e"
   },
   {
-    range: [1, 10000],
+    dist: [10000, 1000],
     type: "integer",
     name: "weight"
   },
   {
-    range: [1000000, 3000000],
+    dist: [3000000, 1000000],
     type: "integer",
     name: "html_bytes"
   },
@@ -99,9 +99,21 @@ var perf_schema = [
 ];
 
 
+// http://www.protonfish.com/random.shtml
+// standard normal distribution
+function rnd_snd() {
+  return (Math.random()*2-1)+(Math.random()*2-1)+(Math.random()*2-1)+(Math.random()*2-1);
+}
+
+function rnd(mean, stdev) {
+  return Math.round(rnd_snd()*stdev+mean);
+}
+// end gank
+
+
 
 function generate_sample_from_schema(schema) {
-  var delta = Math.random() * 60 * 60 * 24 * 7 * 4; // +-4 weeks of data?
+  var delta = Math.random() * 60 * 60 * 24 * 7; // -1 weeks of data?
   var sample = {
     integer: {
       time: parseInt(Date.now() / 1000 - delta, 10)
@@ -120,9 +132,15 @@ function generate_sample_from_schema(schema) {
       field_value = random_choice(field.examples);
     }
     if (field_type == "integer") {
-      var lower = Math.min.apply(null, field.range);
-      var upper = Math.max.apply(null, field.range);
-      field_value = parseInt(Math.random() * (upper - lower) + lower, 10);
+      if (field.range) {
+        var lower = Math.min.apply(null, field.range);
+        var upper = Math.max.apply(null, field.range);
+        field_value = parseInt(Math.random() * (upper - lower) + lower, 10);
+      } 
+
+      if (field.dist) {
+        field_value = parseInt(rnd.apply(null, field.dist));
+      }
     }
     if (field_type == "set") {
       field_value = [];

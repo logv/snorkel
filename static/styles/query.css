@@ -71,7 +71,7 @@ body {
   /* landscape tablet, desktop and up */
   @media (min-width: 768px) {
     height: 100%;
-    margin-left: 350px;
+    margin-left: 330px;
     overflow-y: scroll;
 
     visibility: visible !important;
@@ -153,6 +153,16 @@ body {
   #filters_box { position: relative; }
 
 
+  .helpover {
+    display: inline-block;
+    color: #dadada;
+    float: left;
+  }
+
+  .control-group:hover .helpover {
+    color: #aaa;
+  }
+
   .go_button {
     margin-top: 5px;
   }
@@ -190,7 +200,6 @@ body {
     }
 
     .form-horizontal .control-label {
-      padding-right: 10px;
       padding-top: 5px;
       width: 80px; }
 
@@ -223,7 +232,7 @@ body {
     .span2 { width: 100%; }
     .form-horizontal .controls {
       float: left;
-      width: 70%;
+      width: 65%;
       margin-left: 0px;
       display: block; }
 
@@ -235,9 +244,9 @@ body {
       padding-right: 10px;
       padding-top: 5px;
       margin-left: 0px;
-      text-align: left;
+      text-align: right;
       font-weight: bold;
-      width: 25%; }
+      width: 30%; }
 
     .filter_op {
       width: 20%;

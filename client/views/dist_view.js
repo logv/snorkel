@@ -82,7 +82,7 @@ var DistView = BaseView.extend({
       var weighted_count = result.weighted_count;
       total += count;
       w_total += weighted_count;
-      
+
       // pulled off the array above in the calc_cdf func
       series.push([bucket, count, weighted_count]);
     });
@@ -124,7 +124,7 @@ var DistView = BaseView.extend({
         color: "#aaa",
         dashStyle: 'dash'
       });
-     
+
       if (self.compare_data) {
         plot_lines.push({
           value : self.compare_data.percentiles[p*10][1],
@@ -137,6 +137,14 @@ var DistView = BaseView.extend({
         });
       }
     });
+
+    var xmin = this.data.percentiles[50][1]; // p5
+    var xmax = this.data.percentiles[950][1]; // p95
+
+    if (this.compare_data) {
+      xmin = Math.min(xmin, this.compare_data.percentiles[50][1]);
+      xmax = Math.max(xmax, this.compare_data.percentiles[950][1]);
+    }
 
     var options = {
       chart: {
@@ -160,13 +168,15 @@ var DistView = BaseView.extend({
         type: "linear" // TODO: make this configurable?
       },
       yAxis: {
+        min: xmin,
+        max: xmax,
         reversed: false,
         plotLines: plot_lines
       }
     };
 
     var $el = this.$el;
-    
+
     // render this business
     var shortStatsEl = $el.find(".short_stats");
     var percentiles = this.data.percentiles;
@@ -184,7 +194,7 @@ var DistView = BaseView.extend({
         if (compare_percentiles) {
           cell = helpers.build_compare_cell(percentiles[p][1], compare_percentiles[p][1]);
         } else {
-          cell = $("<div>").html(helpers.number_format(percentiles[p][1]));
+          cell = $("<div>").html(helpers.count_format(percentiles[p][1]));
         }
 
         row.push(cell);
@@ -197,7 +207,7 @@ var DistView = BaseView.extend({
       return table;
     }
 
-    var outerEl = $("<div class='span12' style='margin-left: 10px'>");
+    var outerEl = $("<div class='span12 pll'>");
     outerEl.append($("<h2>At a glance</h2>"));
 
     var headers = ["count"];
@@ -206,7 +216,7 @@ var DistView = BaseView.extend({
     if (compare_percentiles) {
       row.push(helpers.build_compare_cell(this.data.count, this.compare_data.count));
     } else {
-      row.push(helpers.number_format(this.data.count));
+      row.push(helpers.count_format(this.data.count));
     }
 
     if (this.data.weighted_count) {
@@ -214,7 +224,7 @@ var DistView = BaseView.extend({
       if (compare_percentiles) {
         row.unshift(helpers.build_compare_cell(this.data.weighted_count, this.compare_data.weighted_count));
       } else {
-        row.unshift(helpers.number_format(this.data.weighted_count));
+        row.unshift(helpers.count_format(this.data.weighted_count));
       }
     }
 
@@ -266,6 +276,8 @@ var DistView = BaseView.extend({
         }
       ],
       xAxis: {
+        min: xmin,
+        max: xmax,
         reversed: false,
         plotLines: plot_lines,
         type: "linear" // TODO: make this configurable?

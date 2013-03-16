@@ -4,7 +4,7 @@
   background-color: #202030;
 }
  
-#page_content .container-fluid { padding: 0px; }
+#page_content .container-fluid { padding: 0px; padding-left: 30px; }
 
 body {
   font-family: Helvetica, "Helvetica Neue", Arial, Sans serif
@@ -39,3 +39,11 @@ body { -webkit-tap-highlight-color: rgba(0,0,0,0); }
  -webkit-touch-callout: none;
  -webkit-user-select: none;
  user-select: none; }
+
+[class*="span"] {
+  margin-left: 0px;
+}
+
+.row-fluid [class*="span"] {
+  margin-left: 0px;
+}
