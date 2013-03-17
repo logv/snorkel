@@ -179,7 +179,7 @@ module.exports = {
         .html(this.count_format(compare_value));
 
       var delta_suffix = "%";
-      var delta = parseInt((compare_value - col_value) / col_value * 10000, 10) / 100;
+      var delta = parseInt((col_value - compare_value) / col_value * 10000, 10) / 100;
 
       var abs_delta = Math.abs(delta);
       var whichway = "grow";

@@ -182,9 +182,13 @@ function query_hist(opts) {
 }
 
 function query_samples(opts) {
-  opts = opts || {};
 
-  return [];
+  opts = opts || {};
+  var pipeline = [];
+
+  pipeline.push({$limit: opts.limit || 100 });
+  pipeline.push({ $sort: { "integer.time" : -1}});
+  return pipeline;
 }
 
 function get_stats(table, cb) {
@@ -225,6 +229,7 @@ function get_columns(table, cb) {
       _.each(field_types, function(count, type) {
         if (count > max) {
           predicted_type = type;
+          max = count;
         }
       });
 

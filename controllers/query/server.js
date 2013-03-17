@@ -251,6 +251,7 @@ function build_pipeline(params) {
   var end_s = parseInt(params.end_ms / 1000, 10);
 
   var sort = [ {$sort: { "count" : -1 }} ];
+
   var timeline = backend.time_range(start_s, end_s);
   var filters = backend.add_filters(params.filters);
   var limit = [];
