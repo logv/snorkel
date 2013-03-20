@@ -1,23 +1,78 @@
 <% set_default("icon", "") %>
 <% set_default("results", "") %>
+<% set_default("username", null) %>
+<% set_default("query", { parsed: {}}) %>
 
 <div class="query_tile">
   <div class="query_graph mll">
-    <img height="120px" width="100%" src="/images/<%= icon %>"> 
-    
-    </img>
 
-     <div class="query_data"> 
-        <div class="clearfix">
-           <div class="query_actions">
-             <a href="#"><i class="icon-heart icon-white"></i>Save</a>
-             <a href="#"><i class="icon-envelope icon-white"></i>Share</a>
-           </div>
+    <div width="100%" background-color="#000">
+
+      <div class='titlehover'>
+        <span class='title'>
+
+          <% if (query.title) { %>
+            <%= query.title %>
+          <% } else { %>
+            <%= (query.parsed.view  + " view") %>
+          <% } %>
+
+        </span>
+        <span class="icon edit"> <i class="icon-edit"></i> </span>
+        <span class="icon delete"> <i class="icon-trash"></i> </span>
+
+      </div>
+
+
+      <div>
+        <small class="fsi">
+        <% if (query.updated != query.created) { %>
+          <span class="updated" style='display: none;'>updated
+            <span class="timestamp"></span>,
+          </span>
+        <% } %>
+
+        <% if (query.username) { %>
+            created by <%= query.username %>
+        <% } %>
+          <span class="created timestamp"> </span>
+
+        </small>
+      </div>
+    </div>
+
+
+
+
+
+    <div class="row-fluid">
+
+
+      <div class="span6">
+        <div>
+          Dataset: <%= query.parsed.table %>
         </div>
-     </div>
-  </div>
 
-  <div class="timestamp">
+        <div>
+          <% if (query.parsed.start_str) { %> From: <%= query.parsed.start_str %> <% } %>
+          <% if (query.parsed.end_str) { %> &ndash; <%= query.parsed.end_str %> <% } %>
+        </div>
+
+      </div>
+
+      <div class="span6">
+
+        <% if (query.title) { %>
+          <div>
+            View: <%= query.parsed.view %>
+          </div>
+        <% } %>
+
+
+        <div><% if (query.parsed.dims.length) { %> Grouped by: <%= query.parsed.dims.join(',') %> <% } %></div>
+        <div><% if (query.parsed.cols.length) { %> Fields: <%= query.parsed.cols.join(',') %> <% } %></div>
+      </div>
+    </div>
   </div>
 
 </div>

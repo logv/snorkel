@@ -8,7 +8,7 @@
   }
 
   #user_dialog.modal .modal-body {
-    padding: 50px;
+    padding-bottom: 50px;
     text-align: center;
   }
 }

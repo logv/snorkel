@@ -9,6 +9,7 @@ var context = require_root("server/context");
 var controller = require_root("server/controller");
 var db = require_root("server/db");
 var page = require_root("server/page");
+var bridge = require_root("server/bridge");
 var querystring = require("querystring");
 var Sample = require_root("server/sample");
 var template = require_root("server/template");
@@ -188,7 +189,7 @@ function marshall_query(form_data) {
         if (_.isString(val)) {
           try {
             val = JSON.parse(val);
-          } catch(e) { 
+          } catch(e) {
             val = val.split(',');
           }
         }
@@ -280,6 +281,8 @@ function get_index() {
   context("query_table", table);
   context("title", "snorkel");
 
+  bridge.controller("query", "set_table", table);
+
   function render_query_content() {
 
     return template.partial("query/content.html.erb");
@@ -316,7 +319,7 @@ function get_index() {
     });
   }
 
-  var header_str = template.render("helpers/header.html.erb", { 
+  var header_str = template.render("helpers/header.html.erb", {
     tabs: function() {
       return $("<div>")
         .html(view.table_selector()())
@@ -363,10 +366,7 @@ function log_query(query_data, user) {
   return sample;
 }
 
-function handle_new_query(query_id, form_data, socket, done) {
-
-  // Original Query
-  var query_data = marshall_query(form_data);
+function handle_new_query(query_id, query_data, socket, done) {
   var pipeline = build_pipeline(query_data);
   var compare_pipeline;
   var compare_data;
@@ -398,7 +398,7 @@ function handle_new_query(query_id, form_data, socket, done) {
   var sample = log_query(query_data, user);
 
   socket.emit("query_ack", {
-    pipeline: pipeline, parsed: query_data, input: form_data,
+    pipeline: pipeline, parsed: query_data,
     id: query_id, query_str: querystring.stringify(query_data) });
 
   var start = Date.now();
@@ -416,7 +416,7 @@ function handle_new_query(query_id, form_data, socket, done) {
       // how to execute these properly?
       run_query(query_data.table, pipeline, '', weight_cols, function(err, data) {
         query_data.id = query_id;
-        var query_results = { parsed: query_data, results: data, error: err, id: query_id};
+        var query_results = { parsed: query_data, results: data, error: err, id: query_id, created: start};
         socket.emit("query_results", query_results);
         results.query = query_results;
         sample.add_integer("query_duration", Date.now() - start);
@@ -430,7 +430,7 @@ function handle_new_query(query_id, form_data, socket, done) {
     jobs.push(function(cb) {
       run_query(query_data.table, compare_pipeline, 'comparison', weight_cols, function(err, data) {
         compare_data.id = query_id;
-        var compare_results = { parsed: compare_data, results: data, error: err, id: query_id};
+        var compare_results = { parsed: compare_data, results: data, error: err, id: query_id, created: start};
         socket.emit("compare_results", compare_results);
         sample.add_integer("compare_duration", Date.now() - start);
         results.compare = compare_results;
@@ -448,6 +448,12 @@ function handle_new_query(query_id, form_data, socket, done) {
   });
 }
 
+function handle_new_query_from_form(query_id, form_data, socket, done) {
+  // Original Query
+  var query_data = marshall_query(form_data);
+  handle_new_query(query_id, query_data, socket, done);
+}
+
 function get_query_from_db(hashid, cb) {
 
   var collection = db.get("query", "results");
@@ -460,36 +466,181 @@ function get_query_from_db(hashid, cb) {
 
 function get_saved() {
   var query_id = context("req").query.id;
-
-  var res = context("res");
-
   get_query_from_db(query_id, function(obj) {
     res.end(JSON.stringify(obj));
+  });
+}
+
+function get_saved_queries(conditions, options, cb) {
+  var visited = {};
+  var collection = db.get("query", "results");
+  collection.find(conditions, options, function(err, cur) {
+    cur.limit(100);
+    cur.toArray(function(err, arr) {
+      _.each(arr, function(query) {
+        if (visited[query.hashid]) {
+          if ((visited[query.hashid].updated || 0) < query.updated) {
+            visited[query.hashid] = query;
+          }
+        } else {
+          visited[query.hashid] = query;
+        }
+
+      });
+
+      var ret = _.map(visited, function(v, k) { return v; });
+      if (cb) { cb(ret); }
+    });
+
+  });
+
+
+}
+
+function get_saved_for_user(username, dataset, cb) {
+  var conditions = { username: username, "saved" : true };
+  if (dataset) {
+    conditions['parsed.table'] = dataset;
+  }
+
+  get_saved_queries(conditions, {}, function(arr) {
+    cb(arr);
+  });
+}
+
+function get_saved_for_dataset(username, dataset, cb) {
+  var collection = db.get("query", "results");
+
+  var conditions = {
+    "parsed.table" : dataset,
+    "saved" : true,
+    "username": { "$ne": username }
+  };
+
+  get_saved_queries(conditions, {}, function(arr) {
+    if (cb) { cb(arr); }
+  });
+}
+
+function get_saved_query(hashid, cb) {
+  var collection = db.get("query", "results");
+  collection.find({hashid: hashid}, { limit: 1, sort: { updated: -1 }}, function(err, cur) {
+    cur.toArray(function(err, arr) {
+      if (arr && arr.length) {
+        cb(null, arr[0]);
+      } else {
+        cb(err);
+      }
+    });
   });
 }
 
 module.exports = {
   routes: {
     "" : "index",
-    "/saved": "saved"
+    "/saved": "saved",
+    "/user" : "user",
+    "/dataset" : "dataset"
   },
+
   socket: function(socket) {
     var __id = 1;
     var user_id = socket.manager.__user.id || parseInt(Math.random() * 10000, 10);
-    socket.on("new_query", function(form_data) {
+    var user_name = socket.manager.__user.username;
 
+    socket.on("get_saved_queries", function(dataset) {
+      get_saved_for_user(user_name, dataset, function(arr) {
+        socket.emit("saved_queries", arr);
+      });
+    });
+
+    socket.on("get_shared_queries", function(dataset) {
+      get_saved_for_dataset(user_name, dataset, function(arr) {
+        socket.emit("shared_queries", arr);
+      });
+    });
+
+    socket.on("save_query", function(query, name, shared) {
+      get_saved_query(query.server_id || query.hashid, function(err, obj) {
+        if (err || !obj) { return; }
+
+          obj.saved = true;
+          obj.title = name;
+          obj.shared = shared;
+
+        var collection = db.get("query", "results");
+        collection.update({_id: obj._id}, obj);
+      });
+    });
+
+
+    socket.on("delete_query", function(form_data) {
+      var collection = db.get("query", "results");
+      if (!form_data.hashid) {
+        return;
+      }
+
+      collection.update(
+        { hashid: form_data.hashid, username: user_name},
+        { $set: { saved: false }}, 
+        {multi: true});
+
+    });
+    socket.on("refresh_query", function(form_data) {
+      var collection = db.get("query", "results");
+      // save results to db
+      get_saved_query(form_data.hashid, function(err, saved_query) {
+        if (!saved_query) {
+          return;
+        }
+
+        var now = parseInt(Date.now() / 1000, 10);
+        var query_id = user_id + "/" + __id + "/" + now;
+        var hashed_id = form_data.hashid;
+
+        handle_new_query(query_id, saved_query.parsed, socket, function(results) {
+          // save results to db
+          var new_query = _.clone(saved_query);
+          _.extend(new_query, {
+            created: saved_query.created,
+            updated: +Date.now(),
+            parsed: saved_query.parsed,
+            results: results,
+            hashid: form_data.hashid,
+            clientid: query_id
+          });
+
+          delete new_query._id;
+
+          console.log("INSERTING", new_query);
+
+          collection.insert(new_query, function(err, item) {
+            if (err) { console.log("Error saving query results:", err); }
+            socket.emit("query_id", { client_id: query_id, server_id: hashed_id});
+          });
+        });
+      });
+
+    });
+
+    socket.on("new_query", function(form_data) {
       var now = parseInt(Date.now() / 1000, 10);
       var query_id = user_id + "/" + __id + "/" + now;
       var hashed_id = hashids.encrypt(user_id, __id, now);
 
-      handle_new_query(query_id, form_data, socket, function(results) {
-        // save results to db
+      handle_new_query_from_form(query_id, form_data, socket, function(results) {
         var collection = db.get("query", "results");
+        // save results to db
         collection.insert({
           input: form_data,
+          created: +Date.now(),
+          updated: +Date.now(),
           parsed: marshall_query(form_data),
           results: results,
-          hashid: hashed_id
+          hashid: hashed_id,
+          clientid: query_id,
+          userid: user_id,
+          username: user_name
         }, function(err, item) {
           if (err) { console.log("Error saving query results:", err); }
           socket.emit("query_id", { client_id: query_id, server_id: hashed_id});
@@ -497,6 +648,5 @@ module.exports = {
       });
     });
   },
-  index: auth.require_user(get_index),
-  saved: auth.require_user(get_saved)
+  index: auth.require_user(get_index)
 };

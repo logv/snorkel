@@ -1,33 +1,28 @@
 .query_tile {
   overflow: hidden;
-  margin-bottom: 20px;
-  width: 200px;
-  display: inline-block;
-  float: left;
+  display: block;
+  padding: 5px;
+}
+
+.query_tile small {
+  color: #666;
 }
 
 .query_tile .timestamp {
-  text-align: right;
-  margin-top: 5px;
+  margin-bottom: 5px;
 }
 
 #query_queue .query_data {
-  max-height: 40px;
-  overflow: hidden;
   opacity: 0.9;
-  background-color: #202030;
 }
 
 #query_queue .query_graph,
 #query_queue .query_graph img {
   cursor: pointer;
-  overflow: hidden;
-  height: 120px;
   width: 100%;
 }
 
 .query_actions {
-  padding: 5px;
   line-height: 30px;
   font-weight: bold;
   font-size: 16px;
@@ -36,10 +31,23 @@
 .query_actions a {
   padding-left: 15px;
   padding-right: 15px;
-  color: white;
+  color: #666;
   text-decoration: none;
 }
-.query_actions a:hover {
-  color: #8a8aba;
+
+.query_tile:hover {
+  background-color: #dedede;
   text-decoration: none;
+
+}
+
+.query_tile .title {
+  height: 20px;
+  zoom: 1.5;
+  display: inline-block;
+
+}
+
+.query_tile .icon {
+  display: none;
 }

@@ -6,4 +6,4 @@ if [ $# -ne $EXPECTED_ARGS ]; then
 fi
 
 # WE NEED THE HTPASSWD COMMAND
-htpasswd -s -c config/users.htpasswd $1
+htpasswd -s config/users.htpasswd $1

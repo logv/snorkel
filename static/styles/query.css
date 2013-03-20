@@ -65,6 +65,7 @@ body {
   background-color: #fff;
 
   > *:first-child {
+    padding: 10px;
     margin-top: 60px;
   }
 
@@ -311,10 +312,10 @@ body {
 }
 
 #user_dialog {
-
   /* phone and down */
   @media (max-width: 767px) {
     .modal-body {
+      padding: 0px;
       max-height: 250px;
     }
   }

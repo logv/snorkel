@@ -51,6 +51,8 @@ var BaseView = window.Backbone.View.extend({
         that._unrendered = false;
       }, 100);
     }
+
+    this.query_finished = function() { };
   },
 
   // called after handle_data and handle_compare

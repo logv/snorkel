@@ -36,6 +36,8 @@ var VIEW_INPUTS = {
   }
 };
 
+var ResultsStore = require("client/js/results_store");
+
 function get_control(name) {
   var selector = "#query_sidebar .controls[name=" + name + "]";
   var ctl = $(selector);
@@ -120,7 +122,8 @@ function insert_error(err) {
 
   $(_container).empty();
 
-  var errorEl = $("<div class='alert alert-error clearfix' style='vertical-align: bottom'>");
+  var errorEl = $("<div class='clearfix' style='vertical-align: bottom'>");
+  errorEl.append($("<img src='images/no-diving.png' style='height: 60%'>"));
   errorEl.append($("<h1 class='span2'>Doh.</h1>"));
   errorEl.append($("<div class='clearfix' />"));
   errorEl.append($("<hr />"));
@@ -146,31 +149,27 @@ jank.on("query:no_samples", function() {
 
 
 var graphs = {};
-var compare_data = {};
-var results_data = {};
-var graph_types = {};
-
 function create_graph(Grapher, data) {
+  var graphEl = $("<div>");
   var graph = new Grapher({ 
-    el: _container, 
+    el: graphEl, 
     compare_mode: data.parsed.compare_mode });
 
   $(_container).empty();
+  graphEl.appendTo(_container);
   graph.handle_data(data);
 
   graphs[data.parsed.id] = graph;
 
   // TODO: do we delay if comparison mode is on but no results come back?
-  if (compare_data[data.parsed.id]) {
-    graph.handle_compare(compare_data[data.parsed.id]);
+  var compare = ResultsStore.get_compare_data(data.parsed.id);
+  if (compare) {
+    graph.handle_compare(compare);
   }
 }
 
 function insert_new_graph(graph_type, data) {
   var graph_view = graphers[graph_type];
-  results_data[data.parsed.id] = data;
-  graph_types[data.parsed.id] = graph_type;
-
   var comparison;
 
   if (graph_view) {
@@ -188,18 +187,43 @@ function insert_new_graph(graph_type, data) {
 }
 
 function insert_comparison(graph_type, data) {
-  compare_data[data.parsed.id] = data;
-
   var graph = graphs[data.parsed.id];
   if (graph) {
     graph.handle_compare(data);
   }
 }
 
-function redraw_graph(id) {
+function show_saved_query_details(id, created, data) {
+  $C("query_details", {created: created, query: data}, function(cmp) {
+    _container.prepend(cmp.$el);
+  });
+}
+
+function redraw_graph(id, query) {
   $(_container).empty();
-  var data = results_data[id];
-  var type = graph_types[id];
+
+  var data = ResultsStore.get_results_data(id);
+  var compare = ResultsStore.get_compare_data(id);
+
+  if (!data) {
+    console.log("Cant redraw graph: ", id);
+    return;
+  }
+
+  var type = data.parsed.view;
+
+  var timestamp = ResultsStore.get_timestamp(id);
+  // If the query is more than 5 minutes old, display a notice to the user
+  var delta = Date.now() - timestamp;
+  if (delta > 60 * 5 * 1000) {
+    console.log("query is out of date: ", delta);
+    // Show a 'refresh query' button (and add historical results, eventually)
+    show_saved_query_details(id, timestamp, query);
+  }
+
+  if (compare) {
+    insert_comparison(type, compare);
+  }
   insert_new_graph(type, data);
 }
 
@@ -208,10 +232,6 @@ module.exports = {
   insert_graph: insert_new_graph,
   insert_comparison: insert_comparison,
   insert_error: insert_error,
-  results: {
-    compare: compare_data,
-    regular: results_data
-  },
   redraw: redraw_graph,
   set_container: function(container) { _container = container; },
   VIEWS: VIEW_INPUTS

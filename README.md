@@ -42,7 +42,7 @@ questions about the *now*.
     $.post("/data/import", {
       dataset: "mysql",
       subset: "slow_queries",
-      samples: [ // that's right, you send an array of samples at a time
+      samples: JSON.stringify([ // that's right, you send a JSON stringified array of samples at a time
         {
           integer: {
             'query_duration': 500,
@@ -62,7 +62,7 @@ questions about the *now*.
             ]
           },
         }
-      ]});
+      }]));
 
 ### 2) know your data
 

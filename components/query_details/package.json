@@ -1,0 +1,7 @@
+{
+  "main" : "query_details",
+  "helpers": [],
+  "style": "query_details.css",
+  "styles": [],
+  "template": "query_details.html.erb"
+}

@@ -1,6 +1,6 @@
 "use strict";
 module.exports = {
-  tagName: "div",
+  tagName: "span",
   className: "",
   defaults: {
     time: (new Date()).toISOString()

@@ -7,6 +7,7 @@ var views = require("client/js/view");
 var component = require("client/js/component");
 
 var _show_controls = false;
+var ResultsStore = require("client/js/results_store");
 
 
 // Window mutation ftw
@@ -130,6 +131,7 @@ function handle_query_results(data) {
     views.insert_error(data.error);
   } else {
     views.insert_graph(data.parsed.view, data);
+    ResultsStore.add_results_data(data);
   }
 
   QS.reset();
@@ -145,44 +147,86 @@ function handle_compare_results(data) {
   if (data.error) {
     views.insert_error(data.error);
   } else {
+    ResultsStore.add_compare_data(data);
     views.insert_comparison(data.parsed.view, data);
   }
 
 }
 
+function handle_query_id(data) {
+  ResultsStore.identify(data);
+}
+
+function insert_query_tiles(container, queries) {
+  _.each(queries, function(data) {
+    var view_data = views.VIEWS[data.parsed.view];
+
+    if (data.results) {
+
+      ResultsStore.set_timestamp(data.results.query.id, data.updated || data.created);
+
+      if (data.results.query) {
+        ResultsStore.add_results_data(data.results.query);
+      }
+
+      if (data.results.compare) {
+        ResultsStore.add_compare_data(data.results.compare);
+      }
+    }
+
+    var icon = "noun/view.svg";
+    if (view_data) {
+      icon = view_data.icon || "noun/view.svg";
+    }
+
+    // Psas in the query from above for later re-usage
+    $C("query_tile", { query: data, icon: icon }, function(tile) {
+      tile.$el.hide();
+      tile.prependTo(container);
+      tile.$el.fadeIn(1000);
+    });
+  });
+}
+
 function handle_query_ack(data) {
   QS.got_ack();
+  ResultsStore.handle_ack(data);
 
   QS.should_compare(data.parsed.compare_mode);
 
-  var queryEl = $("<pre>");
-  queryEl.text(JSON.stringify(data));
-
-  var view_data = views.VIEWS[data.parsed.view];
-  var icon = "noun/view.svg";
-  if (view_data) {
-    icon = view_data.icon || "noun/view.svg";
-  }
-
-  // Psas in the query from above for later re-usage
-  $C("query_tile", { query: data, icon: icon }, function(tile) {
-    $C("timeago", {}, function(cmp) {
-      tile.$el.find(".timestamp").append(cmp.$el);
-    });
-
-    tile.$el.hide();
-    tile.prependTo($("#query_queue .query_list"));
-    tile.$el.fadeIn(1000);
-  });
+  insert_query_tiles($("#query_queue .query_list"), [data]);
 }
 
 function handle_new_query() {
   QS.new_query();
 }
 
+function load_saved_queries(queries) {
+  insert_query_tiles($("#query_queue .saved_queries"), queries);
+}
+
+function load_shared_queries(queries) {
+  insert_query_tiles($("#query_queue .shared_queries"), queries);
+}
+
 module.exports = {
   init: function() {
     // this is initializing component interactions
+    jank.controller().on("rename_query", function(query, name, shared) {
+      jank.socket().emit("save_query", query, name, shared || false);
+    });
+
+    jank.controller().on("delete_query", function(query, cb) {
+      jank.socket().emit("delete_query", query);
+      if (cb) { cb(); }
+      // gotta show a little dealie for old queries
+    });
+
+    jank.controller().on("refresh_query", function(query) {
+      jank.socket().emit("refresh_query", query);
+      // gotta show a little dealie for old queries
+    });
+
     jank.controller().on("query_tile_clicked", function(query) {
 
       // TODO: this should be better encapsulated into a modal hider/shower
@@ -192,7 +236,8 @@ module.exports = {
 
       var form_str = serialized_array_to_str(query.input);
       this.set_dom_from_query(form_str);
-      views.redraw(query.id);
+
+      views.redraw(query.id || query.clientid, query);
     });
 
     jank.controller().on("swap_panes", function(show_pane) {
@@ -205,8 +250,8 @@ module.exports = {
     var query_str = window.location.search.substring(1);
 
     var that = this;
-    jank.do_when(this.fields, 'query:fields', function() { 
-      that.run_query(query_str); 
+    jank.do_when(this.fields, 'query:fields', function() {
+      that.run_query(query_str);
     });
     this.set_dom_from_query(query_str);
   },
@@ -232,10 +277,13 @@ module.exports = {
 
       // TODO: do better than just reloading the URL.
       // something more ajaxy, with Backbone's Router
-      var uri = new miuri(window.location.pathname);
-      uri.query({ 'table' : table});
+      //
+      if (this.table && table != this.table) {
+        var uri = new miuri(window.location.pathname);
+        uri.query({ 'table' : table});
+        window.location = uri;
+      }
 
-      window.location = uri;
     },
 
     go_clicked: function(el) {
@@ -430,6 +478,19 @@ module.exports = {
     socket.on("query_ack", handle_query_ack);
     socket.on("query_results", handle_query_results);
     socket.on("compare_results", handle_compare_results);
+    socket.on("query_id", handle_query_id);
+
+    socket.on("saved_queries", load_saved_queries);
+    socket.on("shared_queries", load_shared_queries);
+
+    // TODO: make sure this is for reals.
+    var table = $("select[name=table]").val();
+    socket.emit("get_saved_queries", table);
+    socket.emit("get_shared_queries", table);
+  },
+
+  set_table: function(table) {
+    this.table = table;
   },
 
   set_fields: function(data) {

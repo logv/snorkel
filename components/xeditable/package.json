@@ -1,0 +1,7 @@
+{
+  "main" : "xeditable",
+  "helpers": [ "vendor/bootstrap-editable" ],
+  "style": "xeditable.css",
+  "styles": [ "bootstrap/bootstrap-editable" ],
+  "template": "xeditable.html.erb"
+}
