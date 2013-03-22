@@ -4,6 +4,9 @@ module.exports = {
     key: "config/certs/server.key",
     certificate: "config/certs/server.crt"
   },
+  udp: {
+    port: 59036
+  },
   authorized_users: "config/users.htpasswd",
   http_port: 3000,
   https_port: 3443,

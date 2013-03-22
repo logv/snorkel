@@ -13,7 +13,7 @@
     "static/scripts/vendor/strtotime.js"
   ],
   "styles" : [
-    "static/styles/bootstrap/bootstrap.cosmo.min.css",
+    "static/styles/bootstrap/bootstrap.cosmo.css",
     "static/styles/box.css",
     "static/styles/scrollers.css",
     "static/styles/bootstrap/responsive.css",

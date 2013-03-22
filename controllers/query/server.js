@@ -184,6 +184,13 @@ function marshall_query(form_data) {
         op = "$regex";
       }
 
+      // there is no real support for $eq in mongo, instead using $all. even though 
+      // its more janky.
+      if (op === "$eq") {
+        val = [val];
+        op = "$all";
+      }
+
       // For $nin and $in, try JSON first, then regular string second
       if (op === "$nin" || op === "$in") {
         if (_.isString(val)) {
@@ -397,10 +404,6 @@ function handle_new_query(query_id, query_data, socket, done) {
 
   var sample = log_query(query_data, user);
 
-  socket.emit("query_ack", {
-    pipeline: pipeline, parsed: query_data,
-    id: query_id, query_str: querystring.stringify(query_data) });
-
   var start = Date.now();
 
   var results = {};
@@ -446,12 +449,6 @@ function handle_new_query(query_id, query_data, socket, done) {
 
     done(results);
   });
-}
-
-function handle_new_query_from_form(query_id, form_data, socket, done) {
-  // Original Query
-  var query_data = marshall_query(form_data);
-  handle_new_query(query_id, query_data, socket, done);
 }
 
 function get_query_from_db(hashid, cb) {
@@ -628,7 +625,11 @@ module.exports = {
       var query_id = user_id + "/" + __id + "/" + now;
       var hashed_id = hashids.encrypt(user_id, __id, now);
 
-      handle_new_query_from_form(query_id, form_data, socket, function(results) {
+      var query_data = marshall_query(form_data);
+      socket.emit("query_ack", {
+        parsed: query_data, input: form_data, id: query_id });
+
+      handle_new_query(query_id, query_data, socket, function(results) {
         var collection = db.get("query", "results");
         // save results to db
         collection.insert({

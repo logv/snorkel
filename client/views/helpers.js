@@ -16,9 +16,10 @@ var COLORS = [
 
 
 function countToSize(count) {
-    var sizes = ['', 'K', 'M', 'G', 'T', 'P' ];
+    var sizes = ['', 'K', 'M', 'G', 'T', 'P', 'Z' ];
     if (count === 0) { return '0'; }
     var i = parseInt(Math.floor(Math.log(count) / Math.log(1000)), 10);
+
     return Math.round(count / Math.pow(1000, i) * 100, 2) / 100 + '' + sizes[i];
 }
 
@@ -172,11 +173,15 @@ module.exports = {
     var val_div = $("<div class='value_cell'>")
       .html(this.count_format(col_value));
 
+    val_div.attr('data-value', col_value.toString());
+
     cell.append(val_div);
 
     if (typeof compare_value !== "undefined") {
       var comp_div = $("<div class='compare_cell'>")
         .html(this.count_format(compare_value));
+
+      comp_div.attr('data-value', compare_value.toString());
 
       var delta_suffix = "%";
       var delta = parseInt((col_value - compare_value) / col_value * 10000, 10) / 100;

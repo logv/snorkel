@@ -16,6 +16,30 @@ require("static/scripts/vendor/miuri");
 var Throbber = require("client/js/throbber");
 
 
+var _query_id;
+
+
+function get_query_from_str(query_str) {
+  var query = $.deparam(query_str);
+  var filters = query.filters;
+
+  var fields = [];
+  _.each(query, function(val, key) {
+    if (_.isString(val)) {
+      fields.push({ name: key, value: val });
+    }
+
+    if (_.isArray(val)) {
+      _.each(val, function(v) { fields.push( {name: key, value: v }); });
+    }
+  });
+  var serialized = {
+    data: fields,
+    string: query_str
+  };
+
+  return serialized;
+}
 
 function QueryState() {
   var _loading;
@@ -188,11 +212,28 @@ function insert_query_tiles(container, queries) {
   });
 }
 
+
+function add_query_id_to_url(id, push) {
+  var uri = window.location.pathname + window.location.search;
+  var query_data = $.deparam(uri);
+
+  query_data.id = id;
+
+  var dest = decodeURIComponent($.param(query_data));
+  if (!push) {
+    jank.replace(dest);
+  } else {
+    jank.go(dest);
+  }
+}
+
 function handle_query_ack(data) {
   QS.got_ack();
   ResultsStore.handle_ack(data);
+  _query_id = data.id;
 
   QS.should_compare(data.parsed.compare_mode);
+  add_query_id_to_url(data.id, false);
 
   insert_query_tiles($("#query_queue .query_list"), [data]);
 }
@@ -235,21 +276,55 @@ module.exports = {
       this.toggle_pane(false);
 
       var form_str = serialized_array_to_str(query.input);
+
       this.set_dom_from_query(form_str);
 
-      views.redraw(query.id || query.clientid, query);
+      var id = query.id || query.clientid;
+      _query_id = id; // hidden variables ahoy
+      form_str += "&id=" + id;
+      jank.go("/query?" + form_str);
+      views.redraw(id, query);
     });
 
     jank.controller().on("swap_panes", function(show_pane) {
       this.toggle_pane(!show_pane);
     });
 
+    var that = this;
+    jank.controller().on("switch_views", function(view) {
+      that.update_view(view);
+    });
+
+    jank.controller().on("set_control", function(key, value) {
+      views.set_control(key, value);
+    });
+
+    jank.subscribe("popstate", function() {
+      var form_str = window.location.search.substring(1);
+      var data = $.deparam(form_str);
+      var id = data.id;
+
+      that.set_dom_from_query(form_str);
+
+      if (id !== _query_id) {
+        _query_id = id;
+
+        // if we dont have a local cache of the ID, then we should probably
+        // re-run the query, huh?
+        if (!views.redraw(id)) {
+          that.run_query(form_str, true);
+          // run this query again?
+        }
+        // need to restore the old query
+      }
+    });
+
     views.set_container($("#query_content"));
+    filter_helper.set_container(this.$page);
 
 
     var query_str = window.location.search.substring(1);
 
-    var that = this;
     jank.do_when(this.fields, 'query:fields', function() {
       that.run_query(query_str);
     });
@@ -289,28 +364,6 @@ module.exports = {
     go_clicked: function(el) {
       this.run_query();
     }
-  },
-
-  get_query_from_str: function(query_str) {
-    var query = $.deparam(query_str);
-    var filters = query.filters;
-
-    var fields = [];
-    _.each(query, function(val, key) {
-      if (_.isString(val)) {
-        fields.push({ name: key, value: val });
-      }
-
-      if (_.isArray(val)) {
-        _.each(val, function(v) { fields.push( {name: key, value: v }); });
-      }
-    });
-    var serialized = {
-      data: fields,
-      string: query_str
-    };
-
-    return serialized;
   },
 
   get_query_from_dom: function() {
@@ -371,6 +424,7 @@ module.exports = {
       var name = $(this).attr("name");
       var val = query[name];
       $(this).val(val);
+      $(this).trigger("liszt:updated");
     });
 
 
@@ -384,11 +438,9 @@ module.exports = {
 
     if (filters.query || filters.compare) {
       var filterEl = this.$page.find("#filters");
-      var that = this;
-
       // one level of dependencies?
-      jank.do_when(that.fields, 'query:fields', function() {
-        filter_helper.set(filterEl, filters, that.fields);
+      jank.do_when(this.fields, 'query:fields', function() {
+        filter_helper.set(filters);
       });
 
     }
@@ -396,20 +448,19 @@ module.exports = {
 
   show_graph: function() {
     // switching to graph view
-    _show_controls = false;
     this.toggle_pane(false);
 
   },
 
   show_controls: function() {
     // switching to graph view
-    _show_controls = true;
     this.toggle_pane(true);
   },
 
   // TODO: add this to controller and use this.$page
   toggle_pane: function(controls_show) {
     // Hmmmmm... need to figure out which way to toggle the panes?
+    _show_controls = controls_show;
     var text = "Graph";
     if (!controls_show) {
       text = "Query";
@@ -450,24 +501,46 @@ module.exports = {
     });
   },
 
+  compare_mode: function() {
+    var compare = views.get_control("compare");
+    if (compare) {
+      // if we have time, we are comparing
+      return true;
+    }
+
+    var filterBox = this.$page.find(".filter_group[data-filter-type=compare]");
+    // if the compare filter el is visible, means we are comparing
+    return $(filterBox).is(":visible");
+  },
+
+  show_compare_filters: function() {
+    var filterBox = this.$page.find(".filter_group[data-filter-type=compare]");
+    var compareFilter = this.$page.find(".compare_filter");
+    filterBox.show();
+    compareFilter.html("Remove Comparison Filters");
+    var container = filterBox.parents("#query_sidebar");
+    container.animate({
+        scrollTop: filterBox.offset().top - container.offset().top + container.scrollTop()
+    }, 1000);
+
+
+  },
+
+  hide_compare_filters: function() {
+    var filterBox = this.$page.find(".filter_group[data-filter-type=compare]");
+    var compareFilter = this.$page.find(".compare_filter");
+    filterBox.hide();
+    compareFilter.html("Add Comparison Filters");
+
+  },
+
   handle_compare_toggle: function() {
     var filterBox = this.$page.find(".filter_group[data-filter-type=compare]");
-
-    var compareFilter = this.$page.find(".compare_filter");
-    // TODO: dunno why this logic is the way it is
-    var to_hide = !$(filterBox).is(":visible");
-    var hidden = !to_hide;
-    filterBox.toggle();
-
-    if (hidden) {
-      compareFilter.html("Add Comparison Filters");
+    var to_hide = $(filterBox).is(":visible");
+    if (to_hide) {
+      this.hide_compare_filters();
     } else {
-      compareFilter.html("Remove Comparison Filters");
-      var container = filterBox.parents("#query_sidebar");
-      container.animate({
-          scrollTop: filterBox.offset().top - container.offset().top + container.scrollTop()
-      }, 1000);
-
+      this.show_compare_filters();
     }
 
   },
@@ -505,34 +578,37 @@ module.exports = {
 
     this.weight_col = weight_col;
 
-    jank.trigger('query:fields', {});
+    filter_helper.set_fields(this.fields);
+    jank.trigger('query:fields', this.fields);
   },
 
   update_view: function(view) {
     views.update_controls(view);
   },
 
-  handle_pane_toggle_clicked: function() {
+  handle_pane_toggle_clicked: function(e) {
     jank.controller().trigger("swap_panes", _show_controls);
-
-    _show_controls = !_show_controls;
   },
 
-  run_query: function(query_ish) {
+  run_query: function(query_ish, keep_url) {
     var serialized;
     if (!query_ish) {
       serialized = this.get_query_from_dom();
     } else {
       if (_.isString(query_ish)) {
-        serialized = this.get_query_from_str(query_ish);
+        serialized = get_query_from_str(query_ish);
       } else if (_.isObject(query_ish)) {
         serialized = query_ish;
       }
     }
 
-    jank.go("/query?" + serialized.string);
+    if (!keep_url) {
+      jank.go("/query?" + serialized.string);
+    } else {
+      jank.replace("/query?" + serialized.string);
 
-    QS.new_query();
+    }
+
     // TODO: collect filter values, too
 
     if (this.weight_col) {

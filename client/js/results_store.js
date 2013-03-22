@@ -6,6 +6,7 @@ var timestamps = {};
 
 var acks = {};
 var identities = {};
+var uris = {};
 
 function ResultsStore() { }
 
@@ -20,6 +21,7 @@ ResultsStore.get_timestamp = function(id) {
 ResultsStore.add_results_data = function(data) {
   if (!data) { return; }
   results_data[data.parsed.id] = data;
+
 };
 
 ResultsStore.add_compare_data = function(data) {
@@ -37,6 +39,8 @@ ResultsStore.get_results_data = function(id) {
 
 ResultsStore.handle_ack = function(data) {
   acks[data.id] = data;
+  var form_str = _.map(data.input, function(f) { return f.name + "=" + f.value; }).join('&');
+  uris[form_str] = data.id;
 };
 
 ResultsStore.identify = function(data) {

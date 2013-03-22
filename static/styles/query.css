@@ -117,8 +117,10 @@ body {
 
 /* Gotta be less intrusive when we are below things */
 #query_content.below {
-  position: fixed;
-  height: 100%;
+  @media (max-width: 767px) {
+    position: fixed;
+    height: 100%;
+  }
 }
 
 #query_sidebar.below {
@@ -324,44 +326,40 @@ body {
 
 .delta {
   padding: 2px;
+  color: #cecece;
 }
 
+/* color from colorbrewer2: http://colorbrewer2.org/ */
 .per_grow {
 
   font-weight: bold;
   
   &.maybe {
-    background-color: #FFDDD9;
+    color: #fcbba1;
   }
 
   &.kinda {
-    background-color: #FFA7A9;
-    color: #666;
+    color: #fcbba1;
   }
 
   &.sorta {
-    background-color: #5C0002;
-    color: #fefefe;
+    color: #fc9272;
   }
 
   &.probably {
-    background-color: #94090D;
-    color: #fefefe;
+    color: #fb6a4a;
   }
 
   &.definitely {
-    background-color: #D40D12;
-    color: #fefefe;
+    color: #ef3b2c;
   }
 
   &.oh_shit {
-    background-color: #FF1D23;
-    color: #fefefe;
+    color: #cb181d;
   }
 
   &.panic {
-    background-color: #FF1D23;
-    color: #fefefe;
+    color: #99000d;
   }
 
 }
@@ -371,36 +369,31 @@ body {
   font-weight: bold;
 
   &.maybe {
-    color: #0AA;
+    color: #a6bddb;
   }
 
   &.kinda {
-    background-color: #D0E4F2;
+    color: #a6bddb;
   }
 
   &.sorta {
-    background-color: #85a5cc;
-    color: #fefefe;
+    color: #a6bddb;
   }
 
   &.probably {
-    background-color: #4a6491;
-    color: #fefefe;
+    color: #74a9cf;
   }
 
   &.definitely {
-    background-color: #30395C;
-    color: #fefefe;
+    color: #3690c0;
   }
 
   &.oh_shit {
-    background-color: #1A1F2B;
-    color: #fefefe;
+    color: #0570b0;
   }
 
   &.panic {
-    background-color: #1A1F2B;
-    color: #fefefe;
+    color: #034e7b;
   }
 }
 

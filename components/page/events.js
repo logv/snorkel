@@ -5,8 +5,7 @@ module.exports = {
     "click" :  "handle_template_click"
   },
 
-  handle_template_click: function() {
-
+  handle_template_click: function(evt) {
     jank.trigger("page:clicked");
   }
 };

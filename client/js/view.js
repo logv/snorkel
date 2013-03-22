@@ -24,7 +24,7 @@ var VIEW_INPUTS = {
     exclude: ["field", "hist_bucket"],
     icon: "noun/line.svg"
   },
-  "dist" : { 
+  "dist" : {
     include: STD_INPUTS.concat(["field", "hist_bucket", "compare"]),
     exclude: [ "group_by", "max_results", "agg", "fieldset", "time_bucket" ],
     icon: "noun/dist.svg"
@@ -45,6 +45,10 @@ function get_control(name) {
   return ctl;
 }
 
+function get_control_value(name) {
+  return get_control(name).find(":input").val();
+}
+
 function get_control_row(name) {
   var row = get_control(name).parents(".control-group");
 
@@ -53,6 +57,8 @@ function get_control_row(name) {
 
 function handle_update_view(view) {
   var input_schema = VIEW_INPUTS[view];
+
+  get_control('view').find("select").val(view);
 
   var can_compare = true;
   if (input_schema) {
@@ -68,7 +74,7 @@ function handle_update_view(view) {
       controls
         .find("select[multiple=multiple]")
         .attr("data-disabled", false);
-      
+
       if (control_name === "compare") {
         can_compare = true;
       }
@@ -151,8 +157,8 @@ jank.on("query:no_samples", function() {
 var graphs = {};
 function create_graph(Grapher, data) {
   var graphEl = $("<div>");
-  var graph = new Grapher({ 
-    el: graphEl, 
+  var graph = new Grapher({
+    el: graphEl,
     compare_mode: data.parsed.compare_mode });
 
   $(_container).empty();
@@ -207,7 +213,7 @@ function redraw_graph(id, query) {
 
   if (!data) {
     console.log("Cant redraw graph: ", id);
-    return;
+    return false;
   }
 
   var type = data.parsed.view;
@@ -216,7 +222,6 @@ function redraw_graph(id, query) {
   // If the query is more than 5 minutes old, display a notice to the user
   var delta = Date.now() - timestamp;
   if (delta > 60 * 5 * 1000) {
-    console.log("query is out of date: ", delta);
     // Show a 'refresh query' button (and add historical results, eventually)
     show_saved_query_details(id, timestamp, query);
   }
@@ -225,6 +230,14 @@ function redraw_graph(id, query) {
     insert_comparison(type, compare);
   }
   insert_new_graph(type, data);
+
+  return true;
+}
+
+function update_control(name, value) {
+  var control = get_control(name).find(":input");
+  control.val(value);
+  control.trigger("liszt:updated");
 }
 
 module.exports = {
@@ -233,6 +246,8 @@ module.exports = {
   insert_comparison: insert_comparison,
   insert_error: insert_error,
   redraw: redraw_graph,
+  set_control: update_control,
+  get_control: get_control_value,
   set_container: function(container) { _container = container; },
   VIEWS: VIEW_INPUTS
 };

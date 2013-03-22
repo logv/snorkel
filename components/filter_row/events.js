@@ -54,47 +54,9 @@ module.exports = {
   },
 
   handle_field_change: function(evt) {
-
-    function update_operators() {
-      var val = $(evt.target).val(); // i dunno what i'm doing here
-      var selector = $(evt.target);
-      var control_group = $(evt.target).parents(".filter_row");
-      var op = control_group.find(".filter_op");
-      var ops = op.find("option").hide();
-
-
-      var added_ops = null;
-      var types = ["integer", "set", "string"];
-      var shown = [];
-      _.each(ops, function(op) {
-        var $op = $(op);
-        $op.attr("disabled", true);
-        $op.attr("selected", false);
-
-        _.each(types, function(type) {
-          if (val.indexOf(type) !== -1 &&
-              $op.attr("data-type") === type) {
-            $op.attr("disabled", false);
-
-            shown.push(op);
-          }
-        });
-
-      });
-
-      $(shown).show();
-
-      if (!shown.length) {
-        console.log("No operators supported for", val);
-      }
-
-      // Select the first op :-)
-      $(op).find("option:not(:disabled)")
-        .first()
-        .attr("selected", true);
-    }
-
-    update_operators();
+    var val = $(evt.target).val(); // i dunno what i'm doing here
+    var selector = $(evt.target);
+    this.update_operators(selector, val);
   },
 
   handle_remove_filter: function(evt) {

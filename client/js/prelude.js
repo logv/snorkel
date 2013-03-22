@@ -415,9 +415,31 @@
 
   Backbone.history.start({ pushState: true });
   var _history = new Backbone.Router();
-  jank.go = function(uri) {
-    _history.navigate(uri);
+  jank.go = function(uri, data) {
+    _history.navigate(uri, { trigger: true });
   };
+
+  jank.replace = function(uri, data) {
+    _history.navigate(uri, { trigger: true, replace: true });
+  };
+
+  $(window).bind('popstate', function(evt) {
+    // see if we have any results saved for the current URI
+    jank.inform("popstate");
+  });
+
+  // i dont like that clicking links that are just #href causes me history
+  // problems.
+  $(document).on("click", "a[href^='#']", function(event) {
+    // If this is a fastclick event, we let it through. Probably.
+    if (event.forwardedTouchEvent) {
+      return;
+    }
+
+    if (!event.altKey && !event.ctrlKey && !event.metaKey && !event.shiftKey) {
+      event.preventDefault();
+    }
+  });
 
 
   window.bootloader = bootloader;

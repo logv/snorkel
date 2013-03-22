@@ -1,13 +1,14 @@
 var fs = require("fs");
 var _ = require_vendor("underscore");
 var context = require("./context");
+var readfile = require("./readfile");
 
 context.setDefault("CSS_DEPS", {});
 context.setDefault("JS_DEPS", {});
 
 var load_template = function(template) {
   var root_path = "static/templates/";
-  return fs.readFileSync(root_path + template).toString();
+  return readfile(root_path + template);
 };
 
 function add_stylesheet(name) {

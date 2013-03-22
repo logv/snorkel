@@ -45,7 +45,7 @@ function subscribe_to_rabbit_queue() {
             if (err) {
               console.log("Couldnt insert samples!", err);
             } else {
-              console.log("INSERTED " + (samples.length) + " SAMPLE(S) INTO", dataset, subset);
+              console.log("MQ: Inserted " + (samples.length) + " sample(s) into", dataset, subset);
             }
           });
 
@@ -54,6 +54,32 @@ function subscribe_to_rabbit_queue() {
   });
 }
 subscribe_to_rabbit_queue();
+
+
+function setup_udp_socket() {
+  if (!config.udp) {
+    return;
+  }
+
+  var dgram = require("dgram");
+  var s = dgram.createSocket('udp4');
+  s.on("message", function(msg, rinfo) {
+    var parsed_data = JSON.parse(msg.toString());
+    backend.add_sample(parsed_data.dataset, parsed_data.subset, parsed_data.sample, function(err) {
+      if (err) {
+      } else {
+        console.log("UDP: Inserted sample into", parsed_data.dataset, parsed_data.subset);
+      }
+    });
+  });
+
+  s.on("listening", function() {
+    console.log("Listening for incoming packets on UDP");
+  });
+
+  s.bind(config.udp.port || 59036);
+}
+setup_udp_socket();
 
 module.exports = {
   routes: {
@@ -85,7 +111,7 @@ module.exports = {
       samples = [samples];
     }
 
-    console.log("Inserting", samples.length, "into", dataset, subset);
+    console.log("POST: Inserting", samples.length, "into", dataset, subset);
     backend.add_samples(dataset, subset, samples, function(err, data) {
       if (err) {
         console.log("Couldnt insert samples!", err);
@@ -123,7 +149,7 @@ module.exports = {
         }
 
         backend.add_samples(dataset, subset, samples, function(err, data) {
-          if (err) { 
+          if (err) {
             console.log("ERROR INSERTING DATA", err);
             res.write("ERROR:", err);
           } else {
