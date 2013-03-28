@@ -5,6 +5,7 @@
   cursor: pointer;
 }
 
+#query_content .table_popover .overview:hover,
 #query_content .table_popover .view:hover,
 #query_content .table_popover .option:hover {
   background-color: #dedede;

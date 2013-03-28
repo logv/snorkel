@@ -121,6 +121,7 @@ function build(component, options, cb) {
       var cmpClass = _packages[component].class;
       if (!cmpClass) {
         cmpClass = _packages[component].class = Component.extend(exports);
+        cmpClass.helpers = {};
       }
 
       var cmpInstance = new cmpClass(_.extend({ id: id }, options));
@@ -129,12 +130,19 @@ function build(component, options, cb) {
 
       cmpInstance.helpers = {};
       _.each(_packages[component].helpers, function(helper, name) {
-        var helper_instance = bootloader.raw_import(helper);
-        if (helper_instance) {
-          name = helper_instance.name || name;
-        }
 
-        cmpInstance.helpers[name] = helper_instance;
+        if (cmpClass.helpers[name]) {
+          cmpInstance.helpers[name] = cmpClass.helpers[name];
+        } else {
+          var helper_instance = bootloader.raw_import(helper);
+          cmpClass.helpers[name] = helper_instance || true;
+
+          if (helper_instance) {
+            name = helper_instance.name || name;
+          }
+
+          cmpInstance.helpers[name] = helper_instance;
+        }
       });
 
       // instantiate client callbacks for component

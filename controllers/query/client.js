@@ -299,6 +299,14 @@ module.exports = {
       views.set_control(key, value);
     });
 
+    jank.controller().on("hide_compare_filters", function() {
+      that.hide_compare_filters();
+    });
+
+    jank.controller().on("show_compare_filters", function() {
+      that.show_compare_filters();
+    });
+
     jank.subscribe("popstate", function() {
       var form_str = window.location.search.substring(1);
       var data = $.deparam(form_str);
@@ -513,10 +521,16 @@ module.exports = {
     return $(filterBox).is(":visible");
   },
 
-  show_compare_filters: function() {
+  show_compare_filters: function(add_if_empty) {
     var filterBox = this.$page.find(".filter_group[data-filter-type=compare]");
     var compareFilter = this.$page.find(".compare_filter");
     filterBox.show();
+
+    // If there is no filter row and we want to show comparison filters
+    if (!filterBox.find(".filter_row").length && add_if_empty) {
+      filter_helper.add_compare(["", "", ""], true);
+    }
+
     compareFilter.html("Remove Comparison Filters");
     var container = filterBox.parents("#query_sidebar");
     container.animate({
@@ -540,7 +554,7 @@ module.exports = {
     if (to_hide) {
       this.hide_compare_filters();
     } else {
-      this.show_compare_filters();
+      this.show_compare_filters(true /* add if empty */);
     }
 
   },

@@ -1,3 +1,5 @@
+#!/bin/bash
+
 COMPONENT=$1
 
 mkdir controllers/${COMPONENT}/

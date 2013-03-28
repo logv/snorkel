@@ -1,3 +1,5 @@
+#!/bin/bash
+
 DATABASE="snorkel"
 PREFIX="datasets/"
 

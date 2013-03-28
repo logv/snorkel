@@ -431,11 +431,6 @@
   // i dont like that clicking links that are just #href causes me history
   // problems.
   $(document).on("click", "a[href^='#']", function(event) {
-    // If this is a fastclick event, we let it through. Probably.
-    if (event.forwardedTouchEvent) {
-      return;
-    }
-
     if (!event.altKey && !event.ctrlKey && !event.metaKey && !event.shiftKey) {
       event.preventDefault();
     }

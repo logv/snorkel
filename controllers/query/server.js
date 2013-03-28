@@ -586,6 +586,10 @@ module.exports = {
     socket.on("refresh_query", function(form_data) {
       var collection = db.get("query", "results");
       // save results to db
+      if (!form_data || !form_data.hashid) {
+        return;
+      }
+
       get_saved_query(form_data.hashid, function(err, saved_query) {
         if (!saved_query) {
           return;

@@ -108,6 +108,7 @@ function set_filter_data(filters, no_add_if_empty) {
   _.each(query, function(f) {
     add_filter(f);
   });
+
   _.each(compare, function(f) {
     add_filter_compare(f);
   });
@@ -120,10 +121,11 @@ function set_filter_data(filters, no_add_if_empty) {
   var hide_compare = !compare.length;
 
   filter_area.fadeIn();
+
   if (hide_compare) {
-    compare_area.hide();
+    jank.controller().trigger("hide_compare_filters");
   } else {
-    compare_area.fadeIn();
+    jank.controller().trigger("show_compare_filters");
   }
 
 }
@@ -160,7 +162,6 @@ function add_or_update_filter(filters, compare) {
   _.each(to_add, function(filter_data) {
     add_filter.apply(null, filter_data);
   });
-
 }
 
 

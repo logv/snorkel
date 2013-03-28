@@ -1,0 +1,7 @@
+{
+  "main" : "modal",
+  "helpers": [],
+  "style": "modal.css",
+  "styles": [],
+  "template": "modal.html.erb"
+}

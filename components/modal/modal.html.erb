@@ -1,0 +1,16 @@
+<% set_default("body", ""); %>
+<% set_default("title", ""); %>
+<% set_default("footer", ""); %>
+
+<div class="modal hide">
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+    <h3><%= title %></h3>
+  </div>
+  <div class="modal-body">
+    <%= body %>
+  </div>
+  <div class="modal-footer">
+    <%= footer %>
+  </div>
+</div>

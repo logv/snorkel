@@ -2,6 +2,8 @@
 <% set_default("name", null); %>
 
 <div class="table_popover">
+
+
   <% if (type === "string") { %>
     <a class="string option" data-op="$regex">
       Add equals filter
@@ -24,8 +26,12 @@
 
     <hr />
 
+    <a class="overview">
+      View column distribution
+    </a>
+
     <a class="view" data-view="dist">
-      View distribution
+      View cell distribution
     </a>
 
     <a class="view" data-view="time">

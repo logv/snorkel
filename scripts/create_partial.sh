@@ -1,3 +1,5 @@
+#!/bin/bash
+
 if [[ $# == 0 ]] ; then
   echo "Usage: $) [controller] partial"
   echo ""

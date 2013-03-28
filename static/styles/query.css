@@ -46,6 +46,7 @@ body {
     font-weight: bold;
     display: inline-block;
     width: 60px;
+    z-index: 1000;
   }
 
   .pane_toggle:hover {

@@ -1,3 +1,5 @@
+#!/bin/bash
+
 EXPECTED_ARGS=1
 
 if [ $# -ne $EXPECTED_ARGS ]; then
@@ -6,4 +8,8 @@ if [ $# -ne $EXPECTED_ARGS ]; then
 fi
 
 # WE NEED THE HTPASSWD COMMAND
-htpasswd -s config/users.htpasswd $1
+if [ -e config/users.htpasswd ]; then
+  htpasswd -s config/users.htpasswd $1
+else
+  htpasswd -s -c config/users.htpasswd $1
+fi

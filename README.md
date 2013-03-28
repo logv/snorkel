@@ -24,10 +24,10 @@ questions about the *now*.
     cp config/config.js config/local/my_dev_env.js
 
     # create some self signed SSL certs
-    bash scripts/setup_certificates.sh
+    scripts/setup_certificates.sh
 
     # setup your user (creates config/users.htpasswd with basic http auth)
-    bash scripts/add_user.sh
+    scripts/add_user.sh
 
     # start in development mode
     ENV=local/my_dev_env nodemon app.js
@@ -71,4 +71,4 @@ open http://localhost:3000 in your browser and get started :-)
 ### 3) expand your data
 
     # bump the capped collection size to 200MB
-    bash scripts/change_collection_size.sh test/data 200
+    scripts/change_collection_size.sh test/data 200

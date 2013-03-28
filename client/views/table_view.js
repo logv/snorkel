@@ -77,7 +77,8 @@ var TableView = BaseView.extend({
   events: {
     "click td" : "handle_cell_clicked",
     "click .popover a.option" : "handle_popover_filter_clicked",
-    "click .popover a.view" : "handle_popover_view_clicked"
+    "click .popover a.view" : "handle_popover_view_clicked",
+    "click .popover a.overview" : "handle_overview_clicked"
   },
 
   finalize: function() {
@@ -85,6 +86,7 @@ var TableView = BaseView.extend({
       return "No Samples";
     }
 
+    var that = this;
     var group_by = _.clone(this.data.parsed.dims);
     var cols = _.clone(this.data.parsed.cols);
 
@@ -105,18 +107,23 @@ var TableView = BaseView.extend({
     var compare = this.data.parsed.compare_mode;
 
     if (compare) {
+      this.compare_data.count = 0;
       _.each(this.compare_data.results, function(result) {
         var key = row_key(group_by, result);
         compare_row_hash[key] = result;
+        that.compare_data.count += result.weighted_count || result.count;
       });
     }
 
+    this.data.count = 0;
     _.each(this.data.results, function(result) {
       var key = row_key(group_by, result);
       var row = [];
       _.each(group_by, function(group) {
         row.push(result._id[group]);
       });
+
+      that.data.count += result.weighted_count || result.count;
 
 
       var compare_result = compare_row_hash[key];
@@ -258,6 +265,100 @@ var TableView = BaseView.extend({
     jank.controller().trigger("switch_views", to_view);
 
     // update location
+  },
+
+  handle_overview_clicked: function(evt) {
+    var $td = $(evt.target);
+    if (!$td.is("td")) {
+      $td = $td.parents("td");
+    }
+    var that = this;
+
+    var field = get_field_name_for_cell($td);
+    var plotted_vals = [];
+    _.each(this.data.results, function(result) {
+      var count = result.weighted_count || result.count;
+      var of_total = Math.max(count / that.data.count, 0.05);
+      plotted_vals.push({
+        x: parseInt(result[field]),
+        y: 2,
+        marker: {
+          radius: 10,
+          fillColor:'rgba(24,90,169,' + of_total + ')'
+        }
+      });
+    });
+
+    var compare = (this.compare_data && this.compare_data.results || []);
+    _.each(compare, function(result) {
+      if (!result[field]) {
+        return;
+      }
+
+      var count = result.weighted_count || result.count;
+      var of_total = Math.max(count / that.data.count, 0.1);
+      plotted_vals.push({
+        x: parseInt(result[field]),
+        y: 1,
+        marker: {
+          radius: 10,
+          fillColor:'rgba(169,24,24,' + of_total + ')'
+        }
+      });
+    });
+
+    var options = {
+      chart: {
+          type: 'scatter',
+          zoomType: 'xy',
+      },
+      xAxis: {
+        type: "linear",
+      },
+      yAxis: {
+        labels: {
+          enabled: false
+        }
+      },
+      plotOptions: {
+        series: {
+          marker: {
+            enabled: true,
+            states: {
+              hover: {
+                enabled: false
+              }
+            }
+          }
+        }
+      },
+      series: [{
+        data: plotted_vals,
+        marker: {
+          symbol: 'square',
+          lineColor:'rgba(0,0,0,0)',
+          lineWidth: 1,
+        }
+      }],
+    };
+
+    $C("highcharter", {skip_client_init: true}, function(cmp) {
+      $C("modal", {title: "overview of " + field + " values"}, function(modal) {
+        modal.$el.find(".modal-body")
+          .append(cmp.$el)
+          .css("text-align", "center");
+
+        cmp.$el.height("100px");
+        cmp.$el.width("80%");
+        cmp.$el.css("display", "inline-block");
+
+        modal.show();
+
+        // There's a little setup cost to highcharts, maybe?
+        cmp.client(options);
+      });
+    });
+
   }
 
 }, {
