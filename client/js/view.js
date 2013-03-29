@@ -4,38 +4,32 @@ var helpers = require("client/views/helpers");
 
 var _container;
 
-// TODO: Push these into views instead of toplevel?
-var STD_INPUTS = [
-  "start", "end", "group_by", "max_results", "fieldset", "agg"
-];
-
-var STD_EXCLUDES = [
-  "field", "time_bucket", "hist_bucket"
-];
-
+var STD_INPUTS = helpers.STD_INPUTS;
+var STD_EXCLUDES = helpers.STD_EXCLUDES;
 var VIEW_INPUTS = {
-  "table" : {
-    include: STD_INPUTS.concat(["compare"]),
-    exclude: STD_EXCLUDES,
-    icon: "noun/table.svg"
-  },
-  "time" : {
-    include: STD_INPUTS.concat(["time_bucket", "compare"]),
-    exclude: ["field", "hist_bucket"],
-    icon: "noun/line.svg"
-  },
-  "dist" : {
-    include: STD_INPUTS.concat(["field", "hist_bucket", "compare"]),
-    exclude: [ "group_by", "max_results", "agg", "fieldset", "time_bucket" ],
-    icon: "noun/dist.svg"
-  },
-  "samples" : {
-    include: STD_INPUTS,
-    exclude: [ "group_by", "compare", "agg", "field", "fieldset", "compare", "time_bucket", "hist_bucket" ],
-    icon: "noun/pin.svg"
-  }
 };
+var GRAPHERS = {};
 
+
+jank.on("view:add", function(view, details, view_class) {
+  if (VIEW_INPUTS[view]) {
+    console.log("Warning, trying to redefine", view, "as a view");
+  }
+
+  console.log("Adding view:", view, details);
+
+  VIEW_INPUTS[view] = details;
+  GRAPHERS[view] = view_class;
+});
+
+// Requiring these here has this side effect of adding them to the list of
+// views we can use.
+var TimeView = require("client/views/time_view");
+var TableView = require("client/views/table_view");
+var DistView = require("client/views/dist_view");
+var SamplesView = require("client/views/samples_view");
+var ScatterView = require("client/views/scatter_view");
+var AreaView = require("client/views/area_view");
 var ResultsStore = require("client/js/results_store");
 
 function get_control(name) {
@@ -110,19 +104,6 @@ function handle_update_view(view) {
 }
 
 
-var TimeView = require("client/views/time_view");
-var TableView = require("client/views/table_view");
-var DistView = require("client/views/dist_view");
-var SamplesView = require("client/views/samples_view");
-var graphers = {
-  time: TimeView,
-  table: TableView,
-  dist: DistView,
-  samples: SamplesView
-};
-
-
-
 function insert_error(err) {
   console.log(err);
 
@@ -175,7 +156,7 @@ function create_graph(Grapher, data) {
 }
 
 function insert_new_graph(graph_type, data) {
-  var graph_view = graphers[graph_type];
+  var graph_view = GRAPHERS[graph_type];
   var comparison;
 
   if (graph_view) {
@@ -187,7 +168,7 @@ function insert_new_graph(graph_type, data) {
     $C("views/" + graph_type, function(cmp) {
       console.log("LOADING EXTERNAL VIEW", cmp);
       create_graph(cmp, data);
-      graphers[graph_type] = cmp;
+      GRAPHERS[graph_type] = cmp;
     });
   }
 }

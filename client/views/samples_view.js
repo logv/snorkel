@@ -80,4 +80,10 @@ var SamplesView = BaseView.extend({
   icon: "noun/pin.svg"
 });
 
+jank.trigger("view:add", "samples",  {
+  include: helpers.STD_INPUTS,
+  exclude: [ "group_by", "compare", "agg", "field", "fieldset", "compare", "time_bucket", "hist_bucket" ],
+  icon: "noun/pin.svg"
+}, SamplesView);
+
 module.exports = SamplesView;

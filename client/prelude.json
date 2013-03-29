@@ -10,7 +10,8 @@
     "static/scripts/vendor/jquery-deparam.js",
     "static/scripts/vendor/bootstrap.min.js",
     "static/scripts/vendor/fastclick.js",
-    "static/scripts/vendor/strtotime.js"
+    "static/scripts/vendor/strtotime.js",
+    "static/scripts/vendor/hex-rgb.src.js"
   ],
   "styles" : [
     "static/styles/bootstrap/bootstrap.cosmo.css",

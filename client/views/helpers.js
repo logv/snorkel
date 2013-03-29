@@ -15,6 +15,27 @@ var COLORS = [
 ];
 
 
+function row_key(group_by, result) {
+  var row = [];
+  _.each(group_by, function(group) {
+    row.push(result._id[group]);
+  });
+
+
+  return row.join(",");
+}
+
+function result_key(group_by, result) {
+  var row = [];
+  _.each(group_by, function(group) {
+    row.push(result.string[group]);
+  });
+
+
+  return row.join(",");
+}
+
+
 function countToSize(count) {
     var sizes = ['', 'K', 'M', 'G', 'T', 'P', 'Z' ];
     if (count === 0) { return '0'; }
@@ -234,5 +255,16 @@ module.exports = {
     }
 
     return cell;
-  }
+  },
+
+  row_key: row_key,
+  result_key: result_key,
+  STD_INPUTS: [
+    "start", "end", "group_by", "max_results", "fieldset", "agg"
+  ],
+
+  STD_EXCLUDES: [
+    "field", "field_two", "time_bucket", "hist_bucket"
+  ]
+
 };

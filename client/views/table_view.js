@@ -4,16 +4,7 @@ var filter_helper = require("controllers/query/filters");
 var helpers = require("client/views/helpers");
 var BaseView = require("client/views/base_view");
 
-function row_key(group_by, result) {
-  var row = [];
-  _.each(group_by, function(group) {
-    row.push(result._id[group]);
-  });
-
-
-  return row.join(",");
-}
-
+var row_key = helpers.row_key;
 function get_wrapper_for_cell(el) {
   var $el = $(el);
   if (!$el.is("td")) {
@@ -364,5 +355,11 @@ var TableView = BaseView.extend({
 }, {
   icon: "noun/table.svg"
 });
+
+jank.trigger("view:add", "table", {
+  include: helpers.STD_INPUTS.concat(["compare"]),
+  exclude: helpers.STD_EXCLUDES,
+  icon: "noun/table.svg"
+}, TableView);
 
 module.exports = TableView;

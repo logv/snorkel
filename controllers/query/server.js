@@ -239,7 +239,9 @@ var queries = {
   dist: backend.hist,
   table: backend.table,
   samples: backend.samples,
-  time: backend.time_series
+  scatter: backend.samples,
+  time: backend.time_series,
+  area: backend.time_series
 
 };
 
@@ -410,7 +412,13 @@ function handle_new_query(query_id, query_data, socket, done) {
 
   var weight_cols = false;
   // TODO: better encode when views need post processing
-  if (query_data.weight_col && query_data.view !== "samples") {
+  var sample_views = {
+    samples: true,
+    scatter: true,
+    crossfilter: true
+  };
+
+  if (query_data.weight_col && !sample_views[query_data.view]) {
     weight_cols = true;
   }
 

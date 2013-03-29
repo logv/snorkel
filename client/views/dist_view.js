@@ -313,4 +313,10 @@ var DistView = BaseView.extend({
   icon: "noun/dist.svg"
 });
 
+jank.trigger("view:add", "dist",  {
+    include: helpers.STD_INPUTS.concat(["field", "hist_bucket", "compare"]),
+    exclude: [ "group_by", "max_results", "agg", "fieldset", "time_bucket" ],
+    icon: "noun/dist.svg"
+}, DistView);
+
 module.exports = DistView;

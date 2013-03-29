@@ -91,18 +91,13 @@ var TimeView = BaseView.extend({
 
   },
 
-  // TODO: figure out rendering strategy. For now, we hold the graph until both
-  // are ready
-  render: function() {
-    // render with this.series
+  getChartOptions: function() {
     var _hovered;
 
-    var data = this.data.concat(this.compare_data || []);
-
     var options = {
-      series: data,
       chart: {
-        zoomType: "x"
+        zoomType: "x",
+        type: this.chart_type || 'line'
       },
       tooltip: {
         useHTML: true,
@@ -160,6 +155,17 @@ var TimeView = BaseView.extend({
 
     };
 
+    return options;
+
+  },
+  // TODO: figure out rendering strategy. For now, we hold the graph until both
+  // are ready
+  render: function() {
+    // render with this.series
+    var data = this.data.concat(this.compare_data || []);
+
+    var options = this.getChartOptions();
+    options.series = data;
     var $el = this.$el;
     $C("highcharter", {skip_client_init: true}, function(cmp) {
       // get rid of query contents...
@@ -175,5 +181,11 @@ var TimeView = BaseView.extend({
 }, {
   icon: "noun/line.svg"
 });
+
+jank.trigger("view:add", "time",  {
+    include: helpers.STD_INPUTS.concat(["time_bucket", "compare"]),
+    exclude: ["field", "hist_bucket"],
+    icon: "noun/line.svg"
+}, TimeView);
 
 module.exports = TimeView;

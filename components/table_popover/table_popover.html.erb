@@ -4,31 +4,12 @@
 <div class="table_popover">
 
 
-  <% if (type === "string") { %>
-    <a class="string option" data-op="$regex">
-      Add equals filter
-    </a>
-    <a class="string option" data-op="$regexv">
-      Add !equals filter
-    </a>
-  <% } %>
-
   <% if (type === "integer") { %>
-    <a class="integer option" data-op="$gt">
-      Add greater than filter
-    </a>
-    <a class="integer option" data-op="$lt">
-      Add less than filter
-    </a>
-    <a class="integer option" data-op="$ne">
-      Add not equals filter
-    </a>
-
-    <hr />
-
     <a class="overview">
       View column distribution
     </a>
+
+    <hr />
 
     <a class="view" data-view="dist">
       View cell distribution
@@ -39,8 +20,6 @@
     </a>
   <% } %>
 
-  <hr />
-
   <a class="view" data-view="samples">
     View samples
   </a>
@@ -48,4 +27,32 @@
   <a class="view" data-view="time_count">
     View count over time
   </a>
+
+
+  <% if (type === "string") { %>
+    <hr />
+
+    <a class="string option" data-op="$regex">
+      Add equals filter
+    </a>
+    <a class="string option" data-op="$regexv">
+      Add !equals filter
+    </a>
+  <% } %>
+
+  <% if (type === "integer") { %>
+
+    <hr />
+
+    <a class="integer option" data-op="$gt">
+      Add greater than filter
+    </a>
+    <a class="integer option" data-op="$lt">
+      Add less than filter
+    </a>
+    <a class="integer option" data-op="$ne">
+      Add not equals filter
+    </a>
+  <% } %>
+
 </div>
