@@ -2,6 +2,7 @@
 
 var helpers = require("client/views/helpers");
 var BaseView = require("client/views/base_view");
+var ks_test = require("client/js/ks_test");
 
 function calc_cdf(sorted_hist_arr, total, w_total) {
   var sum = 0, w_sum = 0;
@@ -10,7 +11,9 @@ function calc_cdf(sorted_hist_arr, total, w_total) {
   var last_percentile = 0;
   var perc = [];
   var p;
+  var cdf = {};
   var value, count, w_count = 0;
+  var sum_total = 0, w_sum_total = 0;
 
   _.each(sorted_hist_arr, function(bin) {
     value = bin[0];
@@ -20,19 +23,24 @@ function calc_cdf(sorted_hist_arr, total, w_total) {
     sum += count;
     w_sum += w_count;
 
+    w_sum_total += (w_count * value);
+    sum_total += (count * value);
+
     var percentile;
     // we are weighting
     if (w_total) {
-      percentile = parseInt(w_sum/w_total * 1000, 10);
+      percentile = parseInt(w_sum / w_total * 1000, 10);
     } else {
       percentile = parseInt(sum / total * 1000, 10);
     }
+
 
     for (p = last_percentile + 1; p < percentile; p++) {
       perc.push([p, value]);
     }
 
     perc.push([percentile, value]);
+    cdf[value] = percentile;
 
     // we are weighting
     if (w_total) {
@@ -57,7 +65,10 @@ function calc_cdf(sorted_hist_arr, total, w_total) {
     dist: dist,
     percentiles: perc,
     weighted_count: w_sum,
-    count: sum
+    cdf: cdf,
+    count: sum,
+    average: sum_total / sum,
+    w_average: w_sum_total / w_sum
   };
 }
 
@@ -93,7 +104,8 @@ var DistView = BaseView.extend({
 
     var stats = calc_cdf(series, total, w_total);
 
-    // TODO: should cut percentiles off at p99.
+    // copy copy copy
+    stats.parsed = data.parsed;
     return stats;
   },
 
@@ -106,11 +118,17 @@ var DistView = BaseView.extend({
         });
         series.dashStyle = "LongDash";
       });
+
+      this.ks_result = ks_test(this.data.percentiles.slice(50, 950), this.compare_data.percentiles.slice(50, 950), this.data.count, this.compare_data.count);
+      this.ks_low_result = ks_test(this.data.percentiles.slice(0, 250), this.compare_data.percentiles.slice(0, 250), this.data.count, this.compare_data.count);
+      this.ks_high_result = ks_test(this.data.percentiles.slice(749, 999), this.compare_data.percentiles.slice(749, 999), this.data.count, this.compare_data.count);
+
     }
 
     if (!this.data.count && (!this.data || !this.data.count)) {
       return "No Samples";
     }
+
   },
 
   render: function() {
@@ -141,6 +159,46 @@ var DistView = BaseView.extend({
         });
       }
     });
+
+    var ks_line, ks_low_line, ks_high_line;
+    if (this.ks_result) {
+      ks_line = {
+        value: this.ks_result.at,
+        label: {
+          text: "delta: " + helpers.count_format(this.ks_result.max * 100),
+          style: {
+            color: "rgba(200, 0, 0, 0.7)"
+          }
+        },
+        width: 1,
+        color: "rgba(200, 0, 0, 0.7)",
+        dashStyle: "dot"
+      };
+      ks_low_line = {
+        value: this.ks_low_result.at,
+        label: {
+          text: "delta: " + helpers.count_format(this.ks_low_result.max * 100),
+          style: {
+            color: "rgba(200, 0, 0, 0.7)"
+          }
+        },
+        width: 1,
+        color: "rgba(200, 0, 0, 0.7)",
+        dashStyle: "dot"
+      };
+      ks_high_line = {
+        value: this.ks_high_result.at,
+        label: {
+          text: "delta: " + helpers.count_format(this.ks_high_result.max * 100),
+          style: {
+            color: "rgba(200, 0, 0, 0.7)"
+          }
+        },
+        width: 1,
+        color: "rgba(200, 0, 0, 0.7)",
+        dashStyle: "dot"
+      };
+    }
 
     var xmin = this.data.percentiles[50][1]; // p5
     var xmax = this.data.percentiles[950][1]; // p95
@@ -175,7 +233,7 @@ var DistView = BaseView.extend({
         min: xmin,
         max: xmax,
         reversed: false,
-        plotLines: plot_lines
+        plotLines: plot_lines.concat([ks_line, ks_low_line, ks_high_line])
       }
     };
 
@@ -212,31 +270,82 @@ var DistView = BaseView.extend({
     }
 
     var outerEl = $("<div class='span12 pll'>");
+
+    var range = Math.abs(xmax - xmin);
+    var bucket_count = range / this.data.parsed.hist_bucket;
+    var warning;
+    var hist_bucket = this.data.parsed.hist_bucket;
+
+    if (bucket_count > 5000) {
+      warning = "Your bucket size (<b>" + hist_bucket + "</b>), may be too small for the data range (<b>" + helpers.count_format(bucket_count) + "</b> buckets in the range <b>" + helpers.count_format(xmin) + " &mdash; " + helpers.count_format(xmax) + "</b>) and cause artifacts in the distribution. Try raising it to a value that creates 1,000 - 5,000 buckets.";
+    } else if (bucket_count < 10) {
+      warning = "Your bucket size (<b>" + hist_bucket + "</b>), may be too large for the data range (<b>" + bucket_count + "</b> buckets in the range <b>" + helpers.count_format(xmin) + " &mdash; " + helpers.count_format(xmax) + "</b>) and cause artifacts in the distribution. Try lowering it to a value that creates 1,000 - 5,000 buckets.";
+    }
+
+    if (warning) {
+      var warningEl = $("<div class='alert alert-warning lfloat'> </div>");
+      warningEl.html(warning);
+      outerEl.append(warningEl);
+    }
+
     outerEl.append($("<h2>At a glance</h2>"));
 
-    var headers = ["count"];
+    var headers = ["count", "average", "trimean"];
     var row = [];
+
+    function trimean(data) {
+      return (data.percentiles[500][1] * 2 + data.percentiles[250][1] + data.percentiles[750][1]) / 4;
+    }
 
     if (compare_percentiles) {
       row.push(helpers.build_compare_cell(this.data.count, this.compare_data.count));
+      row.push(helpers.build_compare_cell(this.data.average, this.compare_data.average));
+
+      row.push(helpers.build_compare_cell(trimean(this.data), trimean(this.compare_data)));
+
     } else {
       row.push(helpers.count_format(this.data.count));
+      row.push(helpers.count_format(this.data.average));
+      row.push(helpers.count_format(trimean(this.data)));
+
     }
 
     if (this.data.weighted_count) {
+      headers.unshift("weighted average");
       headers.unshift("weighted count");
       if (compare_percentiles) {
+        row.unshift(helpers.build_compare_cell(this.data.w_average, this.compare_data.w_average));
         row.unshift(helpers.build_compare_cell(this.data.weighted_count, this.compare_data.weighted_count));
       } else {
+        row.unshift(helpers.count_format(this.data.w_average));
         row.unshift(helpers.count_format(this.data.weighted_count));
       }
     }
 
 
-    outerEl.append(render_stats_overview([5, 25, 50, 75, 95], headers, row));
+
+    var table = helpers.build_table(headers, [row]);
+    table.attr("class",  "table");
+    outerEl.append(table);
+    outerEl.append($("<h2>Percentiles</h2>"));
+    outerEl.append(render_stats_overview([5, 25, 50, 75, 95]));
     outerEl.append($("<h2>Outliers</h2>"));
     outerEl.append(render_stats_overview([95, 96, 97, 98, 99]));
-    outerEl.append($("<h2>Cumulative Density</h2>"));
+    var cumDensityEl = $("<h2 class='cdf_density'>Cumulative Density</h2>");
+    outerEl.append(cumDensityEl);
+
+    var diffEl = $("<small class='rfloat mtl'>");
+
+    if (this.compare_data) {
+      diffEl.css("color", "rgba(200, 0, 0, 0.7)");
+      if (this.ks_result.p) {
+        diffEl.html("(distributions are <b>similar</b>, p-val:" + helpers.count_format(this.ks_result.p) + ")</small>");
+      } else {
+        diffEl.html("(distributions are <b>not similar</b>)</small>");
+      }
+
+      cumDensityEl.append(diffEl);
+    }
 
     $el.prepend(outerEl);
 

@@ -181,7 +181,7 @@ function handle_query_id(data) {
   ResultsStore.identify(data);
 }
 
-function insert_query_tiles(container, queries) {
+function insert_query_tiles(container, queries, in_order) {
   _.each(queries, function(data) {
     var view_data = views.VIEWS[data.parsed.view];
 
@@ -206,7 +206,11 @@ function insert_query_tiles(container, queries) {
     // Psas in the query from above for later re-usage
     $C("query_tile", { query: data, icon: icon }, function(tile) {
       tile.$el.hide();
-      tile.prependTo(container);
+      if (in_order) {
+        tile.appendTo(container);
+      } else {
+        tile.prependTo(container);
+      }
       tile.$el.fadeIn(1000);
     });
   });
@@ -242,12 +246,16 @@ function handle_new_query() {
   QS.new_query();
 }
 
+function load_recent_queries(queries) {
+  insert_query_tiles($("#query_queue .query_list"), queries, true);
+}
+
 function load_saved_queries(queries) {
-  insert_query_tiles($("#query_queue .saved_queries"), queries);
+  insert_query_tiles($("#query_queue .saved_queries"), queries, true);
 }
 
 function load_shared_queries(queries) {
-  insert_query_tiles($("#query_queue .shared_queries"), queries);
+  insert_query_tiles($("#query_queue .shared_queries"), queries, true);
 }
 
 module.exports = {
@@ -567,13 +575,15 @@ module.exports = {
     socket.on("compare_results", handle_compare_results);
     socket.on("query_id", handle_query_id);
 
+    socket.on("recent_queries", load_recent_queries);
     socket.on("saved_queries", load_saved_queries);
     socket.on("shared_queries", load_shared_queries);
 
     // TODO: make sure this is for reals.
-    var table = $("select[name=table]").val();
+    var table = $("select[name=table]").first().val();
     socket.emit("get_saved_queries", table);
     socket.emit("get_shared_queries", table);
+    socket.emit("get_recent_queries", table);
   },
 
   set_table: function(table) {
@@ -629,7 +639,7 @@ module.exports = {
       serialized.data.push({ name: 'weight_col', value: this.weight_col});
     }
 
-    var table = $("select[name=table]").val();
+    var table = $("select[name=table]").first().val();
     serialized.data.push({ name: 'table', value: table});
 
     jank.socket().emit("new_query", serialized.data);

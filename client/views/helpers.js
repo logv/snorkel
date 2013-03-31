@@ -39,7 +39,17 @@ function result_key(group_by, result) {
 function countToSize(count) {
     var sizes = ['', 'K', 'M', 'G', 'T', 'P', 'Z' ];
     if (count === 0) { return '0'; }
+    if (!count) { 
+      return 'n/a';
+    }
+
     var i = parseInt(Math.floor(Math.log(count) / Math.log(1000)), 10);
+
+    if (i >= sizes.length) {
+      return count;
+    } else if (i < 0) {
+      return parseInt(count * 1000, 10) / 1000;
+    }
 
     return Math.round(count / Math.pow(1000, i) * 100, 2) / 100 + '' + sizes[i];
 }

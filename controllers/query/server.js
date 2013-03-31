@@ -480,7 +480,8 @@ function get_saved_queries(conditions, options, cb) {
   var visited = {};
   var collection = db.get("query", "results");
   collection.find(conditions, options, function(err, cur) {
-    cur.limit(100);
+    cur.sort({ updated: -1 });
+    cur.limit(options.limit || 30);
     cur.toArray(function(err, arr) {
       _.each(arr, function(query) {
         if (visited[query.hashid]) {
@@ -527,6 +528,18 @@ function get_saved_for_dataset(username, dataset, cb) {
   });
 }
 
+function get_recent_queries_for_user(username, dataset, cb) {
+  var conditions = { username: username };
+  if (dataset) {
+    conditions['parsed.table'] = dataset;
+  }
+
+  get_saved_queries(conditions, {limit: 10}, function(arr) {
+    cb(arr);
+  });
+}
+
+
 function get_saved_query(hashid, cb) {
   var collection = db.get("query", "results");
   collection.find({hashid: hashid}, { limit: 1, sort: { updated: -1 }}, function(err, cur) {
@@ -556,6 +569,12 @@ module.exports = {
     socket.on("get_saved_queries", function(dataset) {
       get_saved_for_user(user_name, dataset, function(arr) {
         socket.emit("saved_queries", arr);
+      });
+    });
+
+    socket.on("get_recent_queries", function(dataset) {
+      get_recent_queries_for_user(user_name, dataset, function(arr) {
+        socket.emit("recent_queries", arr);
       });
     });
 

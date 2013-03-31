@@ -55,7 +55,6 @@ module.exports = {
         }
     };
 
-    console.log(chart_options);
     // deep merge.
     $.extend(true, chart_options, options);
 
