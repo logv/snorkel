@@ -16,7 +16,7 @@ function ks_test(perc_one, perc_two, len_one, len_two) {
   var max_delta = 0;
   var at;
 
-  for (var i = 0; i < perc_one.length; i++) {
+  for (var i = 0; i < perc_one.length; i+=10) {
     var d_one = perc_one[i];
     var d_two = perc_two[i];
 
@@ -45,13 +45,11 @@ function ks_test(perc_one, perc_two, len_one, len_two) {
   while (it[1] >= low_val + 1) {
     new_at -= 1;
     if (!high_series[new_at]) {
+      new_at += 1;
       break;
-      new_at -= 1;
     }
 
     it = high_series[new_at];
-
-    low_delta = Math.max(Math.abs(new_at - at), low_delta);
   }
 
   low_delta = Math.abs(new_at - at);
@@ -61,8 +59,8 @@ function ks_test(perc_one, perc_two, len_one, len_two) {
   while (it[1] <= high_val - 1) {
     new_at += 1;
     if (!low_series[new_at]) {
-      break;
       new_at -= 1;
+      break;
     }
 
     it = low_series[new_at];

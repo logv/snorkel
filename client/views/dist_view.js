@@ -120,8 +120,8 @@ var DistView = BaseView.extend({
       });
 
       this.ks_result = ks_test(this.data.percentiles.slice(50, 950), this.compare_data.percentiles.slice(50, 950), this.data.count, this.compare_data.count);
-      this.ks_low_result = ks_test(this.data.percentiles.slice(0, 250), this.compare_data.percentiles.slice(0, 250), this.data.count, this.compare_data.count);
-      this.ks_high_result = ks_test(this.data.percentiles.slice(749, 999), this.compare_data.percentiles.slice(749, 999), this.data.count, this.compare_data.count);
+      this.ks_low_result = ks_test(this.data.percentiles.slice(25, 250), this.compare_data.percentiles.slice(25, 250), this.data.count, this.compare_data.count);
+      this.ks_high_result = ks_test(this.data.percentiles.slice(749, 975), this.compare_data.percentiles.slice(749, 975), this.data.count, this.compare_data.count);
 
     }
 
