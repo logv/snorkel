@@ -62,6 +62,7 @@ function set_container(el) {
   filter_area = el.find(".query_filters");
 }
 
+var _filter_els = [];
 function add_filter(filter, compare, force) {
   filter = _.clone(filter);
 
@@ -72,8 +73,14 @@ function add_filter(filter, compare, force) {
   if (!val && !force) {
     return;
   }
+  var filters = _filter_els;
 
   $C("filter_row", { fields: typed_fields, op: op, selected: val, field: field }, function(cmp) {
+    if (!filters.alive) {
+      return;
+    }
+
+    filters.push(cmp.$el);
     cmp.set_field(field);
     cmp.set_value(val);
     cmp.set_op(op);
@@ -93,14 +100,22 @@ function add_filter(filter, compare, force) {
 function add_filter_compare(filter, force) {
   add_filter(filter, true, force);
 }
+
+function remove_filters_from_dom() {
+  console.log("REMOVING FILTERS FROM DOM");
+  compare_area.find(".filter_row").remove();
+  filter_area.find(".filter_row").remove();
+}
+
 // We need field data available here to even make the component... oh noes...
 // what should we do?
 function set_filter_data(filters, no_add_if_empty) {
-  filter_area.fadeOut();
-  compare_area.fadeOut();
-
-  compare_area.find(".filter_row").remove();
-  filter_area.find(".filter_row").remove();
+  _filter_els.alive = false;
+  _filter_els = [];
+  _filter_els.alive = true;
+  _.each(_filter_els, function(el) {
+    el.remove();
+  });
 
   var query = _.filter(filters.query, function(f) { return f[2]; });
   var compare = _.filter(filters.compare, function(f) { return f[2]; });
@@ -113,26 +128,24 @@ function set_filter_data(filters, no_add_if_empty) {
     add_filter_compare(f);
   });
 
+  var hide_compare = !compare.length;
   if (!no_add_if_empty) {
     if (!query.length) { add_filter(["", "", ""], false, true); }
     if (!compare.length) { add_filter(["", "", ""], true, true); }
   }
 
-  var hide_compare = !compare.length;
 
-  filter_area.fadeIn();
+  filter_area.show();
 
   if (hide_compare) {
     jank.controller().trigger("hide_compare_filters");
   } else {
-    jank.controller().trigger("show_compare_filters");
+    jank.controller().trigger("show_compare_filters", true);
   }
 
 }
 
-function add_or_update_filter(filters, compare) {
-  var cur_filters = get_filter_data();
-  var modify = compare ? cur_filters.compare : cur_filters.query;
+function add_or_update_filters(cur_filters, modify, filters) {
 
   if (!_.isArray(filters)) {
     filters = _.toArray(filters);
@@ -149,7 +162,7 @@ function add_or_update_filter(filters, compare) {
     });
 
     if (!found) {
-      to_add.push([filter, compare]);
+      to_add.push(filter);
       return;
     }
 
@@ -157,17 +170,35 @@ function add_or_update_filter(filters, compare) {
     found[2] = filter[2];
   });
 
-  set_filter_data(cur_filters, filters.length > 0);
-
-  _.each(to_add, function(filter_data) {
-    add_filter.apply(null, filter_data);
-  });
+  return to_add;
 }
+
+function add_or_update_filter(filters, compare_filters) {
+  var cur_filters = get_filter_data();
+
+  var to_add = add_or_update_filters(cur_filters, cur_filters.query, filters);
+  var to_add_compare = add_or_update_filters(cur_filters, cur_filters.compare, compare_filters);
+
+  remove_filters_from_dom();
+  set_filter_data(cur_filters, true);
+
+
+  _.each(to_add, function(filter) {
+    add_filter(filter);
+  });
+
+  _.each(to_add_compare, function(filter) {
+    add_filter(filter, true);
+  });
+
+}
+
 
 
 module.exports = {
   get: get_filter_data,
   set: set_filter_data,
+  empty: remove_filters_from_dom,
   add: add_filter,
   add_compare: add_filter_compare,
   add_or_update: add_or_update_filter,

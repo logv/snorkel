@@ -202,8 +202,7 @@ var TableView = BaseView.extend({
 
     var filter = get_filter_for_popup(el);
 
-    filter_helper.add_or_update([filter]);
-    filter_helper.add_or_update([filter], true);
+    filter_helper.add_or_update([filter], [filter]);
   },
 
   handle_popover_view_clicked: function(evt) {
@@ -223,11 +222,12 @@ var TableView = BaseView.extend({
       }
     });
 
-    filter_helper.add_or_update(filters);
 
     if (jank.controller().compare_mode()) {
-      filter_helper.add_or_update(filters, true);
+      filter_helper.add_or_update(filters, filters);
       jank.controller().show_compare_filters();
+    } else {
+      filter_helper.add_or_update(filters);
     }
 
     var to_view = el.attr("data-view");

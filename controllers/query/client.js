@@ -456,6 +456,7 @@ module.exports = {
       var filterEl = this.$page.find("#filters");
       // one level of dependencies?
       jank.do_when(this.fields, 'query:fields', function() {
+        filter_helper.empty();
         filter_helper.set(filters);
       });
 
@@ -533,6 +534,7 @@ module.exports = {
     var filterBox = this.$page.find(".filter_group[data-filter-type=compare]");
     var compareFilter = this.$page.find(".compare_filter");
     filterBox.show();
+    compareFilter.show();
 
     // If there is no filter row and we want to show comparison filters
     if (!filterBox.find(".filter_row").length && add_if_empty) {
@@ -545,7 +547,6 @@ module.exports = {
         scrollTop: filterBox.offset().top - container.offset().top + container.scrollTop()
     }, 1000);
 
-
   },
 
   hide_compare_filters: function() {
@@ -553,6 +554,7 @@ module.exports = {
     var compareFilter = this.$page.find(".compare_filter");
     filterBox.hide();
     compareFilter.html("Add Comparison Filters");
+
 
   },
 
