@@ -132,289 +132,479 @@ var DistView = BaseView.extend({
   },
 
   render: function() {
-
-
     var self = this;
-    var plot_lines = [];
-    _.each([5, 25, 50, 75, 95], function(p) {
-      plot_lines.push({
-        value : self.data.percentiles[p*10][1],
-        label: {
-          text: "p" + p
-        },
-        width: 1,
-        color: "#aaa",
-        dashStyle: 'dash'
-      });
+    var xmin = self.data.percentiles[50][1]; // p5
+    var xmax = self.data.percentiles[960][1]; // p95
 
-      if (self.compare_data) {
+    if (self.compare_data) {
+      xmin = Math.min(xmin, self.compare_data.percentiles[50][1]);
+      xmax = Math.max(xmax, self.compare_data.percentiles[960][1]);
+    }
+
+    function render_graphs(xmin, xmax) {
+
+      var outerEl = $("<div>");
+      var plot_lines = [];
+      _.each([5, 25, 50, 75, 95], function(p) {
         plot_lines.push({
-          value : self.compare_data.percentiles[p*10][1],
+          value : self.data.percentiles[p*10][1],
           label: {
             text: "p" + p
           },
           width: 1,
-          dashStyle: 'dot',
-          color: "#aaa"
+          color: "#aaa",
+          dashStyle: 'dash'
         });
-      }
-    });
 
-    var ks_line, ks_low_line, ks_high_line;
-    if (this.ks_result) {
-      ks_line = {
-        value: this.ks_result.at,
-        label: {
-          text: "delta: " + helpers.count_format(this.ks_result.max * 100),
-          style: {
-            color: "rgba(200, 0, 0, 0.7)"
-          }
-        },
-        width: 1,
-        color: "rgba(200, 0, 0, 0.7)",
-        dashStyle: "dot"
-      };
-      ks_low_line = {
-        value: this.ks_low_result.at,
-        label: {
-          text: "delta: " + helpers.count_format(this.ks_low_result.max * 100),
-          style: {
-            color: "rgba(200, 0, 0, 0.7)"
-          }
-        },
-        width: 1,
-        color: "rgba(200, 0, 0, 0.7)",
-        dashStyle: "dot"
-      };
-      ks_high_line = {
-        value: this.ks_high_result.at,
-        label: {
-          text: "delta: " + helpers.count_format(this.ks_high_result.max * 100),
-          style: {
-            color: "rgba(200, 0, 0, 0.7)"
-          }
-        },
-        width: 1,
-        color: "rgba(200, 0, 0, 0.7)",
-        dashStyle: "dot"
-      };
-    }
-
-    var xmin = this.data.percentiles[50][1]; // p5
-    var xmax = this.data.percentiles[950][1]; // p95
-
-    if (this.compare_data) {
-      xmin = Math.min(xmin, this.compare_data.percentiles[50][1]);
-      xmax = Math.max(xmax, this.compare_data.percentiles[950][1]);
-    }
-
-    var options = {
-      chart: {
-        inverted: true
-      },
-      series: [
-        {
-          data: this.data.percentiles,
-          name: "Query Results",
-          color: helpers.get_color("cdf")
-        },
-        {
-          data: (this.compare_data && this.compare_data.percentiles) || [],
-          name: "Comparison",
-          dashStyle: "LongDash",
-          color: helpers.get_color("cdf")
+        if (self.compare_data) {
+          plot_lines.push({
+            value : self.compare_data.percentiles[p*10][1],
+            label: {
+              text: "p" + p
+            },
+            width: 1,
+            dashStyle: 'dot',
+            color: "#aaa"
+          });
         }
-      ],
-      xAxis: {
-        reversed: false,
-        type: "linear" // TODO: make this configurable?
-      },
-      yAxis: {
-        min: xmin,
-        max: xmax,
-        reversed: false,
-        plotLines: plot_lines.concat([ks_line, ks_low_line, ks_high_line])
-      }
-    };
-
-    var $el = this.$el;
-
-    // render this business
-    var shortStatsEl = $el.find(".short_stats");
-    var percentiles = this.data.percentiles;
-    var compare_percentiles = this.compare_data && this.compare_data.percentiles;
-
-    function render_stats_overview(stats, headers, row) {
-      headers = headers || [];
-      row = row || [];
-
-      _.each(stats, function(p) {
-        headers.push("p" + parseInt(p, 10));
-        p = p * 10;
-        var cell;
-
-        if (compare_percentiles) {
-          cell = helpers.build_compare_cell(percentiles[p][1], compare_percentiles[p][1]);
-        } else {
-          cell = $("<div>").html(helpers.count_format(percentiles[p][1]));
-        }
-
-        row.push(cell);
       });
+
+      var ks_line, ks_low_line, ks_high_line;
+      if (self.ks_result) {
+        ks_line = {
+          value: self.ks_result.at,
+          label: {
+            text: "delta: " + helpers.count_format(self.ks_result.max * 100),
+            style: {
+              color: "rgba(200, 0, 0, 0.7)"
+            }
+          },
+          width: 1,
+          color: "rgba(200, 0, 0, 0.7)",
+          dashStyle: "dot"
+        };
+        ks_low_line = {
+          value: self.ks_low_result.at,
+          label: {
+            text: "delta: " + helpers.count_format(self.ks_low_result.max * 100),
+            style: {
+              color: "rgba(200, 0, 0, 0.7)"
+            }
+          },
+          width: 1,
+          color: "rgba(200, 0, 0, 0.7)",
+          dashStyle: "dot"
+        };
+        ks_high_line = {
+          value: self.ks_high_result.at,
+          label: {
+            text: "delta: " + helpers.count_format(self.ks_high_result.max * 100),
+            style: {
+              color: "rgba(200, 0, 0, 0.7)"
+            }
+          },
+          width: 1,
+          color: "rgba(200, 0, 0, 0.7)",
+          dashStyle: "dot"
+        };
+      }
+
+      var options = {
+        chart: {
+          inverted: true
+        },
+        series: [
+          {
+            data: self.data.percentiles,
+            name: "Query Results",
+            color: "rgba(0, 0, 200, 0.5)"
+          },
+          {
+            data: (self.compare_data && self.compare_data.percentiles) || [],
+            name: "Comparison",
+            dashStyle: "LongDash",
+            color: "rgba(200, 0, 0, 0.5)"
+          }
+        ],
+        xAxis: {
+          reversed: false,
+          type: "linear" // TODO: make self configurable?
+        },
+        yAxis: {
+          min: xmin,
+          max: xmax,
+          reversed: false,
+          plotLines: plot_lines.concat([ks_line, ks_low_line, ks_high_line])
+        }
+      };
+
+      var cumDensityEl = $("<h2 class='cdf_density'>Cumulative Density Graph</h2>");
+      outerEl.append(cumDensityEl);
+
+      var cdfEl = $("<div class='span12'/>");
+      cdfEl.css("height", "500px");
+
+      outerEl.append(cdfEl);
+
+      $C("highcharter", {skip_client_init: true}, function(cmp) {
+        // get rid of query contents...
+
+        cdfEl
+          .append(cmp.$el)
+          .show();
+
+        // There's a little setup cost to highcharts, maybe?
+        cmp.client(options);
+      });
+
+      var distEl = $("<div class='span12'/>");
+      distEl.css("height", "500px");
+
+      outerEl.append($("<h2 class='mll'>Probability Density</h2>"));
+      outerEl.append(distEl);
+
+      var dist_options = {
+        chart: {
+          inverted: false
+        },
+        series: [
+          {
+            data: self.data.dist,
+            name: "Query Results",
+            color: "rgba(0, 0, 200, 0.5)"
+          },
+          {
+            data: (self.compare_data && self.compare_data.dist) || [],
+            name: "Comparison",
+            dashStyle: "LongDash",
+            color: "rgba(200, 0, 0, 0.5)"
+          }
+        ],
+        xAxis: {
+          min: xmin,
+          max: xmax,
+          reversed: false,
+          plotLines: plot_lines,
+          type: "linear" // TODO: make self configurable?
+        },
+        yAxis: {
+          reversed: false
+        },
+        tooltip: {
+          valueSuffix: "%"
+        }
+      };
+
+      $C("highcharter", {skip_client_init: true}, function(cmp) {
+        // get rid of query contents...
+
+        distEl
+          .append(cmp.$el)
+          .show();
+
+        // There's a little setup cost to highcharts, maybe?
+        cmp.client(dist_options);
+      });
+
+      return outerEl;
+
+
+    }
+
+    function render_glance(xmin, xmax) {
+      var glance_lines = [];
+      var glance_data = [ ];
+      var glance_compare_data = [ ];
+
+      var odd = true;
+      _.each([5, 10, 20, 30, 40, 50, 60, 70, 80, 90, 95], function(p) {
+        odd = !odd;
+        glance_data.push({
+          x : self.data.percentiles[p*10][1],
+          y: p,
+          marker: {
+            radius: odd ? 4 : 8,
+            symbol: odd ? "circle" : "diamond"
+          }
+        });
+
+        if (self.compare_data) {
+          glance_compare_data.push({
+            x : self.compare_data.percentiles[p*10][1],
+            y: p,
+            marker: {
+              radius: odd ? 4 : 8,
+              symbol: odd ? "circle" : "diamond"
+            }
+          });
+        }
+      });
+
+      var percentiles = self.data.percentiles;
+      var compare_percentiles = self.compare_data && self.compare_data.percentiles;
+
+
+
+
+      var glance_options = {
+        chart: {
+          height: 100,
+          type: "spline"
+        },
+        xAxis: {
+          min: xmin,
+          max: xmax,
+          reversed: false,
+          type: "linear" // TODO: make self configurable?
+        },
+        plotOptions: {
+          series: {
+            dataLabels: {
+              enabled: false
+            },
+            marker: {
+              states: {
+                hover: {
+                  enabled: false
+                }
+              }
+            }
+          }
+        },
+        tooltip: {
+          backgroundColor: 'white',
+          borderWidth: 0,
+          borderRadius: 0,
+          headerFormat: '{point.key} ',
+          shared: false,
+          positioner: function () {
+            return { x: 10, y: 0 };
+          },
+
+          formatter: function () {
+
+            var ret = "percentile:" + helpers.count_format(this.y) + " " +
+              "value: " + helpers.count_format(this.x) + ' ';
+
+            if (compare_percentiles) {
+              var percentile = this.y;
+              var delta = Math.abs(compare_percentiles[percentile*10][1] - percentiles[percentile*10][1]);
+
+              ret += " original - compare = " + helpers.count_format(delta);
+            }
+
+            return ret;
+          },
+        },
+        series: [
+          {
+            data: glance_data,
+            name: "Percentiles",
+            marker: {
+              enabled : true,
+              shape: "square"
+            },
+            color: "rgba(0, 0, 200, 0.5)"
+          },
+          {
+            data: glance_compare_data,
+            name: "Percentiles (comparison)",
+            marker: {
+              enabled : true
+            },
+            color: "rgba(200, 0, 0, 0.5)"
+          }
+        ],
+        yAxis: {
+          enabled: true,
+          reversed: false
+        }
+      };
+
+      var glanceEl = $("<h2>At a glance</h2>")
+
+      var samplesEl, countEl, compareCountEl;
+      samplesEl = $("<span style='font-size: 80%'>");
+      samplesEl.addClass("rfloat");
+      samplesEl.html("Samples: ");
+      countEl = $("<span />");
+      countEl.html(helpers.count_format(self.data.count));
+      countEl.css({color: "rgba(0, 0, 200, 0.5)"});
+      samplesEl.append(countEl);
+      if (self.compare_data) {
+        samplesEl.append("/");
+        compareCountEl = $("<span />");
+        compareCountEl.html(helpers.count_format(self.compare_data.count));
+        compareCountEl.css({color: "rgba(200, 0, 0, 0.5)"});
+        samplesEl.append(compareCountEl);
+      }
+      glanceEl.append(samplesEl);
+
+      $C("highcharter", {skip_client_init: true}, function(cmp) {
+        // get rid of query contents...
+
+        glanceEl
+          .append(cmp.$el)
+          .show();
+
+        // There's a little setup cost to highcharts, maybe?
+        cmp.client(glance_options);
+      });
+
+      return glanceEl;
+    }
+
+    function render_percentiles(xmin, xmax) {
+      // render this business
+      var outerEl = $("<div>");
+      var shortStatsEl = $el.find(".short_stats");
+      var percentiles = self.data.percentiles;
+      var compare_percentiles = self.compare_data && self.compare_data.percentiles;
+
+      function render_stats_overview(stats, headers, row) {
+        headers = headers || [];
+        row = row || [];
+
+        _.each(stats, function(p) {
+          headers.push("p" + parseInt(p, 10));
+          p = p * 10;
+          var cell;
+
+          if (compare_percentiles) {
+            cell = helpers.build_compare_cell(percentiles[p][1], compare_percentiles[p][1]);
+          } else {
+            cell = $("<div>").html(helpers.count_format(percentiles[p][1]));
+          }
+
+          row.push(cell);
+        });
+
+        var table = helpers.build_table(headers, [row]);
+
+        // only class attr.
+        table.attr("class",  "table");
+        return table;
+      }
+
+      outerEl.append($("<h2>Percentiles</h2>"));
+      outerEl.append(render_stats_overview([5, 25, 50, 75, 95]));
+      outerEl.append($("<h2>Moments</h2>"));
+
+      var headers = ["count", "average", "trimean"];
+      var row = [];
+
+      function trimean(data) {
+        return (data.percentiles[500][1] * 2 + data.percentiles[250][1] + data.percentiles[750][1]) / 4;
+      }
+
+      if (self.compare_data) {
+        row.push(helpers.build_compare_cell(self.data.count, self.compare_data.count));
+        if (self.data.weighted_count) {
+          row.push(helpers.build_compare_cell(self.data.w_average, self.compare_data.w_average));
+        } else {
+          row.push(helpers.build_compare_cell(self.data.average, self.compare_data.average));
+        }
+        row.push(helpers.build_compare_cell(trimean(self.data), trimean(self.compare_data)));
+
+      } else {
+        row.push(helpers.count_format(self.data.count));
+        if (self.data.weighted_count) {
+          row.push(helpers.count_format(self.data.w_average));
+        } else {
+          row.push(helpers.count_format(self.data.average));
+        }
+        row.push(helpers.count_format(trimean(self.data)));
+      }
+
+      if (self.data.weighted_count) {
+        headers.unshift("weighted count");
+        if (compare_percentiles) {
+          row.unshift(helpers.build_compare_cell(self.data.weighted_count, self.compare_data.weighted_count));
+        } else {
+          row.unshift(helpers.count_format(self.data.weighted_count));
+        }
+      }
+
+
 
       var table = helpers.build_table(headers, [row]);
 
       // only class attr.
       table.attr("class",  "table");
-      return table;
+      outerEl.append(table);
+
+      outerEl.append($("<h2>Outliers</h2>"));
+      outerEl.append(render_stats_overview([95, 96, 97, 98, 99]));
+
+      return outerEl;
     }
 
-    var outerEl = $("<div class='span12 pll'>");
+    function render_notices(xmin, xmax) {
+      var range = Math.abs(xmax - xmin);
+      var bucket_count = range / self.data.parsed.hist_bucket;
+      var warning;
+      var hist_bucket = self.data.parsed.hist_bucket;
+      var warningEl = "";
 
-    var range = Math.abs(xmax - xmin);
-    var bucket_count = range / this.data.parsed.hist_bucket;
-    var warning;
-    var hist_bucket = this.data.parsed.hist_bucket;
-
-    if (bucket_count > 5000) {
-      warning = "Your bucket size (<b>" + hist_bucket + "</b>), may be too small for the data range (<b>" + helpers.count_format(bucket_count) + "</b> buckets in the range <b>" + helpers.count_format(xmin) + " &mdash; " + helpers.count_format(xmax) + "</b>) and cause artifacts in the distribution. Try raising it to a value that creates 1,000 - 5,000 buckets.";
-    } else if (bucket_count < 10) {
-      warning = "Your bucket size (<b>" + hist_bucket + "</b>), may be too large for the data range (<b>" + bucket_count + "</b> buckets in the range <b>" + helpers.count_format(xmin) + " &mdash; " + helpers.count_format(xmax) + "</b>) and cause artifacts in the distribution. Try lowering it to a value that creates 1,000 - 5,000 buckets.";
-    }
-
-    if (warning) {
-      var warningEl = $("<div class='alert alert-warning lfloat'> </div>");
-      warningEl.html(warning);
-      outerEl.append(warningEl);
-    }
-
-    outerEl.append($("<h2>At a glance</h2>"));
-
-    var headers = ["count", "average", "trimean"];
-    var row = [];
-
-    function trimean(data) {
-      return (data.percentiles[500][1] * 2 + data.percentiles[250][1] + data.percentiles[750][1]) / 4;
-    }
-
-    if (compare_percentiles) {
-      row.push(helpers.build_compare_cell(this.data.count, this.compare_data.count));
-      row.push(helpers.build_compare_cell(this.data.average, this.compare_data.average));
-
-      row.push(helpers.build_compare_cell(trimean(this.data), trimean(this.compare_data)));
-
-    } else {
-      row.push(helpers.count_format(this.data.count));
-      row.push(helpers.count_format(this.data.average));
-      row.push(helpers.count_format(trimean(this.data)));
-
-    }
-
-    if (this.data.weighted_count) {
-      headers.unshift("weighted average");
-      headers.unshift("weighted count");
-      if (compare_percentiles) {
-        row.unshift(helpers.build_compare_cell(this.data.w_average, this.compare_data.w_average));
-        row.unshift(helpers.build_compare_cell(this.data.weighted_count, this.compare_data.weighted_count));
-      } else {
-        row.unshift(helpers.count_format(this.data.w_average));
-        row.unshift(helpers.count_format(this.data.weighted_count));
+      if (bucket_count > 5000) {
+        warning = "Your bucket size (<b>" + hist_bucket + "</b>), may be too small for the data range (<b>" + helpers.count_format(bucket_count) + "</b> buckets in the range <b>" + helpers.count_format(xmin) + " &mdash; " + helpers.count_format(xmax) + "</b>) and cause artifacts in the distribution. Try raising it to a value that creates 1,000 - 5,000 buckets.";
+      } else if (bucket_count < 10) {
+        warning = "Your bucket size (<b>" + hist_bucket + "</b>), may be too large for the data range (<b>" + bucket_count + "</b> buckets in the range <b>" + helpers.count_format(xmin) + " &mdash; " + helpers.count_format(xmax) + "</b>) and cause artifacts in the distribution. Try lowering it to a value that creates 1,000 - 5,000 buckets.";
       }
+
+      if (warning) {
+        var warningEl = $("<div class='alert alert-warning lfloat'> </div>");
+        warningEl.html(warning);
+      }
+
+      return warningEl;
     }
 
 
+    var $el = self.$el;
+    var outerEl = $("<div class='span12 prl'>");
+    outerEl.append(render_glance(xmin, xmax));
+    outerEl.append($("<hr />"));
+    $el.append(outerEl);
 
-    var table = helpers.build_table(headers, [row]);
-    table.attr("class",  "table");
-    outerEl.append(table);
-    outerEl.append($("<h2>Percentiles</h2>"));
-    outerEl.append(render_stats_overview([5, 25, 50, 75, 95]));
-    outerEl.append($("<h2>Outliers</h2>"));
-    outerEl.append(render_stats_overview([95, 96, 97, 98, 99]));
-    var cumDensityEl = $("<h2 class='cdf_density'>Cumulative Density</h2>");
-    outerEl.append(cumDensityEl);
+    var graph_target = $("<div>");
+    var tabs = {
+      "Numbers" : render_percentiles(xmin, xmax),
+      "Graphs" : graph_target
+    };
 
-    var diffEl = $("<small class='rfloat mtl'>");
 
-    if (this.compare_data) {
-      diffEl.css("color", "rgba(200, 0, 0, 0.7)");
-      if (this.ks_result.p) {
-        diffEl.html("(distributions are <b>similar</b>, p-val:" + helpers.count_format(this.ks_result.p) + ")</small>");
+    var diffEl = $("<div class='mtl' style='text-align: right'>");
+
+    if (self.compare_data) {
+      diffEl.css("color", "rgba(0, 0, 0, 0.7)");
+      if (self.ks_result.p) {
+        diffEl.html("(distributions are <b>similar</b>, p-val:" + helpers.count_format(self.ks_result.p) + ")</small>");
       } else {
         diffEl.html("(distributions are <b>not similar</b>)</small>");
       }
 
-      cumDensityEl.append(diffEl);
+      outerEl.append(diffEl);
     }
 
-    $el.prepend(outerEl);
+    var tabEl = $("<div>");
+    outerEl.append(tabEl);
 
-    var cdfEl = $("<div class='span12'/>");
-    cdfEl.css("height", "500px");
+    var not_rendered = true;
+    $C("tabs", { tabs: tabs, active: "Numbers" } , function(cmp) {
+      tabEl.prepend(cmp.$el);
+      cmp.$el.find('a[data-toggle]').on('shown', function (e) {
+        var tab_id = $(e.target).attr("data-target");
+        if (!tab_id) { return; }
 
-    $el.append(cdfEl);
-
-    $C("highcharter", {skip_client_init: true}, function(cmp) {
-      // get rid of query contents...
-
-      cdfEl
-        .append(cmp.$el)
-        .show();
-
-      // There's a little setup cost to highcharts, maybe?
-      cmp.client(options);
-    });
-
-    var distEl = $("<div class='span12'/>");
-    distEl.css("height", "500px");
-
-    $el.append($("<h2 class='mll'>Probability Density</h2>"));
-    $el.append(distEl);
-
-    var dist_options = {
-      chart: {
-        inverted: false
-      },
-      series: [
-        {
-          data: this.data.dist,
-          name: "Query Results",
-          color: helpers.get_color("pdf")
-        },
-        {
-          data: (this.compare_data && this.compare_data.dist) || [],
-          name: "Comparison",
-          dashStyle: "LongDash",
-          color: helpers.get_color("pdf")
+        tab_id = tab_id.replace(/^#tab_/, '');
+        if (tab_id === "Graphs" && not_rendered) {
+          var graphEl = render_graphs(xmin, xmax);
+          cmp.getTab("Graphs").append(graphEl);
+          not_rendered = false;
         }
-      ],
-      xAxis: {
-        min: xmin,
-        max: xmax,
-        reversed: false,
-        plotLines: plot_lines,
-        type: "linear" // TODO: make this configurable?
-      },
-      yAxis: {
-        reversed: false
-      },
-      tooltip: {
-        valueSuffix: "%"
-      }
-    };
-
-    $C("highcharter", {skip_client_init: true}, function(cmp) {
-      // get rid of query contents...
-
-      distEl
-        .append(cmp.$el)
-        .show();
-
-      // There's a little setup cost to highcharts, maybe?
-      cmp.client(dist_options);
+      })
     });
-
-
 
   }
 

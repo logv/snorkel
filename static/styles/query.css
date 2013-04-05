@@ -404,3 +404,7 @@ body {
 #query_sidebar .popover.top .arrow {
   bottom: -15px;
 }
+
+a {
+  cursor: pointer;
+}

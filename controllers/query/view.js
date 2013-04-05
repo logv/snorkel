@@ -78,8 +78,8 @@ function get_view_selector_row() {
       "time" : "Time Series",
       "area" : "Stacked Area",
       "dist" : "Distribution",
-      "samples" : "Samples",
-      "scatter" : "Scatter"
+      "scatter" : "Scatter Plot",
+      "samples" : "Samples"
     },
     delegate: {
       "change": "view_changed"

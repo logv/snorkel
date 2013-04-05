@@ -1,0 +1,7 @@
+{
+  "main" : "tabs",
+  "helpers": [],
+  "style": "tabs.css",
+  "styles": [],
+  "template": "tabs.html.erb"
+}

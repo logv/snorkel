@@ -287,6 +287,10 @@ function get_index() {
   if (controller.require_https()) { return; }
 
   var table = context("req").query.table || "test/data";
+  if (_.isArray(table)) {
+    table = table.pop();
+  }
+
   context("query_table", table);
   context("title", "snorkel");
 
@@ -534,8 +538,18 @@ function get_recent_queries_for_user(username, dataset, cb) {
     conditions['parsed.table'] = dataset;
   }
 
-  get_saved_queries(conditions, {limit: 10}, function(arr) {
-    cb(arr);
+  get_saved_queries(conditions, {limit: 100}, function(arr) {
+    var with_results = [];
+    var accepted = 0;
+    _.each(arr, function(f) {
+      if (accepted > 20) { return; }
+      if (f && f.results && f.results.query && f.results.query.results.length) {
+        with_results.push(f);
+        accepted += 1;
+      }
+    });
+
+    cb(with_results);
   });
 }
 

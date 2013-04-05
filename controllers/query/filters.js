@@ -102,7 +102,6 @@ function add_filter_compare(filter, force) {
 }
 
 function remove_filters_from_dom() {
-  console.log("REMOVING FILTERS FROM DOM");
   compare_area.find(".filter_row").remove();
   filter_area.find(".filter_row").remove();
 }

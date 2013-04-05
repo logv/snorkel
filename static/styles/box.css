@@ -42,6 +42,14 @@
   padding: 10px;
 }
 
+.pll {
+  padding-left: 10px;
+}
+
+.prl {
+  .padding-right: 10px;
+}
+
 .pam {
   padding: 5px;
 }

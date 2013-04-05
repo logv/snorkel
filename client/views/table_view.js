@@ -223,11 +223,13 @@ var TableView = BaseView.extend({
     });
 
 
-    if (jank.controller().compare_mode()) {
-      filter_helper.add_or_update(filters, filters);
-      jank.controller().show_compare_filters();
-    } else {
-      filter_helper.add_or_update(filters);
+    if (filters.length) {
+      if (jank.controller().compare_mode()) {
+        filter_helper.add_or_update(filters, filters);
+        jank.controller().show_compare_filters();
+      } else {
+        filter_helper.add_or_update(filters);
+      }
     }
 
     var to_view = el.attr("data-view");

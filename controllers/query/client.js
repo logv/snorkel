@@ -364,7 +364,7 @@ module.exports = {
     // double hmmm
     table_changed: function(cmp) {
       var table_selector = cmp.$el.find("select");
-      var table = table_selector.val();
+      var table = table_selector.first().val();
 
       // TODO: do better than just reloading the URL.
       // something more ajaxy, with Backbone's Router
@@ -415,7 +415,6 @@ module.exports = {
 
   set_dom_from_query: function(query_str) {
     var query = $.deparam(query_str);
-
     var view = query.view;
     this.update_view(view);
 
