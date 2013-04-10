@@ -1,9 +1,9 @@
 tmp-build
-node_modules
+snorkel/node_modules
 .*.sw?
 sync.sh
-config/override.js
-config/certs/
-config/local/
-config/users.htpasswd
+snorkel/config/override.js
+snorkel/config/certs/
+snorkel/config/local/
+snorkel/config/users.htpasswd
 output

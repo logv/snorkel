@@ -13,7 +13,7 @@ questions about the *now*.
     # install node (>= 0.8) and mongo-db (>= 2.2)
 
     # get the code and dependencies for snorkel
-    cd snorkel
+    cd snorkel/snorkel
     npm install
 
     # helper for restarting the server when js files change
