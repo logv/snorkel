@@ -24,7 +24,7 @@
       </div>
 
 
-      <div>
+      <div class="pll">
         <small class="fsi">
         <% if (query.updated != query.created) { %>
           <span class="updated" style='display: none;'>updated
@@ -45,32 +45,70 @@
 
 
 
-    <div class="row-fluid">
+    <div class="row-fluid pll">
 
 
-      <div class="span6">
-        <div>
-          Dataset: <%= query.parsed.table %>
+      <div>
+        <div class="span6">
+          <b>Dataset:</b> <%= query.parsed.table %>
+
+          <% if (query.title) { %>
+            <div>
+              <b>View:</b> <%= query.parsed.view %>
+            </div>
+          <% } %>
+
+
+          <div><% if (query.parsed.dims.length) { %> <b>Grouped by:</b> <%= query.parsed.dims.join(',') %> <% } %></div>
+          <div><% if (query.parsed.cols.length) { %> <b>Fields:</b> <%= query.parsed.cols.join(',') %> <% } %></div>
+
         </div>
 
-        <div>
-          <% if (query.parsed.start_str) { %> From: <%= query.parsed.start_str %> <% } %>
+        <div class="span6">
+          <% if (query.parsed.start_str) { %> <b>From:</b> <%= query.parsed.start_str %> <% } %>
           <% if (query.parsed.end_str) { %> &ndash; <%= query.parsed.end_str %> <% } %>
+          <% if (query.parsed.compare_str) { %>
+            <br />
+            <b>Compared against:</b> <%= query.parsed.compare_str %>
+          <% } %>
         </div>
+
 
       </div>
 
-      <div class="span6">
+      <div class="span12" style='min-height: inherit'>
 
-        <% if (query.title) { %>
-          <div>
-            View: <%= query.parsed.view %>
+        <% if (query.parsed.filters && _.isArray(query.parsed.filters) && query.parsed.filters.length) { %>
+          <div class="span6">
+            <b>Filters</b>
+            <% _.each(query.parsed.filters, function(filt) { %>
+              <div><small class="pll">
+                <%= filt.column %>:
+
+                <% _.each(filt.conditions, function(condition) { %>
+                  <%= condition.op %> <%= condition.value %>
+                <% }); %>
+
+              </small></div>
+            <% }) %>
           </div>
         <% } %>
 
+        <% if (query.parsed.compare_filters && query.parsed.compare_filters.length) { %>
+          <div class="span6">
+            <b>Compare Filters</b>
+            <% _.each(query.parsed.compare_filters, function(filt) { %>
+              <div><small class="pll">
+                <%= filt.column %>:
 
-        <div><% if (query.parsed.dims.length) { %> Grouped by: <%= query.parsed.dims.join(',') %> <% } %></div>
-        <div><% if (query.parsed.cols.length) { %> Fields: <%= query.parsed.cols.join(',') %> <% } %></div>
+                <% _.each(filt.conditions, function(condition) { %>
+                  <%= condition.op %> <%= condition.value %>
+                <% }); %>
+
+              </small></div>
+            <% }) %>
+          </div>
+        <% } %>
       </div>
     </div>
   </div>

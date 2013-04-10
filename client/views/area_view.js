@@ -29,7 +29,7 @@ var AreaView = TimeView.extend({
 
 jank.trigger("view:add", "area",  {
   include: helpers.STD_INPUTS.concat(["time_bucket"]),
-  exclude: ["field", "hist_bucket", "compare"],
+  exclude: ["field", "hist_bucket", "compare", "stacking"],
   icon: "noun/line.svg"
 }, AreaView);
 

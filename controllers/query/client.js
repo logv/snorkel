@@ -559,7 +559,8 @@ module.exports = {
 
   handle_compare_toggle: function() {
     var filterBox = this.$page.find(".filter_group[data-filter-type=compare]");
-    var to_hide = $(filterBox).is(":visible");
+
+    var to_hide = $(filterBox).is(":visible") && filterBox.find(".filter_row").length;
     if (to_hide) {
       this.hide_compare_filters();
     } else {

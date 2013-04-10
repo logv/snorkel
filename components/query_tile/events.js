@@ -1,6 +1,6 @@
 "use strict";
 
-module.exports = { 
+module.exports = {
   events: {
     "click .title" :  "handle_title_click",
     "click .edit" :  "handle_edit_click",
@@ -15,12 +15,12 @@ module.exports = {
     jank.controller().trigger("delete_query", this.options.query, function() {
        $el.fadeOut(function() {
          $el.remove();
-       
+
        });
     });
   },
   handle_edit_click: function(e) {
-    this.editable.activate(); 
+    this.editable.activate();
     e.stopPropagation();
   }
 };

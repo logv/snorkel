@@ -31,8 +31,9 @@ module.exports = {
     }
 
     console.log(host, port, req.url);
+    var hostname = req.headers.host;
     var redirect_uri = url.format({
-      hostname: config.hostname,
+      hostname: hostname,
       port: port,
       protocol: "https",
       pathname: req.url

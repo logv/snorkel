@@ -614,7 +614,7 @@ var DistView = BaseView.extend({
 
 jank.trigger("view:add", "dist",  {
     include: helpers.STD_INPUTS.concat(["field", "hist_bucket", "compare"]),
-    exclude: [ "group_by", "max_results", "agg", "fieldset", "time_bucket" ],
+    exclude: [ "group_by", "max_results", "agg", "fieldset", "time_bucket", "stacking" ],
     icon: "noun/dist.svg"
 }, DistView);
 

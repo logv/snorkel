@@ -30,6 +30,7 @@ var DistView = require("client/views/dist_view");
 var SamplesView = require("client/views/samples_view");
 var ScatterView = require("client/views/scatter_view");
 var AreaView = require("client/views/area_view");
+var BarView = require("client/views/bar_view");
 var ResultsStore = require("client/js/results_store");
 
 function get_control(name) {

@@ -180,6 +180,13 @@ module.exports = {
 
   },
 
+  get_rgba: function(name, opacity) {
+    opacity = opacity || "0.5";
+    var color = window.toRGB(this.get_color(name).substr(1));
+    var color_str = "rgba(" + color.join(',') + ", " + opacity + ")";
+    return color_str;
+  },
+
   get_color: function(hash, palette) {
     if (!palette) { 
       palette = COLORS;
@@ -274,7 +281,7 @@ module.exports = {
   ],
 
   STD_EXCLUDES: [
-    "field", "field_two", "time_bucket", "hist_bucket"
+    "field", "field_two", "time_bucket", "hist_bucket", "stacking"
   ]
 
 };

@@ -44,6 +44,9 @@ var HELP_STRINGS = {
   },
   "hist_bucket" : {
     content: "histograms are a tricky thing. the bucket size will influence the shape of the histogram, so try out a few when examining data."
+  },
+  "stacking" : {
+    content: "by default, integer columns are laid out side by side. Turning stacking on will stack them on top of each other, turning each group by result into one stack of values"
   }
 };
 
@@ -76,8 +79,9 @@ function get_view_selector_row() {
     options: {
       "table" : "Table",
       "time" : "Time Series",
-      "area" : "Stacked Area",
       "dist" : "Distribution",
+      "area" : "Stacked Area",
+      "bar"  : "Bar Chart",
       "scatter" : "Scatter Plot",
       "samples" : "Samples"
     },
@@ -218,6 +222,17 @@ function get_hist_bucket_row() {
   return add_control("hist_bucket", "Bucket", max_results_input.toString());
 }
 
+function get_stacking_row() {
+  var opts = {
+    "normal" : "Off",
+    "stacked" : "On"
+  };
+
+  var stack_input = $C("selector", { name: "stacking", options: opts });
+  return add_control("stacking", "Stacking", stack_input.toString());
+
+}
+
 function get_group_by_row(group_columns) {
   var group_names = {};
   _.each(group_columns, function(m) { group_names[m.name] = m.name; });
@@ -298,6 +313,7 @@ function get_controls(columns) {
   control_box.append(get_aggregate_row());
   control_box.append(get_field_row(agg_columns));
   control_box.append(get_fieldset_row(agg_columns));
+  control_box.append(get_stacking_row());
 
   return control_box.toString();
 }

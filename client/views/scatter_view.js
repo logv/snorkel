@@ -39,8 +39,7 @@ var ScatterView = SamplesView.extend({
     var field_one = this.data.parsed.cols[0];
     var field_two = this.data.parsed.cols[1];
     _.each(this.points, function(point_group, name) {
-      var color = window.toRGB(helpers.get_color(name).substr(1));
-      var color_str = "rgba(" + color.join(',') + ", 0.5)";
+      var color_str = helpers.get_rgba(name);
       var serie = {
         data: [],
         name: (name || ""),
@@ -118,6 +117,6 @@ var ScatterView = SamplesView.extend({
 
 jank.trigger("view:add", "scatter",  {
   include: helpers.STD_INPUTS.concat(["group_by", "fieldset"]),
-  exclude: [ "compare", "agg", "field", "compare", "time_bucket", "hist_bucket" ]
+  exclude: [ "compare", "agg", "field", "compare", "time_bucket", "hist_bucket", "stacking" ]
 }, ScatterView);
 module.exports = ScatterView;

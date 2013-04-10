@@ -80,6 +80,7 @@ function marshall_query(form_data) {
   query_data.view = value_of(form_data, 'view', 'table');
 
   query_data.table = value_of(form_data, 'table');
+  query_data.stacking = value_of(form_data, 'stacking', 'normal');
 
   var start_str_ms = value_of(form_data, 'start', '-1 hour');
   var end_str_ms = value_of(form_data, 'end', 'now');
@@ -236,6 +237,7 @@ function marshall_query(form_data) {
 }
 
 var queries = {
+  bar: backend.table,
   dist: backend.hist,
   table: backend.table,
   samples: backend.samples,

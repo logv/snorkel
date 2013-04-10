@@ -317,9 +317,23 @@ body {
 #user_dialog {
   /* phone and down */
   @media (max-width: 767px) {
-    .modal-body {
+    .modal_body {
       padding: 0px;
-      max-height: 250px;
+      max-height: 340px;
+    }
+  }
+
+  @media (max-width: 767px) {
+    .tab-content {
+      height: 200px;
+      overflow: scroll;
+    }
+  }
+
+  @media (min-width: 768px) {
+    .tab-content {
+      height: 280px;
+      overflow: scroll;
     }
   }
 
