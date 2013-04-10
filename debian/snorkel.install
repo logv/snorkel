@@ -1,0 +1,4 @@
+snorkel/* opt/snorkel
+debian/scripts/start opt/snorkel/scripts
+debian/users.htpasswd opt/snorkel/config
+debian/config.js opt/snorkel/config

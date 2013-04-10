@@ -1,0 +1,13 @@
+Source: snorkel
+Section: web
+Priority: extra
+Maintainer: Matt Erkkila <matt.erkkila@rd.io>
+Build-Depends: debhelper (>= 8.0.0), npm, nodejs (>= 0.8.0)
+Standards-Version: 3.9.2
+
+Package: snorkel
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, nodejs (>= 0.8.0)
+Suggests: apache2-utils
+Description: Snorkel performance
+ A performance monitoring application.
