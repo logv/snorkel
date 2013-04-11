@@ -1,0 +1,6 @@
+#!/bin/sh
+
+if [ "`stat -c %G /var/log/snorkel`" != 'nogroup' ]; then
+    chown root.nogroup /var/log/snorkel
+    chmod 770 /var/log/snorkel
+fi

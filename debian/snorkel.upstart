@@ -1,0 +1,11 @@
+description "snorkel"
+author      "rdio"
+
+start on startup
+stop on shutdown
+
+script
+    chdir /opt/snorkel
+    exec sudo -u nobody /opt/snorkel/scripts/start
+end script
+
