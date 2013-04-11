@@ -1,3 +1,9 @@
+snorkel (0.0.2-2) unstable; urgency=low
+
+  * Fix perms on /var/log/snorkel
+
+ -- Matt Erkkila <matt.erkkila@rd.io>  Thu, 11 Apr 2013 16:27:00 -0700
+
 snorkel (0.0.2-1) unstable; urgency=low
 
   * Initial release
