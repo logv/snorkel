@@ -10,6 +10,7 @@ var readfile = require("./readfile");
 var htpasswd = require("htpasswd");
 
 var https = require('https');
+
 var LocalStrategy = require('passport-local').Strategy;
 var parseCookie = require("express").cookieParser(session.secret());
 
@@ -33,18 +34,6 @@ if (!Object.keys(USERS).length) {
   };
 }
 
-
-var auth_function = function(req, res, next) {
-  context.create(req, res, function() {
-    passport.authenticate(
-      'local',
-      { failureRedirect: '/login' },
-      function(req, res, next) {
-            return res.redirect('/query?user=' + user.id);
-    })(req, res);
-  });
-};
-
 var _users = {};
 var __id = 0;
 
@@ -67,6 +56,58 @@ module.exports = {
       done(null, _users[id]);
     });
 
+    if (config.google_auth && config.google_auth.enabled) {
+      var GoogleStrategy = require('passport-google').Strategy;
+
+      // Redirect the user to Google for authentication.  When complete, Google
+      // will redirect the user back to the application at
+      //     /auth/google/return
+      app.get('/auth/google', passport.authenticate('google'));
+
+      // Google will redirect the user to this URL after authentication.  Finish
+      // the process by verifying the assertion.  If valid, the user will be
+      // logged in.  Otherwise, authentication has failed.
+      app.get('/auth/google/return',
+        passport.authenticate('google', { successRedirect: '/',
+                                          failureRedirect: '/login' }));
+
+      var realm = "http://" + config.hostname;
+      if (!config.behind_proxy) {
+        if (config.http_port && config.http_port !== 80) {
+          realm += ":" + config.http_port;
+        }
+      }
+
+      passport.use(new GoogleStrategy({
+          returnURL: realm + '/auth/google/return',
+          realm: realm
+        },
+        function(identifier, profile, done) {
+          var email = profile.emails[0].value.toLowerCase();
+          var tokens = email.split("@");
+          var domain = tokens.pop();
+          var user = email;
+
+
+          if (config.google_auth.require_domain) {
+            if (domain.downcase() !== config.google_auth.require_domain.toLowerCase()) {
+              return done("Your email account domain is not authorized to use this instance.");
+            }
+          }
+
+          if (config.google_auth.authorized_users) {
+            if (!config.google_auth.authorized_users[email]) {
+              return done("Your email account is not authorized to use this instance.");
+
+            }
+          }
+
+
+          done(null, new_user(user));
+        }
+      ));
+    }
+
     passport.use(new LocalStrategy(
       function(username, password, done) {
         // creates a user, with an incrementing ID from RAM
@@ -76,9 +117,7 @@ module.exports = {
         } else {
           done("just kidding, not just any credentials will wrok. try again");
         }
-
-
-      }));
+    }));
 
     // TODO: via sockets!
     app.post(

@@ -1,15 +1,27 @@
+<% set_default("google", false) %>
+
+<% if (google) { %>
+  <h2>
+  <a class="btn btn-primary" href="/auth/google">Sign in with Google</a>
+  </h2>
+
+  <p>
+    or enter your credentials below:
+  </p>
+<% } %>
+
 <form method="post">
   <fieldset>
 
     <div class="mtl">
       <input type="text" class="input" placeholder="Email" name="username">
     </div>
-    
-    <div> 
+
+    <div>
       <input type="password" class="input" placeholder="Password" name="password">
     </div>
 
 
-    <button type="submit" class="btn">Sign in</button>
+    <button type="submit" class="btn" style="display: block">Sign in</button>
   </fieldset>
 </form>

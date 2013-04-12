@@ -1,4 +1,22 @@
 .container-fluid {
-  margin-left: 20px;
+  margin: auto;
+  margin-left: 0px;
   margin-top: 60px;
+}
+
+.login_form {
+  text-align: center;
+  width: 300px;
+  margin: auto;
+  margin-top: 100px;
+}
+
+.login_form .btn {
+  width: 100%;
+  padding-left: 0px;
+  padding-right: 0px;
+}
+
+.login_form input {
+  width: 100%;
 }

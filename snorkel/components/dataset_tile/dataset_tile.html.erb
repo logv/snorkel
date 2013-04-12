@@ -1,0 +1,27 @@
+<% set_default("name", ""); %>
+<% set_default("description", "") %>
+<% set_default("queries", 0) %>
+
+<div class="dataset_tile">
+  <h3><a href="/query?table=<%= name %>">
+    <%= name %>
+    </a>
+
+    <% if (queries) { %>
+      <small class="query_count">
+        (<%= queries %>)
+      </small>
+    <% } %>
+
+  </h3>
+
+  <div class="dataset_info">
+    <div>
+      <p>
+        <% if (description) { %>
+          <%= description %>
+        <% } %>
+      </p>
+    </div>
+  </div>
+</div>

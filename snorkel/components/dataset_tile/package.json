@@ -1,0 +1,7 @@
+{
+  "main" : "dataset_tile",
+  "helpers": [],
+  "style": "dataset_tile.css",
+  "styles": [],
+  "template": "dataset_tile.html.erb"
+}

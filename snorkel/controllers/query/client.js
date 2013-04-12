@@ -342,7 +342,7 @@ module.exports = {
     var query_str = window.location.search.substring(1);
 
     jank.do_when(this.fields, 'query:fields', function() {
-      that.run_query(query_str);
+      that.run_query(query_str, true);
     });
     this.set_dom_from_query(query_str);
   },

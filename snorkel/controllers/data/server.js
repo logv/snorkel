@@ -63,18 +63,35 @@ function setup_udp_socket() {
 
   var dgram = require("dgram");
   var s = dgram.createSocket('udp4');
+  var msgData, parsed_data;
   s.on("message", function(msg, rinfo) {
-    var parsed_data = JSON.parse(msg.toString());
-    backend.add_sample(parsed_data.dataset, parsed_data.subset, parsed_data.sample, function(err) {
-      if (err) {
+    try {
+      msgData = msg.toString();
+      parsed_data = JSON.parse(msgData);
+    } catch (e) {
+      if (msgData) {
+        console.log("UDP: Problem parsing sample data", msgData);
       } else {
-        console.log("UDP: Inserted sample into", parsed_data.dataset, parsed_data.subset);
+        console.log("UDP: Problem receiving sample");
       }
-    });
+    }
+
+    try {
+      backend.add_sample(parsed_data.dataset, parsed_data.subset, parsed_data.sample, function(err) {
+        if (err) {
+          console.log("UDP: Error inserting sample");
+        } else {
+          console.log("UDP: Inserted sample into", parsed_data.dataset, parsed_data.subset);
+        }
+      });
+    } catch (e) {
+      // TODO: log where this bad sample is coming from
+      console.log("Trouble inserting sample.");
+    }
   });
 
   s.on("listening", function() {
-    console.log("Listening for incoming packets on UDP");
+    console.log("Listening for incoming packets on UDP port", config.udp.port || 59036);
   });
 
   s.bind(config.udp.port || 59036);

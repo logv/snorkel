@@ -14,6 +14,16 @@ module.exports = {
   max_https_sockets: 1000,
   require_https: true,
   hostname: "localhost",
+  google_auth: {
+    enabled: true,
+    // require_domain: 'my_custom_domain.com',
+    require_domain: false,
+    // authorized_users: { 
+    //  'you@your_google_domain.com': true,
+    //  'your_friend@her_google_domain.com' : true
+    // }
+    authorized_users: false
+  },
   behind_proxy: false,
   // This is the default max data size of the collection. Each dataset will
   // only grow to this size and no further, ideally

@@ -349,6 +349,9 @@ function add_samples(dataset, subset, samples, cb) {
 
   _.each(samples, function(sample) {
     // TODO: more validation!
+    if (!_.isObject(sample.integer)) {
+      return;
+    }
     _.each(sample.integer, function(value, key) {
       sample.integer[key] = parseInt(value, 10);
     });

@@ -6,5 +6,6 @@
   "/login" : "login",
   "/pkg" : "bootloader",
   "/query" : "query",
-  "/data" : "data"
+  "/data" : "data",
+  "/datasets" : "datasets"
 }

@@ -51,3 +51,8 @@ body { -webkit-tap-highlight-color: rgba(0,0,0,0); }
 .cdf_density small {
   color: #aaa;
 }
+
+button.close {
+  padding: 10px;
+  font-size: 150%;
+}
