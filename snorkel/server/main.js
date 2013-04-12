@@ -33,6 +33,9 @@ var passport = require('passport');
 // Better stack traces
 require("longjohn");
 
+// Add timestamps
+require("./console").install();
+
 app.use(express.errorHandler({ dumpExceptions: true, showStack: true }));
 
 // Setup authentication
