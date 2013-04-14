@@ -1,9 +1,11 @@
-snorkel (0.0.3-1) unstable; urgency=low
+snorkel (0.0.4-1) unstable; urgency=low
 
   * Initial release
 
   * Add console timestamps
 
   * Upgrading to snorkel 0.0.3 (authentication, dataset landing page)
+
+  * Upgrading to snorkel 0.0.4 (/etc configuration)
 
  -- Matt Erkkila <matt.erkkila@rd.io>  Wed, 10 Apr 2013 09:10:16 -0700

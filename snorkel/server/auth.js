@@ -68,12 +68,17 @@ module.exports = {
       // the process by verifying the assertion.  If valid, the user will be
       // logged in.  Otherwise, authentication has failed.
       app.get('/auth/google/return',
-        passport.authenticate('google', { successRedirect: '/',
+        passport.authenticate('google', { successRedirect: '/login/success',
                                           failureRedirect: '/login' }));
 
+      app.get('/login/success', function(req, res) {
+        var next = req.session.redirect_to || '/';
+        req.session.redirect_to = null;
+        return res.redirect(next +'?user=' + req.user.id);
+      });
       var realm = "http://" + config.hostname;
       if (!config.behind_proxy) {
-        if (config.http_port && config.http_port !== 80) {
+        if (config.http_port && config.http_port !== 80 && !config.behind_proxy) {
           realm += ":" + config.http_port;
         }
       }
@@ -133,7 +138,8 @@ module.exports = {
         'local',
         { failureRedirect: '/login' }),
       function(req, res, next) {
-        var next = req.query.next || '/';
+        var next = req.session.redirect_to || '/';
+        req.session.redirect_to = null;
         return res.redirect(next +'?user=' + req.user.id);
       });
 
@@ -172,7 +178,8 @@ module.exports = {
 
   ensure: function ensureAuthenticated(req, res, next) {
     if (req.isAuthenticated()) { return next(); }
-    res.redirect('/login?next=' + req.path);
+    req.session.redirect_to = req.path;
+    res.redirect('/login');
   },
 
   require_user: function(func) {

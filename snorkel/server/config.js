@@ -15,6 +15,13 @@ try {
 } catch(e) {
 }
 
+try {
+  override = require("/etc/snorkel/config.js");
+  _.extend(_config, override);
+  console.log("Using custom overrides in /etc/snorkel/config.js");
+} catch(e) {
+}
+
 if (env) {
   try {
     override = require_root("config/" + env);
@@ -26,5 +33,4 @@ if (env) {
 }
 
 console.log("CONFIG:", _config);
-
 module.exports = Object.freeze(_config);

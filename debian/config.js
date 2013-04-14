@@ -1,5 +1,5 @@
 module.exports = {
-  sockets: true,
+  sockets: false,
   udp: {
     port: 59036
   },
@@ -7,6 +7,9 @@ module.exports = {
   http_port: 3000,
   max_http_sockets: 1000,
   hostname: "localhost",
+  google_auth: {
+    enabled: true
+  },
   behind_proxy: false,
   // This is the default max data size of the collection. Each dataset will
   // only grow to this size and no further, ideally
