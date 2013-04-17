@@ -1,0 +1,28 @@
+
+
+
+<a href="#csv_upload" role="button" class="btn btn-primary" data-toggle="modal">Upload a CSV File</a>
+
+<form method="post" enctype="multipart/form-data" action="/data/import_csv">
+  <div id="csv_upload" class="modal hide fade" tabindex="-1" role="dialog">
+    <div class="modal-header">
+      <button type="button" class="close" data-dismiss="modal" aria-hidden="true">x</button>
+      <h3 id="myModalLabel">Select a CSV file to upload</h3>
+    </div>
+
+    <div class="modal-body">
+      <div class="alert alert-info mtl">
+        <small>
+          The first line of your CSV file should be headers, otherwise there
+          won't be any column metadata to work with.
+        </small>
+      </div>
+      <input type="file" name="csv">
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
+      <input class="btn btn-primary" type="submit" />
+    </div>
+  </div>
+</form>

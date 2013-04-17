@@ -1,9 +1,8 @@
 module.exports = {
   tagName: "div",
   className: "",
-  defaults: {
-    content: "default content"
-  },
-  client: function() {
+  defaults: { },
+  client: function(options) {
+    this.dataset = options.dataset;
   }
 };

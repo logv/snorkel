@@ -315,6 +315,13 @@ function add_time_range(start, end) {
   return pipeline;
 }
 
+function drop_dataset(collection_name, cb) { 
+  var collection = snorkle_db.get(DATASET_PREFIX + collection_name);
+  cb = context.wrap(cb);
+  collection.drop();
+  cb(collection_name);
+}
+
 function run_pipeline(collection_name, pipeline, unweight, cb) {
   var collection = snorkle_db.get(DATASET_PREFIX + collection_name);
   cb = context.wrap(cb);
@@ -357,13 +364,25 @@ function add_samples(dataset, subset, samples, cb) {
     });
   });
 
+  var chunk_size = 1000;
+  var chunks = Math.ceil(samples.length / chunk_size);
+
+  var after = _.after(chunks, cb);
+
   snorkle_db.get(collection_name, function(collection) {
-    collection.insert(samples, function(err, data) {
-      if (err) { console.log("ERROR INSERTING DATA", data); return; }
-      cb(err, data);
-    });
+    var i;
+    for (i = 0; i < chunks; i++) {
+      var subsamples = samples.slice(i * chunk_size, (i + 1) * chunk_size);
 
+      if (!subsamples.length) {
+        after(null, []);  
+      }
 
+      collection.insert(subsamples, function(err, data) {
+        if (err) { console.log("ERROR INSERTING DATA", data); return; }
+        after(err, data);
+      });
+    }
   });
 }
 
@@ -391,6 +410,7 @@ module.exports = {
 
   // Execution
   run: run_pipeline,
+  drop: drop_dataset,
 
   // Insertion
   add_sample: add_sample,

@@ -1,7 +1,7 @@
 {
   "name": "snorkel",
     "description": "node.js realtime analytics prototype",
-    "version": "0.0.4",
+    "version": "0.0.5",
     "private": true,
     "dependencies": {
       "express": "3.x",

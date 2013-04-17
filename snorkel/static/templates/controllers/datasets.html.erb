@@ -4,10 +4,23 @@
     <h1>snorkel, snorkel, snorkel</h1>
   </div>
 
-  <h2>i want to dive into</h2>
+  <div class="clearfix">
+    <div class="lfloat mrl mth">
+      <%= render_partial("datasets/csv_dialog.html.erb") %>
+    </div>
+
+    <div class="lfloat">
+      <h2>or dive into an existing dataset:</h2>
+    </div>
+  </div>
+
+  <%= render_template("helpers/user_status.html.erb") %>
   <div class="datasets">
     <div class="dataset_list">
       <%= render_datasets() %>
     </div>
   </div>
+
+  <%= add_socket() %>
+
 </div>

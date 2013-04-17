@@ -18,7 +18,7 @@ module.exports = {
     } else {
       var header_str = template.render("helpers/header.html.erb", { show_user_status: false });
 
-      var use_google_auth = !!config.google_auth;
+      var use_google_auth = !!(config.google_auth && config.google_auth.enabled);
       var template_str = template.render("controllers/login.html.erb", { google: use_google_auth });
 
       template.add_stylesheet("login");

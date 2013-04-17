@@ -8,6 +8,9 @@ module.exports = {
     port: 59036
   },
   authorized_users: "config/users.htpasswd",
+  superuser: {
+    "admin" : true
+  },
   http_port: 3000,
   https_port: 3443,
   max_http_sockets: 1000,
@@ -15,7 +18,7 @@ module.exports = {
   require_https: true,
   hostname: "localhost",
   google_auth: {
-    enabled: true,
+    enabled: false,
     // require_domain: 'my_custom_domain.com',
     require_domain: false,
     // authorized_users: { 

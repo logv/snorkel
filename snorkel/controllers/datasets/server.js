@@ -5,11 +5,30 @@ var $ = require("cheerio");
 var auth = require_root("server/auth");
 var db = require_root("server/db");
 var backend = require_root("server/backend");
+var config = require_root("server/config");
 var context = require_root("server/context");
 var page = require_root("server/page");
 var template = require_root("server/template");
 
 var EventEmitter = require('events').EventEmitter;
+
+function dataset_is_editable(dataset, user) {
+  var split_set = dataset.split("/");
+  var username = user.username.split("@").shift();
+
+  var suffix = split_set.pop();
+  var editable = false;
+
+  if (config.superuser && config.superuser[user.username]) {
+    return true;
+  }
+
+  if (split_set.length && username === split_set[0]) {
+    editable = true;
+  }
+
+  return editable;
+}
 
 // need to also get metadata for the datasets, too
 function render_datasets() {
@@ -38,13 +57,18 @@ function render_datasets() {
 
       _.each(datasets, function(table) {
         if (table.table_name === "undefined") { return; }
+        var editable = dataset_is_editable(table.table_name, user);
 
         var cmp = $C("dataset_tile", {
           name: table.table_name,
+          editable: editable,
           queries: query_counts[table.table_name],
-          options: table_options,
+          client_options: {
+            dataset: table.table_name 
+          },
           delegate: {
-            "change" : "table_changed"
+            "change" : "table_changed",
+            "click .delete" : "handle_delete_clicked"
           }
         });
 
@@ -93,5 +117,17 @@ module.exports = {
     page.render({ content: template_str, header: header_str});
   }),
 
-  socket: function() {}
+  socket: function(socket) {
+    socket.on("drop", function(dataset) {
+      // Validate this is an easily droppable dataset
+      var user = socket.manager.__user;
+      if (dataset_is_editable(dataset, user)) {
+        console.log("DROPPING ", dataset);
+
+        backend.drop(dataset, function() {
+          socket.emit("dropped", dataset);
+        });
+      }
+    });
+  }
 };

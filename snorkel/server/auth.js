@@ -29,8 +29,10 @@ try {
 
 if (!Object.keys(USERS).length) {
   console.log("AUTH: default login is 'test' / 'me'");
+  console.log("AUTH: admin login is 'admin' / 'me'");
   USERS = {
-    'test' : '$apr1$XkcK6vCf$RTzLu3dNhr71R.mEmJPBK0'
+    'test' : '$apr1$XkcK6vCf$RTzLu3dNhr71R.mEmJPBK0',
+    'admin' : '$apr1$XkcK6vCf$RTzLu3dNhr71R.mEmJPBK0'
   };
 }
 

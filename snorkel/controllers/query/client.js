@@ -542,7 +542,7 @@ module.exports = {
 
     compareFilter.html("Remove Comparison Filters");
     var container = filterBox.parents("#query_sidebar");
-    container.animate({
+    container.stop(true).animate({
         scrollTop: filterBox.offset().top - container.offset().top + container.scrollTop()
     }, 1000);
 
@@ -553,21 +553,21 @@ module.exports = {
     var compareFilter = this.$page.find(".compare_filter");
     filterBox.hide();
     compareFilter.html("Add Comparison Filters");
-
-
   },
 
-  handle_compare_toggle: function() {
+  handle_compare_toggle: _.debounce(function() {
+    console.log("TOGGLING COMPARE");
     var filterBox = this.$page.find(".filter_group[data-filter-type=compare]");
 
     var to_hide = $(filterBox).is(":visible") && filterBox.find(".filter_row").length;
+
     if (to_hide) {
       this.hide_compare_filters();
     } else {
       this.show_compare_filters(true /* add if empty */);
     }
 
-  },
+  }, 50),
 
 
   socket: function(socket) {
@@ -612,9 +612,9 @@ module.exports = {
     views.update_controls(view);
   },
 
-  handle_pane_toggle_clicked: function(e) {
+  handle_pane_toggle_clicked: _.debounce(function(e) {
     jank.controller().trigger("swap_panes", _show_controls);
-  },
+  }, 50),
 
   run_query: function(query_ish, keep_url) {
     var serialized;

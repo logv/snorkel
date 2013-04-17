@@ -3,7 +3,9 @@
 var page = require_root("server/page");
 var template = require_root("server/template");
 var context = require_root("server/context");
+var csv = require_root("server/csv");
 var auth = require_root("server/auth");
+var fs = require("fs");
 
 var fake_data = require_root("server/fake_data");
 var db = require_root("server/db");
@@ -105,8 +107,31 @@ module.exports = {
   },
 
   post_routes: {
-    "/import" : "add_sample"
+    "/import" : "add_sample",
+    "/import_csv" : "read_csv"
   },
+
+  read_csv: auth.require_user(function() {
+    var req = context("req");
+    var user = req.user;
+
+    var filename = req.files.csv.path;
+    var data = fs.readFileSync(filename);
+
+    var csv_name = req.files.csv.filename;
+    var username = user.username.split("@").shift();
+    csv.read(username, csv_name, data.toString(), {}, function(err) {
+      if (err) {
+        context("res").end(err);
+        return;
+
+      } 
+
+      var dataset = username + "/csv/" + csv_name;
+      context("res").redirect("/query?table=" + dataset);
+    });
+
+  }),
 
   add_sample: function() {
     var res = context("res");

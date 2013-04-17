@@ -51,6 +51,11 @@ var SamplesView = BaseView.extend({
     _.each(data.results, function(result) {
       var row = [];
       _.each(all_cols, function(field) {
+        var types = result[lookup[field]];
+        if (!types) {
+          row.push("");
+          return;
+        }
         row.push(result[lookup[field]][field]);
       });
 

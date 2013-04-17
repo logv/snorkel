@@ -56,3 +56,12 @@ button.close {
   padding: 10px;
   font-size: 150%;
 }
+
+@media (max-width: 768px) {
+  .modal {
+    width: 400px;
+    margin: 0px;
+    left: 5%;
+    width: 90%;
+  }
+}

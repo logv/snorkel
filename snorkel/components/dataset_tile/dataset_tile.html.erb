@@ -1,3 +1,4 @@
+<% set_default("editable", false) %>
 <% set_default("name", ""); %>
 <% set_default("description", "") %>
 <% set_default("queries", 0) %>
@@ -11,6 +12,10 @@
       <small class="query_count">
         (<%= queries %>)
       </small>
+    <% } %>
+
+    <% if (editable) { %>
+      <span class="icon delete"> <i class="icon-trash"></i> </span>
     <% } %>
 
   </h3>
