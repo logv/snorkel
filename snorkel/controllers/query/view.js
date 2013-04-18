@@ -357,7 +357,7 @@ module.exports = {
   },
 
   get_controls: function() {
-    var view = context("req").query.view || "table";
+    var view = context("req").query.view || "samples";
     // this is how i do data dependencies, :P
     return page.async(function(flush_data) {
       backend.get_columns(context("query_table"), function(columns) {

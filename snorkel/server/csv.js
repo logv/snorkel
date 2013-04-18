@@ -31,7 +31,10 @@ function read_csv(username, name, data, options, cb) {
     data = data.split("\n");
   }
 
-  var headers = data.shift().split(",");
+  var headers = _.map(data.shift().split(","), function(h) {
+    return h.replace(/^\s*/, "").replace(/\s*$/, "");
+  });
+
   var rows = [];
   var type_counts = {};
   var err;
@@ -50,16 +53,20 @@ function read_csv(username, name, data, options, cb) {
   }
 
   _.each(data, function(row) {
-    var row_data = row.split(",");
+    var row_data = _.map(row.split(","), function(h) {
+      return h.replace(/^\s*/, "").replace(/\s*$/, "");
+    });
     var row_obj = {};
     rows.push(row_obj);
 
     var i;
+    var val;
     for (i = 0; i < row_data.length; i++) {
       var key = headers[i];
       try {
-        row_obj[key] = row_data[i];
-        infer_type(key, row_data[i]);
+        val = row_data[i];
+        row_obj[key] = val;
+        infer_type(key, val);
       } catch(e) {
         row_obj[key] = null;
       }

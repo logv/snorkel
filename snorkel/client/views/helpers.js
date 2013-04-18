@@ -207,6 +207,10 @@ module.exports = {
 
   },
   build_compare_cell: function(col_value, compare_value) {
+    if (col_value === null || typeof col_value === "undefined") {
+      return 'n/a';
+    }
+
     var cell = $("<div>");
     var val_div = $("<div class='value_cell'>")
       .html(this.count_format(col_value));

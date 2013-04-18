@@ -315,7 +315,38 @@ function add_time_range(start, end) {
   return pipeline;
 }
 
-function drop_dataset(collection_name, cb) { 
+// matches full integer samples, avoiding the 'null' cell problem
+function match_full_samples(cols) {
+  var conditions = [];
+
+  if (!cols.length) {
+    return [];
+  }
+
+  _.each(cols, function(col) {
+    var column = "integer." + col;
+    var conds = [];
+
+    conditions.push({
+      $or: conds
+    });
+
+    
+    _.each(["$gte", "$lt"], function(op) {
+      var cond = {};
+      cond[column] = {};
+      cond[column][op] = 0;
+      cond[column].$ne = NaN;
+
+      conds.push(cond);
+    });
+
+  });
+
+  return [ { $match: { $and: conditions} } ];
+}
+
+function drop_dataset(collection_name, cb) {
   var collection = snorkle_db.get(DATASET_PREFIX + collection_name);
   cb = context.wrap(cb);
   collection.drop();
@@ -375,7 +406,7 @@ function add_samples(dataset, subset, samples, cb) {
       var subsamples = samples.slice(i * chunk_size, (i + 1) * chunk_size);
 
       if (!subsamples.length) {
-        after(null, []);  
+        after(null, []);
       }
 
       collection.insert(subsamples, function(err, data) {
@@ -401,6 +432,7 @@ module.exports = {
   // Filters
   add_filters: add_filters,
   time_range: add_time_range,
+  full_samples: match_full_samples,
 
   // Metadata
   get_columns: get_columns,

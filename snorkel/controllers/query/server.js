@@ -77,7 +77,7 @@ function marshall_query(form_data) {
   }
 
   query_data.dims = array_of(form_data, 'group_by', ["browser"]);
-  query_data.view = value_of(form_data, 'view', 'table');
+  query_data.view = value_of(form_data, 'view', 'samples');
 
   query_data.table = value_of(form_data, 'table');
   query_data.stacking = value_of(form_data, 'stacking', 'normal');
@@ -271,7 +271,10 @@ function build_pipeline(params) {
     limit.push({$limit: params.limit || 100});
   }
 
+  var non_null_ints = backend.full_samples(params.cols);
+
   return timeline
+    .concat(non_null_ints)
     .concat(filters)
     .concat(pipeline)
     .concat(sort)
@@ -545,7 +548,7 @@ function get_recent_queries_for_user(username, dataset, cb) {
     var accepted = 0;
     _.each(arr, function(f) {
       if (accepted > 20) { return; }
-      if (f && f.results && f.results.query && f.results.query.results.length) {
+      if (f && f.results && f.results.query && f.results.query.results && f.results.query.results.length) {
         with_results.push(f);
         accepted += 1;
       }
