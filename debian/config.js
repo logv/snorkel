@@ -7,6 +7,8 @@ module.exports = {
   http_port: 3000,
   max_http_sockets: 1000,
   hostname: "localhost",
+  // Collector and Web server are run separately
+  separate_services: true,
   google_auth: {
     enabled: true
   },

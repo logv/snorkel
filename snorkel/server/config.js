@@ -15,13 +15,6 @@ try {
 } catch(e) {
 }
 
-try {
-  override = require("/etc/snorkel/config.js");
-  _.extend(_config, override);
-  console.log("Using custom overrides in /etc/snorkel/config.js");
-} catch(e) {
-}
-
 if (env) {
   try {
     override = require_root("config/" + env);
@@ -29,6 +22,13 @@ if (env) {
     console.log("Using custom overrides in config/" + env);
   } catch(e) {
     console.log("Couldn't load Environment config from config/" + env);
+  }
+} else {
+  try {
+    override = require("/etc/snorkel/config.js");
+    _.extend(_config, override);
+    console.log("Using custom overrides in /etc/snorkel/config.js");
+  } catch(e) {
   }
 }
 

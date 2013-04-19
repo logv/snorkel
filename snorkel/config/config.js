@@ -11,6 +11,10 @@ module.exports = {
   superuser: {
     "admin" : true
   },
+
+  // setting to true will make the UDP collector and the web server run as
+  // different processes, for stability reasons
+  separate_services: false,
   http_port: 3000,
   https_port: 3443,
   max_http_sockets: 1000,

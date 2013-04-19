@@ -1,4 +1,4 @@
-description "snorkel"
+description "snorkel_collector"
 author      "rdio"
 
 start on startup
@@ -6,6 +6,6 @@ stop on shutdown
 
 script
     chdir /opt/snorkel
-    exec sudo -u nobody /opt/snorkel/scripts/start_server
+    exec sudo -u nobody /opt/snorkel/scripts/start_collector
 end script
 

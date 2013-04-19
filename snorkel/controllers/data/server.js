@@ -13,7 +13,7 @@ var backend = require_root("server/backend");
 var Sample = require_root("server/sample");
 
 var config = require_root("server/config");
-
+var _collect_samples;
 
 // If the config specific rabbit options, we listen to rabbit exchange  for new
 // incoming samples
@@ -55,7 +55,6 @@ function subscribe_to_rabbit_queue() {
     });
   });
 }
-subscribe_to_rabbit_queue();
 
 
 function setup_udp_socket() {
@@ -98,7 +97,7 @@ function setup_udp_socket() {
 
   s.bind(config.udp.port || 59036);
 }
-setup_udp_socket();
+
 
 module.exports = {
   routes: {
@@ -125,7 +124,7 @@ module.exports = {
         context("res").end(err);
         return;
 
-      } 
+      }
 
       var dataset = username + "/csv/" + csv_name;
       context("res").redirect("/query?table=" + dataset);
@@ -134,6 +133,10 @@ module.exports = {
   }),
 
   add_sample: function() {
+    if (!_collect_samples) {
+      return;
+    }
+
     var res = context("res");
 
     // TODO: validate this
@@ -216,6 +219,12 @@ module.exports = {
       future();
     });
 
+  },
+
+  setup_collector: function() {
+    subscribe_to_rabbit_queue();
+    setup_udp_socket();
+    _collect_samples = true;
   },
 
   index: function() {

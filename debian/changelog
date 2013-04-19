@@ -1,13 +1,37 @@
+snorkel (0.0.6-1) unstable; urgency=low
+
+  * separate services for collector
+
+ -- okay <okay.zed@gmail.com>  Wed, 19 Apr 2013 09:10:16 -0700
+
 snorkel (0.0.5-1) unstable; urgency=low
 
-  * Initial release
+  * deletable datasets
+  * CSV uploads
+
+ -- okay <okay.zed@gmail.com>  Wed, 15 Apr 2013 09:10:16 -0700
+
+snorkel (0.0.4-1) unstable; urgency=low
+
+  * etc config
+
+ -- okay <okay.zed@gmail.com>  Wed, 14 Apr 2013 09:10:16 -0700
+
+snorkel (0.0.3-1) unstable; urgency=low
+
+  * authentication
+  * dataset landing page
+
+ -- okay <okay.zed@gmail.com>  Wed, 13 Apr 2013 09:10:16 -0700
+
+snorkel (0.0.2-1) unstable; urgency=low
 
   * Add console timestamps
 
-  * Upgrading to snorkel 0.0.3 (authentication, dataset landing page)
+ -- okay <okay.zed@gmail.com>  Wed, 12 Apr 2013 09:10:16 -0700
 
-  * Upgrading to snorkel 0.0.4 (/etc configuration)
+snorkel (0.0.1-1) unstable; urgency=low
 
-  * Upgrading to snorkel 0.0.5 (deletable datasets, CSV uploads)
+  * Initial release
 
  -- Matt Erkkila <matt.erkkila@rd.io>  Wed, 10 Apr 2013 09:10:16 -0700
