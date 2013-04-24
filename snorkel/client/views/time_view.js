@@ -3,6 +3,8 @@
 
 var _labels = {};
 var helpers = require("client/views/helpers");
+var presenter = require("client/views/presenter");
+
 var BaseView = require("client/views/base_view");
 var TimeView = BaseView.extend({
   prepare: function(data) {
@@ -34,7 +36,7 @@ var TimeView = BaseView.extend({
         });
 
         var group_label = dims.join(",");
-        var field_label = group_label + " " + field;
+        var field_label = group_label + " " + presenter.get_field_name(field);
         var full_label = field_label;
   
         _labels[full_label] = group_label || full_label;

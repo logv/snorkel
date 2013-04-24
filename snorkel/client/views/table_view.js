@@ -2,6 +2,7 @@
 
 var filter_helper = require("controllers/query/filters");
 var helpers = require("client/views/helpers");
+var presenter = require("client/views/presenter");
 var BaseView = require("client/views/base_view");
 
 var row_key = helpers.row_key;
@@ -18,8 +19,8 @@ function get_field_type_for_cell(el) {
   var $td = get_wrapper_for_cell(el);
   var $th = $td.closest('table').find('th').eq($td.index());
 
-  var col_name = $th.text();
-  var col_type = filter_helper.get_field_type(col_name);
+  var col_name = $th.data('name');
+  var col_type = presenter.get_field_type(col_name);
 
   return col_type;
 }
@@ -28,7 +29,7 @@ function get_field_name_for_cell(el) {
   var $td = get_wrapper_for_cell(el);
   var $th = $td.closest('table').find('th').eq($td.index());
 
-  var col_name = $th.text();
+  var col_name = $th.data('name');
 
   return col_name;
 }
@@ -88,6 +89,8 @@ var TableView = BaseView.extend({
       cols.unshift("weighted_count");
     }
 
+    var col_metadata = jank.controller().get_fields();
+
     var headers = [];
     _.each(group_by.concat(cols), function(col) {
       headers.push(col);
@@ -142,7 +145,7 @@ var TableView = BaseView.extend({
 
   render: function() {
 
-    var table = helpers.build_table(this.headers, this.rows);
+    var table = helpers.build_table(this.headers, this.rows, jank.controller().get_fields());
 
     this.$el
       .append(table)
@@ -167,12 +170,13 @@ var TableView = BaseView.extend({
     var div = $("<div class='cell_data'>");
 
 
-    var col_name = $th.text();
-    var col_type = filter_helper.get_field_type(col_name);
+    var col_name = $th.attr('data-name');
+    var col_type = presenter.get_field_type(col_name);
 
     div.attr("data-value", $td.find(".value_cell").attr("data-value") || $td.html());
     div.attr("data-name", col_name);
     div.attr("data-type", col_type);
+
     $td.append(div);
 
     _.delay(function() {

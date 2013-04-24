@@ -14,6 +14,10 @@ table.table tbody td {
   padding-top: 0px;
   padding-bottom: 0px;
   vertical-align: inherit;
+  overflow-x: hidden;
+  white-space: nowrap;
+  max-width: 200px;
+  text-overflow: ellipsis;
 }
 
 /* Scrollbar styling overrides */
@@ -64,4 +68,23 @@ button.close {
     left: 5%;
     width: 90%;
   }
+}
+
+.editable-container.editable-inline {
+  width: 100%;
+}
+
+.editable-container.editable-inline .editable-input {
+  width: 100%;
+}
+.editable-container.editable-inline .editable-buttons {
+  display: block;
+  margin-top: 10px;
+  margin-left: 0px;
+}
+
+
+
+.editable-container.editable-inline .editable-input .input-large {
+  width: 100%;
 }

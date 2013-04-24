@@ -5,6 +5,7 @@ var backend = require_root("server/backend");
 var template = require_root("server/template");
 var bridge = require_root("server/bridge");
 var page = require_root("server/page");
+var metadata = require_root("server/metadata");
 var view_helper = require_root("client/views/helpers");
 var $ = require("cheerio");
 
@@ -94,26 +95,34 @@ function get_view_selector_row() {
 
 function get_table_selector() {
   return page.async(function(flush_data) {
-    backend.get_tables(function(tables) {
-      var table_options = {};
+    metadata.all(function(configs) {
+      backend.get_tables(function(tables) {
+        var table_options = {};
 
-      _.each(tables, function(table) {
-        if (table.table_name === "undefined") { return; }
+        _.each(tables, function(table) {
+          if (table.table_name === "undefined") { return; }
+          table_options[table.table_name] = table.table_name;
 
-        table_options[table.table_name] = table.table_name;
+          var config = configs[table.table_name];
+          if (config) {
+            table_options[table.table_name] = config.metadata.display_name || table.table_name;
+          }
+        });
+
+        var cmp = $C("selector", {
+          name: "table",
+          options: table_options,
+          selected: context("query_table"),
+          delegate: {
+            "change" : "table_changed"
+          }
+        });
+
+        flush_data(cmp.toString());
       });
 
-      var cmp = $C("selector", {
-        name: "table",
-        options: table_options,
-        selected: context("query_table"),
-        delegate: {
-          "change" : "table_changed"
-        }
-      });
-
-      flush_data(cmp.toString());
     });
+
   });
 }
 
@@ -235,7 +244,7 @@ function get_stacking_row() {
 
 function get_group_by_row(group_columns) {
   var group_names = {};
-  _.each(group_columns, function(m) { group_names[m.name] = m.name; });
+  _.each(group_columns, function(m) { group_names[m.name] = m.display_name || m.name; });
 
   var group_by_selector = $C("multiselect", { name: "group_by", options: group_names });
   var group_by_row = add_control("group_by", "Group By", group_by_selector.toString(), {
@@ -261,7 +270,7 @@ function get_aggregate_row() {
 
 function get_field_row(agg_columns) {
   var agg_names = {};
-  _.each(agg_columns, function(m) { agg_names[m.name] = m.name; });
+  _.each(agg_columns, function(m) { agg_names[m.name] = m.display_name || m.name; });
 
   var field_selector = $C("selector", {
     name: "field",
@@ -272,7 +281,7 @@ function get_field_row(agg_columns) {
 
 function get_fieldset_row(agg_columns) {
   var agg_names = {};
-  _.each(agg_columns, function(m) { agg_names[m.name] = m.name; });
+  _.each(agg_columns, function(m) { agg_names[m.name] = m.display_name || m.name; });
 
   var field_selector = $C("multiselect", {
     name: "fieldset",
@@ -285,15 +294,15 @@ function get_controls(columns) {
   var control_box = $("<div>");
 
   var groupable_columns = _.filter(columns, function(col) {
-    return col.type_str === GROUPABLE_TYPE;
+    return col.type_str === GROUPABLE_TYPE && col.hidden !== 'true';
   });
 
   var agg_columns = _.filter(columns, function(col) {
-    return col.type_str === AGGREGABLE_TYPE && col.name !== "time";
+    return col.type_str === AGGREGABLE_TYPE && col.name !== "time" && col.hidden !== 'true';
   });
 
   var tag_columns = _.filter(columns, function(col) {
-    return col.type_str.match("set_");
+    return col.type_str.match("set_") && col.hidden !== 'true';
   });
 
 
@@ -322,14 +331,16 @@ module.exports = {
   get_filters: function() {
     return page.async(function(flush_data) {
 
-      backend.get_columns(context("query_table"), function(columns) {
+      metadata.get(context("query_table"), function(config) {
+        var columns = config.metadata.columns;
+
         var typed_fields = {};
         _.each(columns, function(field) {
-          if (BLACKLIST[field.name] || BLACKLIST[field.type_str]) {
+          if (BLACKLIST[field.name] || BLACKLIST[field.type_str] || field.hidden === 'true') {
             return;
           }
 
-          typed_fields[field.type_str + "." + field.name] = field.name;
+          typed_fields[field.type_str + "." + field.name] = field.display_name || field.name;
         });
 
         var filter_row = $C("filter_row", { fields: typed_fields });
@@ -360,8 +371,8 @@ module.exports = {
     var view = context("req").query.view || "samples";
     // this is how i do data dependencies, :P
     return page.async(function(flush_data) {
-      backend.get_columns(context("query_table"), function(columns) {
-        var controls = get_controls(columns);
+      metadata.get(context("query_table"), function(config) {
+        var controls = get_controls(config.metadata.columns);
         bridge.controller("query", "update_view", view);
         flush_data(controls.toString());
       });

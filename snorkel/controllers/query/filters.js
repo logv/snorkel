@@ -46,13 +46,9 @@ function set_fields(fields) {
       return;
     }
 
-    typed_fields[field.type_str + "." + field.name] = field.name;
+    typed_fields[field.type_str + "." + field.name] = field.display_name || field.name;
     field_types[field.name] = field.type_str;
   });
-}
-
-function get_field_type(field_name) {
-  return field_types[field_name];
 }
 
 var compare_area, filter_area, container;
@@ -203,6 +199,5 @@ module.exports = {
   add_or_update: add_or_update_filter,
   set_container: set_container,
   set_fields: set_fields,
-  get_field_type: get_field_type,
   BLACKLIST: BLACKLIST
 };

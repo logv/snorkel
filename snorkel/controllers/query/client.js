@@ -2,9 +2,10 @@
 
 var filter_helper = require("controllers/query/filters");
 
-var helpers = require("client/views/helpers");
-var views = require("client/js/view");
 var component = require("client/js/component");
+var helpers = require("client/views/helpers");
+var presenter = require("client/views/presenter");
+var views = require("client/js/view");
 
 var _show_controls = false;
 var ResultsStore = require("client/js/results_store");
@@ -605,7 +606,13 @@ module.exports = {
     this.weight_col = weight_col;
 
     filter_helper.set_fields(this.fields);
+    helpers.set_fields(this.fields);
+    presenter.set_fields(this.fields);
     jank.trigger('query:fields', this.fields);
+  },
+
+  get_fields: function() {
+    return this.fields;
   },
 
   update_view: function(view) {

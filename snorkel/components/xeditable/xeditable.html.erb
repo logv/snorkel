@@ -1,6 +1,7 @@
 <% set_default("type", "text") %>
+<% set_default("name", "") %>
 
-<a href="#" data-type="<%= type %>" class=""> 
+<a href="#" data-type="<%= type %>" class="" data-name="<%= name %>"> 
   <% if (content) { %>
     <%= content %>
   <% } %>

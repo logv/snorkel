@@ -169,6 +169,7 @@ var DistView = BaseView.extend({
         }
       });
 
+      var ks_lines = [];
       var ks_line, ks_low_line, ks_high_line;
       if (self.ks_result) {
         ks_line = {
@@ -183,30 +184,41 @@ var DistView = BaseView.extend({
           color: "rgba(200, 0, 0, 0.7)",
           dashStyle: "dot"
         };
-        ks_low_line = {
-          value: self.ks_low_result.at,
-          label: {
-            text: "delta: " + helpers.count_format(self.ks_low_result.max * 100),
-            style: {
-              color: "rgba(200, 0, 0, 0.7)"
-            }
-          },
-          width: 1,
-          color: "rgba(200, 0, 0, 0.7)",
-          dashStyle: "dot"
-        };
-        ks_high_line = {
-          value: self.ks_high_result.at,
-          label: {
-            text: "delta: " + helpers.count_format(self.ks_high_result.max * 100),
-            style: {
-              color: "rgba(200, 0, 0, 0.7)"
-            }
-          },
-          width: 1,
-          color: "rgba(200, 0, 0, 0.7)",
-          dashStyle: "dot"
-        };
+
+        ks_lines.push(ks_line);
+
+        if (self.ks_low_result) {
+          ks_low_line = {
+            value: self.ks_low_result.at,
+            label: {
+              text: "delta: " + helpers.count_format(self.ks_low_result.max * 100),
+              style: {
+                color: "rgba(200, 0, 0, 0.7)"
+              }
+            },
+            width: 1,
+            color: "rgba(200, 0, 0, 0.7)",
+            dashStyle: "dot"
+          };
+          ks_lines.push(ks_low_line);
+
+        } 
+
+        if (self.ks_high_result) {
+          ks_high_line = {
+            value: self.ks_high_result.at,
+            label: {
+              text: "delta: " + helpers.count_format(self.ks_high_result.max * 100),
+              style: {
+                color: "rgba(200, 0, 0, 0.7)"
+              }
+            },
+            width: 1,
+            color: "rgba(200, 0, 0, 0.7)",
+            dashStyle: "dot"
+          };
+          ks_lines.push(ks_high_line);
+        }
       }
 
       var options = {
@@ -234,7 +246,7 @@ var DistView = BaseView.extend({
           min: xmin,
           max: xmax,
           reversed: false,
-          plotLines: plot_lines.concat([ks_line, ks_low_line, ks_high_line])
+          plotLines: plot_lines.concat(ks_lines)
         }
       };
 
@@ -578,7 +590,7 @@ var DistView = BaseView.extend({
 
     if (self.compare_data) {
       diffEl.css("color", "rgba(0, 0, 0, 0.7)");
-      if (self.ks_result.p) {
+      if (self.ks_result && self.ks_result.p) {
         diffEl.html("(distributions are <b>similar</b>, p-val:" + helpers.count_format(self.ks_result.p) + ")</small>");
       } else {
         diffEl.html("(distributions are <b>not similar</b>)</small>");

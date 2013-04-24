@@ -1,0 +1,69 @@
+<%= set_default("name", "") %>
+<%= set_default("display_name", "") %>
+<%= set_default("description", "") %>
+<%= set_default("col_types", []) %>
+
+<div class="container-fluid">
+  <div class="clearfix" style="margin-top: 60px;"></div>
+  <div class="span12 mbl mtl clearfix">
+    <div class="btn btn-primary save">
+      Save Changes
+    </div>
+    <div class="btn cancel">
+      Discard Changes
+    </div>
+  </div>
+
+  <div class="clearfix">&nbsp;</div>
+
+  <form id="dataset_metadata">
+    <div class="clearfix">
+      <div class="span5 clearfix dataset_config">
+        <h2><b>Name</b> <span class=""><%= name %></span> </h2>
+        <div> <a target=_blank href="/query?table=<%=name%>">(Open dataset)</a> </div>
+        <h2><b>Display Name</b></h2> <div class="manual xeditable" data-name="display_name"><%= display_name %></div>
+        <h2><b>Description</b></h2> <div class="manual xeditable" data-type="wysihtml5" data-name="description"><%= description %></div>
+      </div>
+
+      <div class="span1 clearfix"> </div>
+
+      <div class="span6 clearfix column_config offset1">
+
+        <h2><b>Columns</b></h2>
+
+        <% if (col_types.string && col_types.string.length) { %>
+          <h3>String</h3>
+          <table class="table" >
+            <%= render_table_header() %>
+            <% _.each(col_types.string, function(datum) { %>
+                <%= render_column(datum) %>
+            <% }) %>
+          </table>
+        <% } %>
+
+        <% if (col_types.integer && col_types.integer.length) { %>
+          <h3>Integer</h3>
+          <table class="table">
+            <%= render_table_header() %>
+            <% _.each(col_types.integer, function(datum) { %>
+                <%= render_column(datum) %>
+            <% }) %>
+          </table>
+        <% } %>
+
+        <% if (col_types.set && col_types.set.length) { %>
+          <h3>Set</h3>
+          <table class="table">
+            <%= render_table_header() %>
+            <% _.each(col_types.set, function(datum) { %>
+                <%= render_column(datum) %>
+            <% }) %>
+          </table>
+        <% } %>
+      </div>
+    </div>
+  </form>
+
+  <%= add_socket() %>
+
+</div>

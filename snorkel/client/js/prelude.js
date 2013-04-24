@@ -189,6 +189,7 @@
   }
 
   var _controllers = {};
+  var _pending;
   function get_controller(name, cb) {
     var name = name || bootloader.__controller_name;
     if (_controllers[name]) {
@@ -196,7 +197,17 @@
       return _controllers[name];
     }
 
-    var controller = {};
+    var controller = {
+      name: name
+    };
+
+    if (_pending) {
+      _pending.push(cb);
+      return controller;
+    }
+
+    _pending = [ cb ];
+
     bootloader.require("controllers/" + name + "/client", function(mod) {
       var ViewController = Backbone.View.extend(mod);
       var instance = new ViewController();
@@ -209,9 +220,11 @@
       _controllers[name] = controller;
       _modules["controllers/" + name + "/client"] = controller;
 
-      if (cb) {
-        cb(controller);
-      }
+      _.each(_pending, function(cb) {
+        if (cb) {
+          cb(controller);
+        }
+      });
     });
 
     controller.name = name;

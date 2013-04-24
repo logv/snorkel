@@ -1,11 +1,13 @@
 <% set_default("editable", false) %>
 <% set_default("name", ""); %>
+<% set_default("display_name", ""); %>
 <% set_default("description", "") %>
 <% set_default("queries", 0) %>
 
 <div class="dataset_tile">
+
   <h3><a href="/query?table=<%= name %>">
-    <%= name %>
+    <%= display_name || name %>
     </a>
 
     <% if (queries) { %>
@@ -15,12 +17,15 @@
     <% } %>
 
     <% if (editable) { %>
-      <span class="icon delete"> <i class="icon-trash"></i> </span>
+      <a class="icon delete" href="#"> <i class="icon-trash"></i> </a>
+      <a class="mth mrl" href="/datasets/edit?table=<%=name %>">
+            <span class="icon delete"> <i class="icon-edit"></i> </span>
+      </a>
     <% } %>
 
   </h3>
 
-  <div class="dataset_info">
+  <div class="dataset_info span6">
     <div>
       <p>
         <% if (description) { %>

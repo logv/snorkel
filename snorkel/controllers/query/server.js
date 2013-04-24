@@ -11,6 +11,7 @@ var db = require_root("server/db");
 var page = require_root("server/page");
 var bridge = require_root("server/bridge");
 var querystring = require("querystring");
+var metadata = require_root("server/metadata");
 var Sample = require_root("server/sample");
 var template = require_root("server/template");
 var url = require("url");
@@ -193,7 +194,7 @@ function marshall_query(form_data) {
       }
 
       // For $nin and $in, try JSON first, then regular string second
-      if (op === "$nin" || op === "$in") {
+      if (op === "$nin" || op === "$in" || op === "$all") {
         if (_.isString(val)) {
           try {
             val = JSON.parse(val);
@@ -327,11 +328,17 @@ function get_index() {
       };
     }
 
+    var editEl = $("<a>Dataset Settings</a>")
+      .attr('href', '/datasets/edit?table=' +  table)
+      .attr('target', '_blank');
+
+    var edit_link = editEl.toString();
 
     return template.partial("query/sidebar.html.erb", {
       render_controls: wrap_str(controls),
       render_filters: wrap_str(filters),
       render_stats: wrap_str(stats),
+      render_edit_link: wrap_str(edit_link),
       render_go_button: go_button.toString,
       render_aux_button: aux_button.toString
     });
@@ -352,6 +359,7 @@ function get_index() {
 
 
   page.render({content: template_str, header: header_str});
+
 }
 
 function log_query(query_data, user) {

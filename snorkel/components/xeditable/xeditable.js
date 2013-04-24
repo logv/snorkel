@@ -2,7 +2,7 @@
 
 module.exports = {
   tagName: "div",
-  className: "",
+  className: "xeditable",
   defaults: {
     content: "default content"
   },

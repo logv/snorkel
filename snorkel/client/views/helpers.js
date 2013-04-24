@@ -138,8 +138,13 @@ module.exports = {
   byte_format: bytesToSize,
 
   count_format: countToSize,
+  set_fields: function(fields) {
+    this.fields = fields;
+  },
 
-  build_table: function(headers, rows) {
+  build_table: function(headers, rows, column_config) {
+    var presenter = require("client/views/presenter");
+
     // TODO: data formatting / munging goes on where?
     // How configurable is group by order?
     var table = $("<table class='table table-hover table-striped table-bordered'/>");
@@ -147,9 +152,12 @@ module.exports = {
     var row = $("<tr />");
     var td;
 
+    var fields = this.fields;
     _.each(headers, function(col) { 
       td = $("<th>");
-      td.html(col);
+      var display_name = presenter.get_field_name(col);
+      td.attr('data-name', col);
+      td.html(display_name);
       row.append(td);
     });
 

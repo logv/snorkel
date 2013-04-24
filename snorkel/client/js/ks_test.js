@@ -28,8 +28,12 @@ function ks_test(perc_one, perc_two, len_one, len_two) {
     }
   }
 
-  var one_val = perc_one[at][1];
-  var two_val = perc_two[at][1];
+  if (!at) {
+    return;
+  }
+
+  var one_val = (perc_one[at] && perc_one[at][1]) || 0;
+  var two_val = (perc_two[at] && perc_two[at][1]) || 0;
 
   var high_val = Math.max(one_val, two_val);
   var low_val = Math.min(one_val, two_val);

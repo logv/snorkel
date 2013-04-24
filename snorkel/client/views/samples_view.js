@@ -2,6 +2,7 @@
 
 var helpers = require("client/views/helpers");
 var BaseView = require("client/views/base_view");
+var presenter = require("client/views/presenter");
 
 var SamplesView = BaseView.extend({
 
@@ -44,7 +45,7 @@ var SamplesView = BaseView.extend({
 
     var all_cols = string_cols.concat(integer_cols).concat(set_cols);
     _.each(all_cols, function(col) {
-      headers.push(col);
+      headers.push(presenter.get_field_name(col));
     });
 
     var rows = [];

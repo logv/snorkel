@@ -1,6 +1,7 @@
 "use strict";
 
 var helpers = require("client/views/helpers");
+var presenter = require("client/views/presenter");
 var SamplesView = require("client/views/samples_view");
 
 var ScatterView = SamplesView.extend({
@@ -63,7 +64,7 @@ var ScatterView = SamplesView.extend({
       xAxis: {
         type: "linear",
         title: {
-          text: field_one
+          text: presenter.get_field_name(field_one)
         }
       },
       tooltip: {
@@ -96,7 +97,7 @@ var ScatterView = SamplesView.extend({
       },
       yAxis: {
         title: {
-          text: field_two
+          text: presenter.get_field_name(field_two)
         }
       },
 

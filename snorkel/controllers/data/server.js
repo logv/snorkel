@@ -15,6 +15,45 @@ var Sample = require_root("server/sample");
 var config = require_root("server/config");
 var _collect_samples;
 
+var _sample_insertions = {};
+var _sample_errors = {};
+var print_input_stats = _.throttle(function() {
+
+  _.delay(function() {
+    var tables = _.keys(_sample_insertions).concat(_.keys(_sample_errors));
+
+    tables.sort();
+
+    if (tables.length) {
+      console.log("INSERT SUMMARY");
+    }
+
+    _.each(tables, function(table) {
+      // TODO: log these to snorkel DB, too
+      console.log_no_ts(table,"\n  inserts:", _sample_insertions[table] || 0, "\terrors:", _sample_errors[table] || 0);
+    });
+
+    _sample_insertions = {};  
+    _sample_errors = {};
+  }, 500);
+}, 5000);
+
+
+function inserted_samples(table, count, source) {
+  _sample_insertions[table] = (_sample_insertions[table] || 0) + count;
+
+  print_input_stats();
+}
+
+function errored_samples(table, count, error, source) {
+  _sample_errors[table] = (_sample_errors[table] || 0) + count;
+  print_input_stats();
+}
+
+function get_table(dataset, subset) {
+  return dataset + "/" + subset;
+}
+
 // If the config specific rabbit options, we listen to rabbit exchange  for new
 // incoming samples
 var default_options = { type: 'direct', durable: true, auto_delete: false};
@@ -45,9 +84,9 @@ function subscribe_to_rabbit_queue() {
 
           backend.add_samples(dataset, subset, samples, function(err, data) {
             if (err) {
-              console.log("Couldnt insert samples!", err);
+              errored_samples(get_table(dataset, subset), 1, err, "MQ");
             } else {
-              console.log("MQ: Inserted " + (samples.length) + " sample(s) into", dataset, subset);
+              inserted_samples(get_table(dataset, subset), samples.length, "MQ");
             }
           });
 
@@ -75,19 +114,21 @@ function setup_udp_socket() {
       } else {
         console.log("UDP: Problem receiving sample");
       }
+
+      return;
     }
 
     try {
       backend.add_sample(parsed_data.dataset, parsed_data.subset, parsed_data.sample, function(err) {
         if (err) {
-          console.log("UDP: Error inserting sample");
+          errored_samples(get_table(parsed_data.dataset, parsed_data.subset), 1, null, "UDP");
         } else {
-          console.log("UDP: Inserted sample into", parsed_data.dataset, parsed_data.subset);
+          inserted_samples(get_table(parsed_data.dataset, parsed_data.subset), 1, "UDP");
         }
       });
     } catch (e) {
       // TODO: log where this bad sample is coming from
-      console.log("Trouble inserting sample.");
+      errored_samples(get_table(parsed_data.dataset, parsed_data.subset), 1, null, "UDP");
     }
   });
 
@@ -156,12 +197,12 @@ module.exports = {
       samples = [samples];
     }
 
-    console.log("POST: Inserting", samples.length, "into", dataset, subset);
     backend.add_samples(dataset, subset, samples, function(err, data) {
       if (err) {
-        console.log("Couldnt insert samples!", err);
+        errored_samples(get_table(dataset, subset), 1, err, "POST");
         res.end("ERROR");
       } else {
+        inserted_samples(get_table(dataset, subset), samples.length, "POST");
         res.end("INSERTED " + (samples.length) + " SAMPLE(S)");
       }
     });
@@ -201,6 +242,7 @@ module.exports = {
             var sec = (Date.now() - now) / 1000;
             res.write("INSERTED " + inserted + " SAMPLES INTO THE DB IN " + sec + " SECONDS\n");
             inserted += samples.length;
+            inserted_samples(get_table(dataset, subset), samples.length);
           }
 
           pending -= 1;

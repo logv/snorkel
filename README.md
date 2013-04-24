@@ -62,7 +62,7 @@ questions about the *now*.
             ]
           },
         }
-      }]));
+      ])});
 
 ### 2) know your data
 

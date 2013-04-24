@@ -1,3 +1,22 @@
+snorkel (0.0.7-3) unstable; urgency=low
+
+  * no cross dataset metadata contamination
+
+ -- okay <okay.zed@gmail.com>  Tue, 23 Apr 2013 09:10:16 -0700
+
+snorkel (0.0.7-2) unstable; urgency=low
+
+  * kill server if it cant grab the port
+
+ -- okay <okay.zed@gmail.com>  Tue, 23 Apr 2013 09:10:16 -0700
+
+snorkel (0.0.7-1) unstable; urgency=low
+
+  * concise insertion logs
+  * dataset editor & presenter service
+
+ -- okay <okay.zed@gmail.com>  Mon, 22 Apr 2013 09:10:16 -0700
+
 snorkel (0.0.6-1) unstable; urgency=low
 
   * separate services for collector

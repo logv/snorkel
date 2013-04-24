@@ -80,6 +80,26 @@ function setup_services(options) {
   }
 }
 
+function try_restart(server, port) {
+  var retries = 0;
+
+  return function(e) {
+    if (e.code === 'EADDRINUSE') {
+      console.log('Port', port, 'in use, retrying...');
+      setTimeout(function () {
+        try { server.close(); } catch(e) {}
+
+        if (retries > 5) {
+          console.log("Couldn't listen on port", port, ", exiting.");
+          process.exit();
+        }
+
+        retries += 1;
+        server.listen(port);
+      }, 2000);
+    }
+  };
+}
 module.exports = {
   run: function() {
     var services = { web_server: true };
@@ -90,6 +110,7 @@ module.exports = {
     var https_port = config.https_port;
     socket.setup_io(app, http_server);
     http_server.listen(http_port);
+    http_server.on('error', try_restart(http_server, http_port));
 
     console.log("Listening for HTTP connections on port", http_port);
 
@@ -98,6 +119,7 @@ module.exports = {
       console.log("Listening for HTTPS connections on port", https_port);
       socket.setup_io(app, https_server);
       https_server.listen(https_port);
+      https_server.on('error', try_restart(https_server, https_port));
     }
     // End SSL Server
   },

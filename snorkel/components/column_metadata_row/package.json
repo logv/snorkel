@@ -1,0 +1,7 @@
+{
+  "main" : "column_metadata_row",
+  "helpers": [],
+  "style": "column_metadata_row.css",
+  "styles": [],
+  "template": "column_metadata_row.html.erb"
+}

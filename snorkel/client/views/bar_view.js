@@ -3,6 +3,7 @@
 var filter_helper = require("controllers/query/filters");
 var helpers = require("client/views/helpers");
 var BaseView = require("client/views/base_view");
+var presenter = require("client/views/presenter");
 
 var row_key = helpers.row_key;
 var BarView = BaseView.extend({
@@ -22,14 +23,14 @@ var BarView = BaseView.extend({
     _.each(this.data.parsed.cols, function(col) {
       serieses[col] = {
         data: [],
-        name: col,
+        name: presenter.get_field_name(col),
         color: helpers.get_rgba(col, 1)
       };
 
       if (compare_data) {
         compare_series[col] = {
           data: [],
-          name: col + " (compare)",
+          name: presenter.get_field_name(col) + " (compare)",
           color: helpers.get_rgba(col, 0.7)
         };
 

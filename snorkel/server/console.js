@@ -9,6 +9,7 @@ module.exports = {
 
     _.each(['info', 'log', 'warn', 'debug'], function(func) {
       var old_func = console[func];
+      console[func + "_no_ts"] = old_func;
       console[func] = function() {
         var args = _.toArray(arguments);
         args.unshift(new Date().toISOString());
