@@ -88,3 +88,7 @@ button.close {
 .editable-container.editable-inline .editable-input .input-large {
   width: 100%;
 }
+
+.close {
+  opacity: 1;
+}

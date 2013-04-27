@@ -3,7 +3,6 @@
 module.exports = {
   events: {
     "click .title" :  "handle_title_click",
-    "click .edit" :  "handle_edit_click",
     "click .delete" :  "handle_delete_click"
   },
 
@@ -18,9 +17,5 @@ module.exports = {
 
        });
     });
-  },
-  handle_edit_click: function(e) {
-    this.editable.activate();
-    e.stopPropagation();
   }
 };

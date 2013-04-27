@@ -574,7 +574,7 @@ var DistView = BaseView.extend({
 
 
     var $el = self.$el;
-    var outerEl = $("<div class='span12 prl'>");
+    var outerEl = $("<div class='span12 prl pll'>");
     outerEl.append(render_glance(xmin, xmax));
     outerEl.append($("<hr />"));
     $el.append(outerEl);
@@ -626,7 +626,7 @@ var DistView = BaseView.extend({
 
 jank.trigger("view:add", "dist",  {
     include: helpers.STD_INPUTS.concat(["field", "hist_bucket", "compare"]),
-    exclude: [ "group_by", "max_results", "agg", "fieldset", "time_bucket", "stacking" ],
+    exclude: [ "group_by", "max_results", "agg", "fieldset", "time_bucket", "stacking", "sort_by" ],
     icon: "noun/dist.svg"
 }, DistView);
 

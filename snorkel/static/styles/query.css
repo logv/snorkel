@@ -149,7 +149,7 @@ body {
 #query_sidebar {
   background-color: #f5f5f5;
   float: left;
-  padding-left: 30px;
+  padding-left: 20px;
   padding-right: 10px;
   width: 310px;
   visibility: visible !important;
@@ -170,11 +170,6 @@ body {
     color: #aaa;
   }
 
-  .go_button {
-    margin-top: 5px;
-  }
-
-
   /* landscape tablet, desktop and up */
   @media (min-width: 768px) {
     position: fixed;
@@ -189,6 +184,10 @@ body {
       margin-top: 20px;
     }
     .go_button {
+      float: right;
+    }
+
+    .aux_buttons {
       float: right;
     }
     .filter_op {
@@ -267,13 +266,12 @@ body {
       margin-bottom: 10px;
     }
 
-    .aux_go_button_wrapper {
+    .go_button_wrapper {
       display: none;
     }
 
     /* Make the go button huge and at the bottom in big displays */
-    .go_button_wrapper {
-      width: 100%;
+    .aux_go_button_wrapper {
       background-color: #202030;
       position: fixed;
       bottom: -5px;
@@ -283,11 +281,22 @@ body {
       padding-bottom: 13px;
     }
 
+    .save_button,
+    .share_button,
     .go_button {
       margin-left: 5px;
       margin-right: 5px;
       margin-top: 8px;
-      display: block;
+    }
+
+    .aux_buttons {
+      float: left;
+    }
+
+    .go_button {
+      padding-left: 40px;
+      padding-right: 40px;
+      float: right;
     }
   }
 
@@ -300,6 +309,12 @@ body {
   #filters .filter_op {
     margin-left: 9px;
   }
+
+  .save_button,
+  .share_button {
+    padding: 8px;
+  }
+
 
   .form-horizontal select { margin-top: 5px; }
 

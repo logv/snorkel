@@ -1,0 +1,41 @@
+<% set_default("body", ""); %>
+<% set_default("title", ""); %>
+<% set_default("description", ""); %>
+<% set_default("footer", ""); %>
+
+<div class="modal hide">
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+    <h3>Save query</h3>
+  </div>
+  <div class="modal-body">
+    <div class="form-horizontal">
+      <div class="control-group">
+        <label class="control-label">Title</label>
+        <div class="controls">
+          <input type="text" class="mtm" name="title" value="<%= title %>"/>
+        </div>
+      </div>
+      <div class="control-group">
+        <label class="control-label">Info</label>
+        <div class="controls">
+          <textarea type="text" class="mtm" name="description">
+            <%= description %>
+          </textarea>
+        </div>
+      </div>
+
+      <% if (edit) { %>
+        <p class="small prl">
+          You are editing an existing query and will update the title &amp;
+          information of the existing query
+        </p>
+      <% } %>
+    </div>
+  </div>
+
+  <div class="modal-footer">
+    <a href="#" class="btn btn-primary save mll">Save</a>
+    <a href="#" data-dismiss="modal" class="btn close">Close</a>
+  </div>
+</div>

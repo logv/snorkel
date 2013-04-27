@@ -176,8 +176,6 @@ function query_hist(opts) {
 
   pipeline.push(group_op);
 
-  pipeline.push({ $sort: { "count" : -1}});
-
   return pipeline;
 }
 

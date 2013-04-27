@@ -8,6 +8,9 @@ module.exports = {
   max_http_sockets: 1000,
   // Collector and Web server are run separately
   separate_services: true,
+  superuser: {
+    admin: true
+  },
   google_auth: {
     enabled: true
   },

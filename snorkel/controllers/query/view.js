@@ -28,6 +28,9 @@ var HELP_STRINGS = {
   "group_by" : {
     content: "groups the data into several sub groups before calculating the final metric"
   },
+  "sort_by" : {
+    content: "sometimes, you just wanna sort shit"
+  },
   "max_results" : {
     content: "after grouping the data, select a limit to the number of results we want to see. The higher this number, the slower the query (and graph drawing) will be. By default, snorkel will pick a reasonable number. "
   },
@@ -242,6 +245,19 @@ function get_stacking_row() {
 
 }
 
+function get_sort_by_row(sort_columns) {
+  var sort_names = {};
+  sort_names[""] = "Count";
+  _.each(sort_columns, function(m) { sort_names[m.name] = m.display_name || m.name; });
+
+
+  var sort_by_selector = $C("selector", { name: "sort_by", options: sort_names });
+  var sort_by_row = add_control("sort_by", "Sort By", sort_by_selector.toString(), {
+    space: true });
+
+  return sort_by_row;
+}
+
 function get_group_by_row(group_columns) {
   var group_names = {};
   _.each(group_columns, function(m) { group_names[m.name] = m.display_name || m.name; });
@@ -316,6 +332,7 @@ function get_controls(columns) {
 
   control_box.append($("<div id='rollup' style='position: relative; top: -40px'>"));
   control_box.append(get_group_by_row(groupable_columns));
+  control_box.append(get_sort_by_row(agg_columns));
   control_box.append(get_max_results_row());
   control_box.append(get_time_bucket_row());
   control_box.append(get_hist_bucket_row());

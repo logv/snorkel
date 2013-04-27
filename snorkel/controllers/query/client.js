@@ -18,6 +18,7 @@ var Throbber = require("client/js/throbber");
 
 
 var _query_id;
+var _query_details;
 
 
 function get_query_from_str(query_str) {
@@ -182,6 +183,22 @@ function handle_query_id(data) {
   ResultsStore.identify(data);
 }
 
+function handle_query_saved(query_details) {
+  var container = $("#query_queue .saved_queries");
+  // Psas in the query from above for later re-usage
+  $C("query_tile", { query: query_details }, function(tile) {
+    tile.$el.hide();
+    tile.prependTo(container);
+    tile.$el.fadeIn(1000);
+  });
+
+  $C("modal", {
+    title: "Success!",
+    body: "yuor query has been saved. look in your query history for it. <br />" +
+          "<small>(Click on your username to see recent &amp; saved queries)</small>"
+  });
+}
+
 function insert_query_tiles(container, queries, in_order) {
   _.each(queries, function(data) {
     var view_data = views.VIEWS[data.parsed.view];
@@ -217,28 +234,12 @@ function insert_query_tiles(container, queries, in_order) {
   });
 }
 
-
-function add_query_id_to_url(id, push) {
-  var uri = window.location.pathname + window.location.search;
-  var query_data = $.deparam(uri);
-
-  query_data.id = id;
-
-  var dest = decodeURIComponent($.param(query_data));
-  if (!push) {
-    jank.replace(dest);
-  } else {
-    jank.go(dest);
-  }
-}
-
 function handle_query_ack(data) {
   QS.got_ack();
   ResultsStore.handle_ack(data);
   _query_id = data.id;
 
   QS.should_compare(data.parsed.compare_mode);
-  add_query_id_to_url(data.id, false);
 
   insert_query_tiles($("#query_queue .query_list"), [data]);
 }
@@ -262,8 +263,8 @@ function load_shared_queries(queries) {
 module.exports = {
   init: function() {
     // this is initializing component interactions
-    jank.controller().on("rename_query", function(query, name, shared) {
-      jank.socket().emit("save_query", query, name, shared || false);
+    jank.controller().on("rename_query", function(query, name, info) {
+      jank.socket().emit("save_query", query, name, info);
     });
 
     jank.controller().on("delete_query", function(query, cb) {
@@ -284,14 +285,13 @@ module.exports = {
       $("#user_dialog").modal('hide');
       this.toggle_pane(false);
 
-      var form_str = serialized_array_to_str(query.input);
-
-      this.set_dom_from_query(form_str);
+      this.set_dom_from_input(query.input);
 
       var id = query.id || query.clientid;
       _query_id = id; // hidden variables ahoy
-      form_str += "&id=" + id;
-      jank.go("/query?" + form_str);
+      _query_details = query;
+
+      jank.go("/query?table=" + this.table + "&c=" + id);
       views.redraw(id, query);
     });
 
@@ -319,18 +319,20 @@ module.exports = {
     jank.subscribe("popstate", function() {
       var form_str = window.location.search.substring(1);
       var data = $.deparam(form_str);
-      var id = data.id;
+      var id = data.c || data.id;
 
       that.set_dom_from_query(form_str);
 
       if (id !== _query_id) {
         _query_id = id;
+        _query_details = null;
 
         // if we dont have a local cache of the ID, then we should probably
         // re-run the query, huh?
         if (!views.redraw(id)) {
           that.run_query(form_str, true);
           // run this query again?
+          // TODO: show 'save' button
         }
         // need to restore the old query
       }
@@ -341,11 +343,16 @@ module.exports = {
 
 
     var query_str = window.location.search.substring(1);
+  },
 
+  run_startup_query: function() {
+    var that = this;
+    var query_str = window.location.search.substring(1);
     jank.do_when(this.fields, 'query:fields', function() {
       that.run_query(query_str, true);
+      that.set_dom_from_query(query_str);
     });
-    this.set_dom_from_query(query_str);
+
   },
 
   events: {
@@ -378,6 +385,12 @@ module.exports = {
 
     },
 
+    save_clicked: function(el) {
+      this.save_query();
+    },
+    share_clicked: function(el) {
+      this.share_query();
+    },
     go_clicked: function(el) {
       this.run_query();
     }
@@ -414,17 +427,39 @@ module.exports = {
 
   },
 
+  load_saved_query: function(obj) {
+    var that = this;
+    _query_id = obj.clientid;
+    _query_details = obj;
+    var done = _.after(2, function() {
+      handle_query_results(obj.results.query);
+      handle_compare_results(obj.results.compare);
+      that.set_dom_from_input(obj.input);
+
+      ResultsStore.identify({
+        server_id: obj.hashid,
+        client_id: obj.clientid
+      });
+
+      views.show_query_details(obj.clientid, obj);
+    });
+
+    // Gotta wait for certain components...
+    component.load("selector", done);
+    component.load("multiselect", done);
+  },
+
   set_dom_from_query: function(query_str) {
     var query = $.deparam(query_str);
     var view = query.view;
-    this.update_view(view);
+    this.update_view(view || "samples");
 
     var formEl = this.$page.find("#query_sidebar form");
     formEl.deserialize(query_str);
     formEl.find(":input[name]").each(function() {
       var val = $(this).val();
       var name = $(this).attr("name");
-      if (name === "table") {
+      if (name === "table" || name === "view") {
         return;
       }
 
@@ -448,9 +483,7 @@ module.exports = {
     var filters = {};
     try {
       filters = JSON.parse(query.filters);
-    } catch(e) {
-      console.log("Couldn't parse filters, oh noes!");
-    }
+    } catch(e) { }
 
     if (filters.query || filters.compare) {
       var filterEl = this.$page.find("#filters");
@@ -557,7 +590,6 @@ module.exports = {
   },
 
   handle_compare_toggle: _.debounce(function() {
-    console.log("TOGGLING COMPARE");
     var filterBox = this.$page.find(".filter_group[data-filter-type=compare]");
 
     var to_hide = $(filterBox).is(":visible") && filterBox.find(".filter_row").length;
@@ -570,6 +602,13 @@ module.exports = {
 
   }, 50),
 
+  set_dom_from_input: function(input) {
+    var that = this;
+    jank.do_when(this.fields, 'query:fields', function() {
+      var form_str = serialized_array_to_str(input);
+      that.set_dom_from_query(form_str);
+    });
+  },
 
   socket: function(socket) {
     socket.on("new_query", handle_new_query);
@@ -577,6 +616,7 @@ module.exports = {
     socket.on("query_results", handle_query_results);
     socket.on("compare_results", handle_compare_results);
     socket.on("query_id", handle_query_id);
+    socket.on("saved_query", handle_query_saved);
 
     socket.on("recent_queries", load_recent_queries);
     socket.on("saved_queries", load_saved_queries);
@@ -623,7 +663,41 @@ module.exports = {
     jank.controller().trigger("swap_panes", _show_controls);
   }, 50),
 
+  share_query: function() {
+    var table = this.table;
+    $C("modal", { title: "Query URL" }, function(cmp) {
+      var div = $("<div>");
+      var input = $("<input type='text' style='width: 100%' />");
+      var uri = window.location.host + window.location.pathname + '?table=' + table + '&c='  + _query_id;
+
+      input.val(uri);
+      div.append(input);
+      cmp.$el.find(".modal-body").append(div);
+
+      var closeButtonEl = $("<a href='#' class='btn rfloat' data-dismiss='modal'>Close</a>");
+      cmp.$el.find(".modal-footer").append(closeButtonEl);
+
+      input.select();
+
+    });
+  },
+
+  save_query: function() {
+    var query_id = _query_id;
+    // TODO: get current query details
+
+    var title, description, edit;
+    if (_query_details) {
+      edit = true;
+      title = _query_details.title;
+      description = _query_details.description;
+    }
+
+    $C("save_query_modal", { query_id: _query_id, title: title, description: description, edit: edit }, function(cmp) { });
+  },
+
   run_query: function(query_ish, keep_url) {
+    _query_details = null;
     var serialized;
     if (!query_ish) {
       serialized = this.get_query_from_dom();

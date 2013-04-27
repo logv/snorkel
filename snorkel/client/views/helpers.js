@@ -3,14 +3,14 @@
 
 var color_hashes = {};
 var COLORS = [
-  '#4572A7', 
-  '#AA4643', 
-  '#89A54E', 
-  '#80699B', 
-  '#3D96AE', 
-  '#DB843D', 
-  '#92A8CD', 
-  '#A47D7C', 
+  '#4572A7',
+  '#AA4643',
+  '#89A54E',
+  '#80699B',
+  '#3D96AE',
+  '#DB843D',
+  '#92A8CD',
+  '#A47D7C',
   '#B5CA92'
 ];
 
@@ -39,7 +39,7 @@ function result_key(group_by, result) {
 function countToSize(count) {
     var sizes = ['', 'K', 'M', 'G', 'T', 'P', 'Z' ];
     if (count === 0) { return '0'; }
-    if (!count) { 
+    if (!count) {
       return 'n/a';
     }
 
@@ -153,7 +153,7 @@ module.exports = {
     var td;
 
     var fields = this.fields;
-    _.each(headers, function(col) { 
+    _.each(headers, function(col) {
       td = $("<th>");
       var display_name = presenter.get_field_name(col);
       td.attr('data-name', col);
@@ -196,7 +196,7 @@ module.exports = {
   },
 
   get_color: function(hash, palette) {
-    if (!palette) { 
+    if (!palette) {
       palette = COLORS;
     }
 
@@ -247,15 +247,15 @@ module.exports = {
 
       var delta_class;
       if (abs_delta > 100) {
-        delta_class = "panic"; 
+        delta_class = "panic";
       } else if (abs_delta > 30) {
-        delta_class = "oh_shit"; 
+        delta_class = "oh_shit";
       }  else if (abs_delta > 15) {
-        delta_class = "definitely"; 
+        delta_class = "definitely";
       } else if (abs_delta > 10) {
-        delta_class = "probably"; 
+        delta_class = "probably";
       } else if (abs_delta > 8) {
-        delta_class = "sorta"; 
+        delta_class = "sorta";
       } else if (abs_delta > 4) {
         delta_class = "kinda";
       } else if (abs_delta > 2) {
@@ -272,7 +272,7 @@ module.exports = {
       var delta_div = $("<div class='delta'>").html("(" + delta + delta_suffix + ")");
 
       if (compare_value === 0) {
-        whichway = "noway";  
+        whichway = "noway";
       }
 
       delta_div
@@ -293,7 +293,7 @@ module.exports = {
   ],
 
   STD_EXCLUDES: [
-    "field", "field_two", "time_bucket", "hist_bucket", "stacking"
+    "field", "field_two", "time_bucket", "hist_bucket", "stacking", "sort_by"
   ]
 
 };

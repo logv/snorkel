@@ -81,6 +81,7 @@ function marshall_query(form_data) {
   query_data.view = value_of(form_data, 'view', 'samples');
 
   query_data.table = value_of(form_data, 'table');
+  query_data.sort_by = value_of(form_data, 'sort_by', "count");
   query_data.stacking = value_of(form_data, 'stacking', 'normal');
 
   var start_str_ms = value_of(form_data, 'start', '-1 hour');
@@ -263,7 +264,8 @@ function build_pipeline(params) {
   var start_s = parseInt(params.start_ms / 1000, 10);
   var end_s = parseInt(params.end_ms / 1000, 10);
 
-  var sort = [ {$sort: { "count" : -1 }} ];
+  var sort = [ {$sort: { }} ];
+  sort[0].$sort[params.sort_by] = -1;
 
   var timeline = backend.time_range(start_s, end_s);
   var filters = backend.add_filters(params.filters);
@@ -304,23 +306,91 @@ function get_index() {
 
   function render_query_content() {
 
-    return template.partial("query/content.html.erb");
+    return page.async(function(flush) {
+      var client_id = context("req").query.client_id || context("req").query.c;
+      var hashid = context("req").query.hashid || context("req").query.h;
+      var empty_str = template.partial("query/content.html.erb");
+      var conditions = { };
+
+      if (hashid) {
+        conditions.hashid = hashid;
+      } else if (client_id) {
+        conditions.clientid = client_id;
+      } else {
+        bridge.controller("query", "run_startup_query");
+        return flush(empty_str);
+      }
+
+      var collection = db.get("query", "results");
+      collection.findOne(conditions, context.wrap(function(err, obj) {
+
+
+        if (err || !obj) {
+          bridge.controller("query", "run_startup_query");
+          return flush(empty_str);
+        }
+       
+        console.log("Found saved query, sending cached results to client", hashid || client_id);
+
+        var input_view = _.find(obj.input, function(r) {
+          return r.name === "view";
+        });
+
+        if (!input_view) {
+          obj.input.push({name: "view", value: obj.parsed.view});
+        }
+
+        bridge.controller("query", "load_saved_query", obj);
+
+        return flush(empty_str);
+      }));
+
+
+
+    })();
   }
 
   function render_query_sidebar() {
     var controls = view.get_controls(),
         filters = view.get_filters(),
-        stats = view.get_stats(),
-        aux_button = $C("button", {
-          name: "Go",
-          delegate: { "click" : "go_clicked" },
-          classes: "go_button btn-primary"
-        }),
-        go_button = $C("button", {
-          name: "Go",
-          delegate: { "click" : "go_clicked" },
-          classes: "go_button btn-primary"
-        });
+        stats = view.get_stats();
+
+    function render_button_bar(aux_buttons) {
+      var go_button = $C("button", {
+        name: "Go",
+        delegate: { "click" : "go_clicked" },
+        classes: "go_button btn-primary"
+      });
+
+      if (!aux_buttons) {
+        go_button.$el.addClass("mtm");
+        return go_button.toString();
+      }
+
+      var barEl = $("<div class='button-bar clearfix mbl'/>");
+      var save_button = $C("button", {
+        name: "",
+        delegate: { "click" : "save_clicked" },
+        classes: "save_button mll btn-success"
+      });
+
+      var share_button = $C("button", {
+        name: "",
+        delegate: { "click" : "share_clicked" },
+        classes: "share_button mll btn-info"
+      });
+
+      save_button.$el.append($("<i class='icon-star' />"));
+      share_button.$el.append($("<i class='icon-share' />"));
+
+      barEl.append(go_button.toString());
+      var leftSideEl = $("<div class='mrl aux_buttons' />");
+      leftSideEl.append(share_button.toString());
+      leftSideEl.append(save_button.toString());
+      barEl.append(leftSideEl);
+
+      return barEl.toString();
+    }
 
     function wrap_str(str) {
       return function() {
@@ -339,8 +409,8 @@ function get_index() {
       render_filters: wrap_str(filters),
       render_stats: wrap_str(stats),
       render_edit_link: wrap_str(edit_link),
-      render_go_button: go_button.toString,
-      render_aux_button: aux_button.toString
+      render_go_button: render_button_bar,
+      render_aux_button: render_button_bar
     });
   }
 
@@ -437,6 +507,12 @@ function handle_new_query(query_id, query_data, socket, done) {
 
   if (query_data.weight_col && !sample_views[query_data.view]) {
     weight_cols = true;
+  }
+
+  function sort_data(data, col) {
+    return _.sortBy(data, function(r) {
+      return r[col] || 0;
+    }).reverse();
   }
 
   var jobs = [
@@ -567,9 +643,9 @@ function get_recent_queries_for_user(username, dataset, cb) {
 }
 
 
-function get_saved_query(hashid, cb) {
+function get_saved_query(conditions, cb) {
   var collection = db.get("query", "results");
-  collection.find({hashid: hashid}, { limit: 1, sort: { updated: -1 }}, function(err, cur) {
+  collection.find(conditions, { limit: 1, sort: { updated: -1 }}, function(err, cur) {
     cur.toArray(function(err, arr) {
       if (arr && arr.length) {
         cb(null, arr[0]);
@@ -611,16 +687,29 @@ module.exports = {
       });
     });
 
-    socket.on("save_query", function(query, name, shared) {
-      get_saved_query(query.server_id || query.hashid, function(err, obj) {
-        if (err || !obj) { return; }
+    socket.on("save_query", function(query, name, description) {
+      var conditions = {};
+      if (query.clientid) { conditions.clientid = query.clientid; }
+      if (query.hashid) { conditions.hashid = query.hashid; }
+
+      console.log("SAVING QUERY", conditions);
+      get_saved_query(conditions, function(err, obj) {
+        console.log(obj);
+        if (err || !obj) { 
+          console.log("FAILED TO SAVE", conditions);
+          return; 
+        }
+
+          console.log("SAVED QUERY", conditions);
 
           obj.saved = true;
           obj.title = name;
-          obj.shared = shared;
+          obj.description = description;
+    
+          var collection = db.get("query", "results");
+          collection.update({_id: obj._id}, obj);
 
-        var collection = db.get("query", "results");
-        collection.update({_id: obj._id}, obj);
+          socket.emit("saved_query", obj);
       });
     });
 
@@ -644,7 +733,7 @@ module.exports = {
         return;
       }
 
-      get_saved_query(form_data.hashid, function(err, saved_query) {
+      get_saved_query({ hashid: form_data.hashid}, function(err, saved_query) {
         if (!saved_query) {
           return;
         }

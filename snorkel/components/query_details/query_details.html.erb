@@ -1,7 +1,20 @@
-<div class="alert alert-info clearfix"> 
-  <div class='btn btn-primary refresh pull-left'>update results</div>
+<%= set_default("title", "") %>
+<%= set_default("description", "") %>
+<%= set_default("show_timestamp", true) %>
 
-  <div class="mll mtm pull-left">
-    This query is showing historical results from <span class='timestamp'> </span>
+<% if (show_timestamp) { %>
+  <div class="alert alert-info clearfix"> 
+    <div class='btn btn-primary refresh pull-left'>update results</div>
+
+    <div class="mll mtm pull-left">
+      This query is showing historical results from <span class='timestamp'> </span>
+    </div>
   </div>
-</div>
+<% } %>
+
+<h3> <%= title %> </h3>
+<p> <%= description %> </p>
+
+<% if (title || description) { %>
+  <hr />
+<% } %>

@@ -363,8 +363,8 @@ var TableView = BaseView.extend({
 });
 
 jank.trigger("view:add", "table", {
-  include: helpers.STD_INPUTS.concat(["compare"]),
-  exclude: helpers.STD_EXCLUDES,
+  include: helpers.STD_INPUTS.concat(["compare", "sort_by"]),
+  exclude: _.without(helpers.STD_EXCLUDES, "sort_by"),
   icon: "noun/table.svg"
 }, TableView);
 

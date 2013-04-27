@@ -49,9 +49,17 @@ var BarView = BaseView.extend({
       categories.push(key);
       _.each(cols, function(col) {
         if (metric === '$count') {
-          serieses[col].data.push(result.count);
+          serieses[col].data.push(
+            {
+              y: result.count,
+              samples: result.count
+
+            });
         } else {
-          serieses[col].data.push(result[col]);
+          serieses[col].data.push({
+            y: result[col],
+            samples: result.count
+          });
         }
       });
     });
@@ -63,9 +71,15 @@ var BarView = BaseView.extend({
         categories.push(key);
         _.each(cols, function(col) {
           if (metric === '$count') {
-            compare_series[col].data.push(result.count);
+            compare_series[col].data.push({
+              samples: result.count,
+              y: result.count
+            });
           } else {
-            compare_series[col].data.push(result[col]);
+            compare_series[col].data.push({
+              samples: result.count,
+              y: result[col]
+            });
           }
         });
       });
@@ -99,7 +113,7 @@ var BarView = BaseView.extend({
       tooltip: {
         shared: false,
         useHTML: true,
-        formatter: function() { 
+        formatter: function() {
           var tooltip = $("<div>");
           tooltip.append($("<b>" + this.series.name + "</b><br />"));
 
@@ -120,8 +134,13 @@ var BarView = BaseView.extend({
           }
 
           tooltip.append(label_row("Value", this.y));
-          tooltip.append(label_row("Total", this.point.stackTotal));
-          tooltip.append(label_row("% of Total", this.y / this.point.stackTotal * 100));
+
+          tooltip.append(label_row("Samples", this.point.samples));
+
+          if (this.point.stackTotal) {
+            tooltip.append(label_row("Total", this.point.stackTotal));
+            tooltip.append(label_row("% of Total", this.y / this.point.stackTotal * 100));
+          }
 
           return tooltip.html();
         }
@@ -144,7 +163,38 @@ var BarView = BaseView.extend({
       options.xAxis.labels = {
         enabled: false
       };
-      options.tooltip.formatter = null;
+      options.tooltip.formatter = function() {
+        var tooltip = $("<div>");
+        tooltip.append($("<b>" + this.x + "</b><br />"));
+        tooltip.append($("<br />"));
+        var point;
+        function label_row(label, value) {
+          var div = $("<div class='clearfix' style='min-width: 200px'/>");
+          var nameEl = $("<div class='lfloat' />");
+          nameEl.css("color", helpers.get_rgba(label, 1));
+          nameEl.html(label);
+
+          var valueEl = $("<div class='rfloat'/>");
+          valueEl.html(helpers.count_format(value));
+
+          div.append(nameEl);
+          div.append(valueEl);
+
+          return div;
+        }
+
+        _.each(this.points, function(pt) {
+          point = pt;
+          tooltip.append(label_row(point.series.name, point.y));
+
+        });
+
+
+        tooltip.append($("<br />"));
+        tooltip.append(label_row("Samples", point.point.samples));
+
+        return tooltip.html();
+      };
       options.tooltip.shared = true;
     }
 
@@ -164,8 +214,8 @@ var BarView = BaseView.extend({
 
 var excludes = _.clone(helpers.STD_EXCLUDES);
 jank.trigger("view:add", "bar", {
-  include: helpers.STD_INPUTS.concat(["compare", "stacking"]),
-  exclude: _.without(excludes, "stacking"),
+  include: helpers.STD_INPUTS.concat(["compare", "stacking", "sort_by", "group_by"]),
+  exclude: _.without(excludes, "stacking", "sort_by", "group_by"),
   icon: "noun/table.svg"
 }, BarView);
 

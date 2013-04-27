@@ -1,3 +1,9 @@
+snorkel (0.0.8-1) unstable; urgency=low
+
+  * more friendly UI
+
+ -- okay <okay.zed@gmail.com>  Sat, 27 Apr 2013 09:10:16 -0700
+
 snorkel (0.0.7-3) unstable; urgency=low
 
   * no cross dataset metadata contamination

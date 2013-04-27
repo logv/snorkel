@@ -1,0 +1,7 @@
+{
+  "main" : "save_query_modal",
+  "helpers": [],
+  "style": "save_query_modal.css",
+  "styles": [],
+  "template": "save_query_modal.html.erb"
+}

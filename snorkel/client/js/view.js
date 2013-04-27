@@ -181,8 +181,13 @@ function insert_comparison(graph_type, data) {
   }
 }
 
-function show_saved_query_details(id, created, data) {
-  $C("query_details", {created: created, query: data}, function(cmp) {
+function show_saved_query_details(id, data) {
+  var created = ResultsStore.get_timestamp(id);
+  data = data || {};
+  var options = {created: created, query: data, title: data.title, description: data.description};
+
+  options.show_timestamp = Date.now() - created > 5 * 60 * 1000;
+  $C("query_details", options, function(cmp) {
     _container.prepend(cmp.$el);
   });
 }
@@ -200,13 +205,7 @@ function redraw_graph(id, query) {
 
   var type = data.parsed.view;
 
-  var timestamp = ResultsStore.get_timestamp(id);
-  // If the query is more than 5 minutes old, display a notice to the user
-  var delta = Date.now() - timestamp;
-  if (delta > 60 * 5 * 1000) {
-    // Show a 'refresh query' button (and add historical results, eventually)
-    show_saved_query_details(id, timestamp, query);
-  }
+  show_saved_query_details(id, query);
 
   if (compare) {
     insert_comparison(type, compare);
@@ -231,5 +230,6 @@ module.exports = {
   set_control: update_control,
   get_control: get_control_value,
   set_container: function(container) { _container = container; },
-  VIEWS: VIEW_INPUTS
+  VIEWS: VIEW_INPUTS,
+  show_query_details: show_saved_query_details
 };

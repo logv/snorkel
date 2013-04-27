@@ -11,6 +11,7 @@ var cheerio = require('cheerio');
 
 var template = require_root("server/template");
 var readfile = require_root("server/readfile");
+var packager = require_root("server/packager");
 
 
 Backbone.$ = cheerio;
@@ -62,13 +63,23 @@ Component.build_package = function(component, cb) {
     };
   }
 
+  function process_style(obj, style_file, key) {
+  
+    return function(cb) {
+      packager.less([style_file], function(data) {
+        obj[key] = data[style_file];
+        cb();
+      });
+    };
+  }
+
   // Do asynchronous readfiles, my friend.
   var js_dir = "static/scripts/";
   var jobs = [
     process_file(cmp, base_dir + pkg.main + ".js", "main"),
     process_file(cmp, base_dir + pkg.template, "template"),
     process_file(cmp, base_dir + "events.js", "events"),
-    process_file(cmp, base_dir + pkg.style, "style")
+    process_style(cmp, base_dir + pkg.style.replace(".css", ""), "style")
   ];
 
   var named = _.isObject(pkg.helpers);
