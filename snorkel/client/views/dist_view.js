@@ -135,6 +135,7 @@ var DistView = BaseView.extend({
     var self = this;
     var xmin = self.data.percentiles[50][1]; // p5
     var xmax = self.data.percentiles[960][1]; // p95
+    var dataset = this.table; 
 
     if (self.compare_data) {
       xmin = Math.min(xmin, self.compare_data.percentiles[50][1]);
@@ -491,7 +492,7 @@ var DistView = BaseView.extend({
           row.push(cell);
         });
 
-        var table = helpers.build_table(headers, [row]);
+        var table = helpers.build_table(dataset, headers, [row]);
 
         // only class attr.
         table.attr("class",  "table");
@@ -539,7 +540,7 @@ var DistView = BaseView.extend({
 
 
 
-      var table = helpers.build_table(headers, [row]);
+      var table = helpers.build_table(dataset, headers, [row]);
 
       // only class attr.
       table.attr("class",  "table");

@@ -15,11 +15,8 @@ module.exports = {
 
     this.$el.find('.modal').modal('hide');
 
-    var server_id = ResultsStore.to_server(query_id);
-
     var query = {
-      hashid: server_id,
-      clientid: query_id
+      hashid: query_id
     };
 
     jank.controller().trigger("rename_query", query, title, description);

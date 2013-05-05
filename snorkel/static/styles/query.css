@@ -6,12 +6,6 @@
   }
 }
 
-body {
-  @media (min-width: 768px) {
-    overflow-y: hidden;
-  }
-}
-
 .action_buttons {
   background-color: #202030;
   position: fixed;
@@ -282,6 +276,7 @@ body {
     }
 
     .save_button,
+    .dash_button,
     .share_button,
     .go_button {
       margin-left: 5px;
@@ -294,8 +289,8 @@ body {
     }
 
     .go_button {
-      padding-left: 40px;
-      padding-right: 40px;
+      padding-left: 30px;
+      padding-right: 30px;
       float: right;
     }
   }
@@ -310,6 +305,7 @@ body {
     margin-left: 9px;
   }
 
+  .dash_button,
   .save_button,
   .share_button {
     padding: 8px;

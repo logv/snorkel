@@ -15,17 +15,17 @@ function get_wrapper_for_cell(el) {
   return $el;
 }
 
-function get_field_type_for_cell(el) {
+function get_field_type_for_cell(table, el) {
   var $td = get_wrapper_for_cell(el);
   var $th = $td.closest('table').find('th').eq($td.index());
 
   var col_name = $th.data('name');
-  var col_type = presenter.get_field_type(col_name);
+  var col_type = presenter.get_field_type(table, col_name);
 
   return col_type;
 }
 
-function get_field_name_for_cell(el) {
+function get_field_name_for_cell(table, el) {
   var $td = get_wrapper_for_cell(el);
   var $th = $td.closest('table').find('th').eq($td.index());
 
@@ -50,9 +50,9 @@ function get_filter_for_popup(el) {
 
 }
 
-function get_filter_for_cell(el) {
-  var field_type = get_field_type_for_cell(el);
-  var field_name = get_field_name_for_cell(el);
+function get_filter_for_cell(table, el) {
+  var field_type = get_field_type_for_cell(table, el);
+  var field_name = get_field_name_for_cell(table, el);
   var op = "$regex";
 
   var value;
@@ -89,7 +89,7 @@ var TableView = BaseView.extend({
       cols.unshift("weighted_count");
     }
 
-    var col_metadata = jank.controller().get_fields();
+    var col_metadata = jank.controller().get_fields(this.table);
 
     var headers = [];
     _.each(group_by.concat(cols), function(col) {
@@ -144,8 +144,10 @@ var TableView = BaseView.extend({
   },
 
   render: function() {
+    var dataset = this.data.parsed.table;
+    var table = helpers.build_table(this.table, this.headers, this.rows, jank.controller().get_fields(dataset));
 
-    var table = helpers.build_table(this.headers, this.rows, jank.controller().get_fields());
+    console.log("RENDERING", dataset, table);
 
     this.$el
       .append(table)
@@ -155,6 +157,10 @@ var TableView = BaseView.extend({
   },
 
   handle_cell_clicked: function(evt) {
+    if (this.options.widget) {
+      return;
+    }
+
     if ($(evt.target).parents(".popover").length) {
       return;
     }
@@ -171,7 +177,7 @@ var TableView = BaseView.extend({
 
 
     var col_name = $th.attr('data-name');
-    var col_type = presenter.get_field_type(col_name);
+    var col_type = presenter.get_field_type(this.table, col_name);
 
     div.attr("data-value", $td.find(".value_cell").attr("data-value") || $td.html());
     div.attr("data-name", col_name);
@@ -215,13 +221,15 @@ var TableView = BaseView.extend({
       el = el.parents(".view");
     }
 
+    var table = this.table;
+
     var row = this.popover.options.row;
     var filters = [];
     _.each(row.find("td"), function(td) {
       var $td = $(td);
-      var type = get_field_type_for_cell($td);
+      var type = get_field_type_for_cell(table, $td);
       if (type === "string") {
-        var filter = get_filter_for_cell($td);
+        var filter = get_filter_for_cell(table, $td);
         filters.push(filter);
       }
     });
@@ -239,8 +247,9 @@ var TableView = BaseView.extend({
     var to_view = el.attr("data-view");
 
     var agg;
-    var field = get_field_name_for_cell(this.popover.options.cell);
+    var field = get_field_name_for_cell(this.table, this.popover.options.cell);
     var fields = [field];
+
     if (to_view === "time_count") {
       to_view = "time";
       field = "";
@@ -271,7 +280,7 @@ var TableView = BaseView.extend({
     }
     var that = this;
 
-    var field = get_field_name_for_cell($td);
+    var field = get_field_name_for_cell(this.table, $td);
     var plotted_vals = [];
     _.each(this.data.results, function(result) {
       var count = result.weighted_count || result.count;

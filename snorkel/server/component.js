@@ -66,7 +66,7 @@ Component.build_package = function(component, cb) {
   function process_style(obj, style_file, key) {
   
     return function(cb) {
-      packager.less([style_file], function(data) {
+      packager.scoped_less(component, style_file, function(data) {
         obj[key] = data[style_file];
         cb();
       });

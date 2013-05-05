@@ -1,3 +1,15 @@
+snorkel (0.0.9-2) unstable; urgency=low
+
+  * query fix for dahsboards
+
+ -- okay <okay.zed@gmail.com>  Tue, 07 May 2013 09:10:16 -0700
+
+snorkel (0.0.9-2) unstable; urgency=low
+
+  * dashboards
+
+ -- okay <okay.zed@gmail.com>  Sat, 05 May 2013 09:10:16 -0700
+
 snorkel (0.0.8-1) unstable; urgency=low
 
   * more friendly UI

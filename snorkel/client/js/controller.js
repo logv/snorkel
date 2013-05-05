@@ -39,6 +39,7 @@ module.exports = {
       }
 
       _loaded[controller] = true;
+
       _arbiter.trigger(controller);
     });
   },
@@ -61,7 +62,6 @@ module.exports = {
       });
       
     }
-
   }
 
 };

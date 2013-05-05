@@ -64,7 +64,7 @@ var ScatterView = SamplesView.extend({
       xAxis: {
         type: "linear",
         title: {
-          text: presenter.get_field_name(field_one)
+          text: presenter.get_field_name(this.table, field_one)
         }
       },
       tooltip: {
@@ -97,7 +97,7 @@ var ScatterView = SamplesView.extend({
       },
       yAxis: {
         title: {
-          text: presenter.get_field_name(field_two)
+          text: presenter.get_field_name(this.table, field_two)
         }
       },
 

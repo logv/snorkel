@@ -1,0 +1,87 @@
+.portlet_wrapper {
+  overflow: hidden;
+  float: left;
+  margin-right: 20px;
+  margin-top: 20px;
+}
+
+.full-width {
+  display: block;
+  text-align: left;
+}
+
+.portlet_header {
+  color: #202030;
+}
+
+.close-button {
+  display: none;
+}
+
+&.fullscreen {
+  z-index: 10000;
+
+  position: fixed;
+  width: 100%;
+  height: 100%;
+
+  top: 0;
+  left: 0;
+
+  background-color: rgba(0,0,0, 0.8);
+
+  .portlet_wrapper {
+    position: fixed;
+    width: 95%;
+    height: 95%;
+
+    top: 10px;
+    left: 2%;
+
+    background-color: #fff;
+  }
+
+  .close-button {
+    display: block;
+    float: right;
+    margin-right: 25px;
+    cursor: pointer;
+  }
+
+  .popout {
+    display: none;
+  }
+
+  .query_portlet {
+    overflow: auto;
+    height: 100%;
+    width: 100%;
+  }
+
+}
+
+.height1 {
+  height: 100px;
+}
+
+.height2 {
+  height: 200px;
+}
+.height3 {
+  height: 300px;
+}
+.height4 {
+  height: 400px;
+}
+.height5 {
+  height: 500px;
+}
+.height6 {
+  height: 600px;
+}
+.height7 {
+  height: 700px;
+}
+.height8 {
+  height: 800px;
+}

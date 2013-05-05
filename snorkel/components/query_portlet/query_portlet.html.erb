@@ -1,0 +1,87 @@
+<% set_default("title", "") %>
+<% set_default("description", "") %>
+<% set_default("query_id", "") %>
+<% set_default("table", "") %>
+<% set_default("created", "") %>
+<% set_default("width", 4) %>
+<% set_default("height", 1) %>
+<% set_default("style", "") %>
+
+<% if (width >= 12) {
+  style = "width: 100%;"
+} %>
+
+<div class="lfloat portlet_wrapper" style="<%= style %>">
+  <blockquote class="clearfix portlet_header" style="width: 100%">
+
+    <div data-query="<%= query_id %>"> </div>
+    <div class="btn-group lfloat">
+
+      <a class="btn dropdown-toggle mtm" data-toggle="dropdown" href="#">
+        <span class="caret"></span>
+        <i class="mts icon-wrench"></i>
+      </a>
+
+      <ul class="dropdown-menu">
+        <li class="open-button mlm clearfix">
+          <a class="full-width" target="_blank" href="/query?h=<%= query_id %>&table=<%= table %>">
+            <i class="mts icon-share-alt"></i>
+            open
+          </a>
+        </li>
+
+        <li class="popout popout-button mlm clearfix">
+          <a class="full-width" href="#">
+            <i class="mts icon-fullscreen"></i>
+            large
+          </a>
+        </li>
+
+        <li class="refresh-button mlm clearfix">
+          <a class="full-width" href="#">
+            <i class="mts icon-refresh"></i>
+            refresh
+          </a>
+        </li>
+
+        <li class="edit-button mlm clearfix">
+          <a class="full-width" href="#">
+            <i class="mts icon-edit"></i>
+            edit portlet
+          </a>
+        </li>
+
+        <li class="edit-query-button mlm clearfix">
+          <a class="full-width" href="#">
+            <i class="mts icon-edit"></i>
+            edit query
+          </a>
+        </li>
+
+
+        <li class="remove-button mlm clearfix">
+          <a class="full-width" href="#">
+            <i class="mts icon-trash"></i>
+            remove
+          </a>
+        </li>
+      </ul>
+    </div>
+
+    <div class="lfloat clearfix mll" style="">
+      <h3 style="margin: 0px"><a class="close-button lfloat">close <i class="icon-remove"></i></h3>
+      </a>
+    </div>
+
+    <h3 class="rfloat mrl" style="margin-right: 30px; margin-top: 0; margin-bottom: 0px;">
+      <a target="_blank" href="#" class="large query_title"><%= title %></a>&nbsp;
+    </h3>
+  </blockquote>
+
+  <% if (width >= 12) { %>
+    <% width = 12 %>
+    <div class="query_portlet span<%= width %> height<%= height %>" style="width: 100%"> </div>
+  <% } else { %>
+    <div class="query_portlet span<%= width %> height<%= height %>"> </div>
+  <% } %>
+</div>

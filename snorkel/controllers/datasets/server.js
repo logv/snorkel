@@ -11,7 +11,6 @@ var page = require_root("server/page");
 var template = require_root("server/template");
 var metadata = require_root("server/metadata");
 var bridge = require_root("server/bridge");
-
 var EventEmitter = require('events').EventEmitter;
 
 function dataset_is_editable(dataset, user) {
@@ -135,9 +134,13 @@ module.exports = {
   index: auth.require_user(function() {
     var header_str = template.render("helpers/header.html.erb");
     var searchahead = $C("textinput", { name: "search" });
+    var dashboards_controller = require_root("controllers/dashboards/server");
+
+    var render_dashboards = page.async(dashboards_controller.render_dashboards);
     var template_str = template.render("controllers/datasets.html.erb", {
       render_searchahead: searchahead.toString,
-      render_datasets: render_datasets
+      render_datasets: render_datasets,
+      render_dashboards: render_dashboards
     });
 
 
@@ -220,6 +223,18 @@ module.exports = {
         socket.emit("set_metadata", "NOK");
       }
 
+    });
+
+    socket.on("new_dashboard", function(dashboard, fn) {
+      var dashboard_controller = require_root("controllers/dashboard/server");
+      dashboard_controller.new_dashboard(socket, dashboard, function(err) {
+        if (err) {
+          fn("NOK");
+        } else {
+          fn("OK");
+        }
+      });
+      
     });
 
     socket.on("drop", function(dataset) {

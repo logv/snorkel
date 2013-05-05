@@ -3,12 +3,28 @@
 var helpers = require("client/views/helpers");
 
 var _container;
+var _containers = {};
+var _widget;
+
+var ResultsStore = require("client/js/results_store");
 
 var STD_INPUTS = helpers.STD_INPUTS;
 var STD_EXCLUDES = helpers.STD_EXCLUDES;
 var VIEW_INPUTS = {
 };
 var GRAPHERS = {};
+
+function get_container(query) {
+  var emptyEl = $("<div />");
+  if (!query) {
+    return emptyEl;
+  }
+
+
+  var server_id = ResultsStore.to_server(query.clientid) || ResultsStore.to_server(query.parsed.id) || query.hashid;
+
+  return _containers[server_id] || _container || emptyEl;
+}
 
 
 jank.on("view:add", function(view, details, view_class) {
@@ -105,34 +121,32 @@ function handle_update_view(view) {
 }
 
 
-function insert_error(err) {
+function insert_error(query, err) {
   console.log(err);
 
-  $(_container).empty();
+  $(get_container(query)).empty();
 
   var errorEl = $("<div class='clearfix' style='vertical-align: bottom'>");
-  errorEl.append($("<img src='images/no-diving.png' style='height: 60%'>"));
+  errorEl.append($("<img src='/images/no-diving.png' style='height: 60%'>"));
   errorEl.append($("<h1 class='span2'>Doh.</h1>"));
   errorEl.append($("<div class='clearfix' />"));
   errorEl.append($("<hr />"));
   errorEl.append($("<h2 class='span12'>").html(err.name));
   errorEl.append($("<h3 class='span12'>").html(err.errmsg));
 
-  console.log(errorEl);
-
-  $(_container).append(errorEl);
+  $(get_container(query)).append(errorEl);
 }
 
-function no_samples(error) {
-  insert_error({
+function no_samples(data, error) {
+  insert_error(data, {
     name: "No Samples Found",
     errmsg: error || "Your query returned no samples, try expanding the time range or removing some filters."
   });
 }
 
-jank.on("query:no_samples", function() {
+jank.on("query:no_samples", function(data) {
   console.log("NO SAMPLES");
-  no_samples();
+  no_samples(data, (data && data.error));
 });
 
 
@@ -141,10 +155,11 @@ function create_graph(Grapher, data) {
   var graphEl = $("<div>");
   var graph = new Grapher({
     el: graphEl,
-    compare_mode: data.parsed.compare_mode });
+    compare_mode: data.parsed.compare_mode,
+    widget: _widget});
 
-  $(_container).empty();
-  graphEl.appendTo(_container);
+  get_container(data).empty();
+  graphEl.appendTo(get_container(data));
   graph.handle_data(data);
 
   graphs[data.parsed.id] = graph;
@@ -181,31 +196,50 @@ function insert_comparison(graph_type, data) {
   }
 }
 
-function show_saved_query_details(id, data) {
-  var created = ResultsStore.get_timestamp(id);
-  data = data || {};
-  var options = {created: created, query: data, title: data.title, description: data.description};
+function show_saved_query_details(id, data, force) {
+  if (!data) {
+    return;
+  }
+
+  var created = ResultsStore.get_timestamp(id) || data.updated || data.created;
+  var options = {created: created, query: data };
+
+  if (!_widget) {
+    options.title = data.title; 
+    options.description = data.description;
+  }
 
   options.show_timestamp = Date.now() - created > 5 * 60 * 1000;
+
+  if (typeof force !== "undefined") {
+    options.show_timestamp = force;
+    if (!force) {
+      return;
+    }
+  }
+
+  var container = get_container(data);
   $C("query_details", options, function(cmp) {
-    _container.prepend(cmp.$el);
+    container.prepend(cmp.$el);
   });
 }
 
-function redraw_graph(id, query) {
-  $(_container).empty();
+function redraw_graph(id, query, show_details) {
+  $(get_container(query)).empty();
 
   var data = ResultsStore.get_results_data(id);
   var compare = ResultsStore.get_compare_data(id);
 
+  console.log("Redrawing graph", id, data);
+
   if (!data) {
-    console.log("Cant redraw graph: ", id);
+    console.log("Cant redraw graph: ", id, data);
     return false;
   }
 
   var type = data.parsed.view;
 
-  show_saved_query_details(id, query);
+  show_saved_query_details(id, query, show_details);
 
   if (compare) {
     insert_comparison(type, compare);
@@ -229,7 +263,16 @@ module.exports = {
   redraw: redraw_graph,
   set_control: update_control,
   get_control: get_control_value,
-  set_container: function(container) { _container = container; },
+  set_default_container: function(container) {
+    _container = container; 
+  },
+  set_container: function(container, query) { 
+    if (!query) { return; }
+
+    var server_id = ResultsStore.to_server(query.clientid) || ResultsStore.to_server(query.parsed.id);
+    _containers[server_id] = container;
+  },
+  set_widget: function(widget) { _widget = widget; },
   VIEWS: VIEW_INPUTS,
   show_query_details: show_saved_query_details
 };

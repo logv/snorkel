@@ -376,7 +376,6 @@ module.exports = {
         filters.append(filter_box);
         filters.append(compare_filter_box);
 
-
         bridge.controller("query", "set_fields", columns);
         flush_data(filters.toString());
       });

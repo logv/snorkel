@@ -7,5 +7,7 @@
   "/pkg" : "bootloader",
   "/query" : "query",
   "/data" : "data",
-  "/datasets" : "datasets"
+  "/datasets" : "datasets",
+  "/dashboard" : "dashboard",
+  "/dashboards" : "dashboards"
 }

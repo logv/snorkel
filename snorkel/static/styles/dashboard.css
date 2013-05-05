@@ -1,0 +1,15 @@
+.dashboard .table {
+  border: none;
+}
+.dashboard .table.table-bordered td, 
+.dashboard .table.table-bordered th {
+  border: none;
+}
+
+.dashboard {
+  margin-top: 60px;
+}
+
+.dashboard {
+  overflow: scroll;
+}

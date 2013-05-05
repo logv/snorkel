@@ -19,18 +19,19 @@ var BarView = BaseView.extend({
     var serieses = {};
     var compare_series = {};
     var compare_data = this.compare_data;
+    var dataset = this.table;
 
     _.each(this.data.parsed.cols, function(col) {
       serieses[col] = {
         data: [],
-        name: presenter.get_field_name(col),
+        name: presenter.get_field_name(dataset, col),
         color: helpers.get_rgba(col, 1)
       };
 
       if (compare_data) {
         compare_series[col] = {
           data: [],
-          name: presenter.get_field_name(col) + " (compare)",
+          name: presenter.get_field_name(dataset, col) + " (compare)",
           color: helpers.get_rgba(col, 0.7)
         };
 

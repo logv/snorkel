@@ -2,11 +2,14 @@
 
 var _datasets = {};
 
+var helpers = require("client/views/helpers");
+
 module.exports = {
   events: {
     "click .logout" : "handle_logout",
     "click .save" : "handle_save_metadata",
-    "click .cancel" : "handle_discard_metadata"
+    "click .cancel" : "handle_discard_metadata",
+    "click .add_dashboard" : "handle_new_dashboard"
   },
   initialize: function() {
   },
@@ -26,6 +29,30 @@ module.exports = {
 
   set_table: function(table) {
     this.table = table;
+  },
+
+  handle_new_dashboard: function() {
+    var dismissButton = $('<button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>');
+    var createButton = $('<button class="btn btn-primary really_add">Add Dashboard</button> </div>');
+    var footerEl = $("<div />");
+    footerEl
+      .append(dismissButton)
+      .append(createButton);
+
+    $C("modal", {title: "Name your dashboard", footer: footerEl.html()}, function(cmp) {
+      var bodyEl = $('<input type="text" name="dashboard" class="dashboard">');
+      cmp.$el.find(".modal-body").append(bodyEl);
+
+      var reallyAddEl = cmp.$el.find(".really_add");
+      reallyAddEl.on("click", function() {
+        var val = cmp.$el.find(".dashboard").val();
+        jank.socket().emit("new_dashboard", val, function(res) {
+          if (res === "OK") {
+            window.location = "/dashboard?id=" + val;
+          }
+        });
+        cmp.hide(); });
+    });
   },
 
   handle_save_metadata: function() {
@@ -78,30 +105,15 @@ module.exports = {
 
   delegates: {
     handle_delete_clicked: function(obj) {
-
       var dataset = obj.dataset;
-      var footerEl = $("<div />");
-      var dismissButton = $('<button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>');
-      var deleteButton = $('<button class="btn btn-primary really_drop">Drop Dataset</button> </div>');
-      deleteButton.data("dataset", dataset);
-
-      footerEl
-        .append(dismissButton)
-        .append(deleteButton);
-
-      $C("modal", {
-        title: "Confirm dataset deletion?",
+      helpers.confirm_action({
+        title: "Confirm dataset deletion",
         body: "You are about to drop the " + dataset + " dataset. Are you sure?",
-        footer: footerEl.html()
-      }, function(cmp) {
-        var reallyDropEl = cmp.$el.find(".really_drop");
-        reallyDropEl.on("click", function() {
-          _datasets[dataset] = obj;
-          jank.socket().emit("drop", dataset);
-          cmp.hide();
-        });
+        confirm: "Drop dataset"
+      }, function() {
+        _datasets[dataset] = obj;
+        jank.socket().emit("drop", dataset);
 
-        cmp.show();
       });
     }
   }

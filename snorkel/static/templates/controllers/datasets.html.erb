@@ -1,24 +1,32 @@
 <div class="container-fluid">
  
-  <div>
-    <h1>snorkel, snorkel, snorkel</h1>
-  </div>
+  <%= render_template("helpers/user_status.html.erb") %>
 
   <div class="clearfix">
-    <div class="lfloat mrl mth">
-      <%= render_partial("datasets/csv_dialog.html.erb") %>
+    <div class="datasets span6">
+      <div class="clearfix">
+        <h2 class="lfloat">Datasets</h2>
+        <div class="lfloat mll mth">
+          <%= render_partial("datasets/csv_dialog.html.erb") %>
+        </div>
+      </div>
+
+      <div class="dataset_list">
+        <%= render_datasets() %>
+      </div>
     </div>
 
-    <div class="lfloat">
-      <h2>or dive into an existing dataset:</h2>
+    <div class="dashboards span6">
+      <div class="clearfix">
+        <h2 class="lfloat">Dashboards</h2>
+        <div class="lfloat btn mth mll add_dashboard">Add a Dashboard</div>
+      </div>
+      <div class="dashboard_list">
+        <%= render_dashboards() %>
+      </div>
     </div>
-  </div>
 
-  <%= render_template("helpers/user_status.html.erb") %>
-  <div class="datasets">
-    <div class="dataset_list">
-      <%= render_datasets() %>
-    </div>
+
   </div>
 
   <%= add_socket() %>

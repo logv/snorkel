@@ -7,6 +7,8 @@ var BaseView = window.Backbone.View.extend({
     return data;
   },
   handle_data: function(data) {
+    this.table = data.parsed.table;
+    this.server_data = data;
     this.data = this.prepare(data);
     this.query = data;
     if (!this.data) {
@@ -38,7 +40,7 @@ var BaseView = window.Backbone.View.extend({
 
     // If finalize throws an error...
     if (error) {
-      jank.trigger("query:no_samples");
+      jank.trigger("query:no_samples", this.server_data);
       return;
     }
 

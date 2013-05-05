@@ -8,7 +8,6 @@ var less = require("less");
 
 function package_less(includes, cb) {
   var included = _.map(includes, function(s) { return s.trim(); });
-  var excluded = [];
 
   var ret = {};
   async.each(included, function(module, done) {
@@ -21,6 +20,19 @@ function package_less(includes, cb) {
 
   }, function(err) {
     cb(ret);
+  });
+}
+
+function package_and_scope_less(component, module, cb) {
+  var ret = {};
+  fs.readFile(module + ".css", function(err, data) {
+    var module_css = "[data-cmp=" + component + "] {\n";
+    var module_end = "\n}";
+    less.render(module_css + data.toString() + module_end, function(err, css) {
+      ret[module] = css;
+
+      cb(ret);
+    });
   });
 
 }
@@ -69,5 +81,6 @@ function package_js(includes, cb) {
 
 module.exports = {
   js: package_js,
-  less: package_less
+  less: package_less,
+  scoped_less: package_and_scope_less
 }

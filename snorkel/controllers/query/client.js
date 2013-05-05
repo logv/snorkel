@@ -154,7 +154,7 @@ function handle_query_results(data) {
   QS.got_results();
 
   if (data.error) {
-    views.insert_error(data.error);
+    views.insert_error(data, data.error);
   } else {
     views.insert_graph(data.parsed.view, data);
     ResultsStore.add_results_data(data);
@@ -171,7 +171,7 @@ function handle_compare_results(data) {
   QS.got_compare();
 
   if (data.error) {
-    views.insert_error(data.error);
+    views.insert_error(data, data.error);
   } else {
     ResultsStore.add_compare_data(data);
     views.insert_comparison(data.parsed.view, data);
@@ -199,10 +199,15 @@ function handle_query_saved(query_details) {
   });
 }
 
+function handle_portlet_update(data) {
+  jank.socket().emit("update_portlet", data);
+}
+
 function insert_query_tiles(container, queries, in_order) {
   _.each(queries, function(data) {
     var view_data = views.VIEWS[data.parsed.view];
 
+    ResultsStore.identify({ client_id: data.clientid, server_id: data.hashid });
     if (data.results) {
 
       ResultsStore.set_timestamp(data.results.query.id, data.updated || data.created);
@@ -215,6 +220,11 @@ function insert_query_tiles(container, queries, in_order) {
         ResultsStore.add_compare_data(data.results.compare);
       }
     }
+
+    ResultsStore.handle_ack({
+      input: data.input,
+      id: data.hashid
+    });
 
     var icon = "noun/view.svg";
     if (view_data) {
@@ -234,10 +244,45 @@ function insert_query_tiles(container, queries, in_order) {
   });
 }
 
+function set_query(query) {
+  _query_id = query.hashid;
+  _query_details = query;
+
+  if (query.results) {
+    ResultsStore.add_results_data(query.results.query);
+    ResultsStore.add_compare_data(query.results.compare);
+  }
+
+  ResultsStore.identify({ client_id: query.clientid, server_id: query.hashid });
+
+  function replace_id_in_params() {
+    var uri = window.location.pathname + window.location.search;
+    var params = window.location.search.substr(1).split('&');
+
+    params = _.reject(params, function(r) {
+      var vals = r.split('=');
+
+      return vals[0] === 'h';
+    });
+
+    params.push('h=' + _query_id);
+
+    var param_str = params.join('&');
+
+    var url = window.location.pathname + '?' + param_str;
+    jank.replace(url, true);
+  }
+
+  replace_id_in_params();
+
+
+}
+
 function handle_query_ack(data) {
   QS.got_ack();
   ResultsStore.handle_ack(data);
-  _query_id = data.id;
+
+  set_query(data);
 
   QS.should_compare(data.parsed.compare_mode);
 
@@ -273,6 +318,10 @@ module.exports = {
       // gotta show a little dealie for old queries
     });
 
+    jank.controller().on("update_portlet", function(portlet) {
+      handle_portlet_update(portlet);
+    });
+
     jank.controller().on("refresh_query", function(query) {
       jank.socket().emit("refresh_query", query);
       // gotta show a little dealie for old queries
@@ -287,12 +336,19 @@ module.exports = {
 
       this.set_dom_from_input(query.input);
 
-      var id = query.id || query.clientid;
-      _query_id = id; // hidden variables ahoy
-      _query_details = query;
+      var client_id, server_id;
+      if (query.hashid) {
+        server_id = query.hashid;
+        client_id = ResultsStore.to_client(server_id) || query.id;
+      } else {
+        client_id = query.id;
+        server_id = ResultsStore.to_server(client_id);
+      }
 
-      jank.go("/query?table=" + this.table + "&c=" + id);
-      views.redraw(id, query);
+      jank.go("/query?table=" + this.table + "&h=" + server_id);
+      set_query(query);
+
+      views.redraw(client_id, query);
     });
 
     jank.controller().on("swap_panes", function(show_pane) {
@@ -319,14 +375,28 @@ module.exports = {
     jank.subscribe("popstate", function() {
       var form_str = window.location.search.substring(1);
       var data = $.deparam(form_str);
-      var id = data.c || data.id;
+      var id = data.c;
 
-      that.set_dom_from_query(form_str);
+      var server_id;
+      if (!id) {
+        server_id = data.h;
+        if (server_id) {
+          id = ResultsStore.to_client(server_id);
+        }
+      }
 
-      if (id !== _query_id) {
-        _query_id = id;
-        _query_details = null;
+      server_id = ResultsStore.to_server(id);
 
+
+
+      var input = ResultsStore.get_input(server_id);
+      if (input) {
+        that.set_dom_from_input(input);
+      } else {
+        that.set_dom_from_query(form_str);
+      }
+
+      if (server_id !== _query_id) {
         // if we dont have a local cache of the ID, then we should probably
         // re-run the query, huh?
         if (!views.redraw(id)) {
@@ -336,9 +406,15 @@ module.exports = {
         }
         // need to restore the old query
       }
+
+      set_query({
+        hashid: server_id,
+        clientid: id
+      });
+
     });
 
-    views.set_container($("#query_content"));
+    views.set_default_container($("#query_content"));
     filter_helper.set_container(this.$page);
 
 
@@ -391,6 +467,9 @@ module.exports = {
     share_clicked: function(el) {
       this.share_query();
     },
+    dashboard_clicked: function(el) {
+      this.dashboard_query();
+    },
     go_clicked: function(el) {
       this.run_query();
     }
@@ -429,19 +508,14 @@ module.exports = {
 
   load_saved_query: function(obj) {
     var that = this;
-    _query_id = obj.clientid;
-    _query_details = obj;
     var done = _.after(2, function() {
+      set_query(obj);
+
       handle_query_results(obj.results.query);
       handle_compare_results(obj.results.compare);
       that.set_dom_from_input(obj.input);
 
-      ResultsStore.identify({
-        server_id: obj.hashid,
-        client_id: obj.clientid
-      });
-
-      views.show_query_details(obj.clientid, obj);
+      views.show_query_details(obj.clientid, obj, true /* show client timestamp */);
     });
 
     // Gotta wait for certain components...
@@ -631,24 +705,33 @@ module.exports = {
 
   set_table: function(table) {
     this.table = table;
+    jank.trigger('query:table');
+  },
+
+  set_dashboards: function(dashboards) {
+    this.dashboards = dashboards;
   },
 
   set_fields: function(data) {
-    this.fields = data;
 
-    var weight_col;
-    _.each(this.fields, function(f) {
-      if (f.name === "weight" || f.name === "sample_rate") {
-        weight_col = f.name;
-      }
+    var that = this;
+    jank.do_when(that.table, 'query:table', function() {
+      that.fields = data;
+
+      var weight_col;
+      _.each(that.fields, function(f) {
+        if (f.name === "weight" || f.name === "sample_rate") {
+          weight_col = f.name;
+        }
+      });
+
+      that.weight_col = weight_col;
+
+      filter_helper.set_fields(that.fields);
+      helpers.set_fields(that.fields);
+      presenter.set_fields(that.table, that.fields);
+      jank.trigger('query:fields', that.fields);
     });
-
-    this.weight_col = weight_col;
-
-    filter_helper.set_fields(this.fields);
-    helpers.set_fields(this.fields);
-    presenter.set_fields(this.fields);
-    jank.trigger('query:fields', this.fields);
   },
 
   get_fields: function() {
@@ -668,7 +751,7 @@ module.exports = {
     $C("modal", { title: "Query URL" }, function(cmp) {
       var div = $("<div>");
       var input = $("<input type='text' style='width: 100%' />");
-      var uri = window.location.host + window.location.pathname + '?table=' + table + '&c='  + _query_id;
+      var uri = window.location.host + window.location.pathname + '?table=' + table + '&h='  + _query_id;
 
       input.val(uri);
       div.append(input);
@@ -680,6 +763,14 @@ module.exports = {
       input.select();
 
     });
+  },
+
+  dashboard_query: function() {
+    $C("query_portlet_modal", {
+      show_dashboard: true,
+      dashboards: this.dashboards,
+      query_id: _query_id
+    }, function() { });
   },
 
   save_query: function() {

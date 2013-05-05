@@ -1,0 +1,21 @@
+<% set_default("title", "dashboard, dashboard, dashbored") %>
+<% set_default("editable", false) %>
+
+<div class="container-fluid">
+  <div class="dashboard">
+    <div class="page-header">
+
+      <% if (editable) { %>
+        <div class="rfloat mtl">
+          <%= render_remove_dashboard_button() %>
+        </div>
+      <% } %>
+
+      <h1><%= title %></h1>
+    </div>
+
+    <%= render_portlets() %>
+  </div>
+
+  <%= add_socket() %>
+</div>

@@ -9,6 +9,7 @@ var BaseView = require("client/views/base_view");
 var TimeView = BaseView.extend({
   prepare: function(data) {
 
+    var dataset = this.table;
     var series = {};
     var is_compare = this.compare_query === data;
 
@@ -36,7 +37,7 @@ var TimeView = BaseView.extend({
         });
 
         var group_label = dims.join(",");
-        var field_label = group_label + " " + presenter.get_field_name(field);
+        var field_label = group_label + " " + presenter.get_field_name(dataset, field);
         var full_label = field_label;
   
         _labels[full_label] = group_label || full_label;
@@ -186,7 +187,7 @@ var TimeView = BaseView.extend({
 
 jank.trigger("view:add", "time",  {
     include: helpers.STD_INPUTS.concat(["time_bucket", "compare", "sort_by"]),
-    exclude: ["field", "hist_bucket", "stacking"],
+    exclude: ["field", "hist_bucket", "stacking", "max_results"],
     icon: "noun/line.svg"
 }, TimeView);
 

@@ -1,4 +1,8 @@
 module.exports = {
   tagName: "div",
-  className: "btn"
+  className: "btn",
+
+  set_title: function(title) {
+    this.$el.attr('title', title);
+  }
 };

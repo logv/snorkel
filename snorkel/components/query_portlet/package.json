@@ -1,0 +1,7 @@
+{
+  "main" : "query_portlet",
+  "helpers": [ ],
+  "style": "query_portlet.css",
+  "styles": [],
+  "template": "query_portlet.html.erb"
+}

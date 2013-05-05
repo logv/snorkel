@@ -37,6 +37,7 @@ var SamplesView = BaseView.extend({
     var integer_cols = Object.keys(cols.integer);
     var string_cols = Object.keys(cols.string);
     var set_cols = Object.keys(cols.set);
+    var dataset = this.table;
 
     integer_cols.sort();
     set_cols.sort();
@@ -45,7 +46,7 @@ var SamplesView = BaseView.extend({
 
     var all_cols = string_cols.concat(integer_cols).concat(set_cols);
     _.each(all_cols, function(col) {
-      headers.push(presenter.get_field_name(col));
+      headers.push(presenter.get_field_name(dataset, col));
     });
 
     var rows = [];
@@ -76,7 +77,7 @@ var SamplesView = BaseView.extend({
   },
 
   render: function() {
-    var table = helpers.build_table(this.data.headers, this.data.rows);
+    var table = helpers.build_table(this.table, this.data.headers, this.data.rows);
 
     this.$el
       .append(table)

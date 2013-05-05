@@ -142,7 +142,7 @@ module.exports = {
     this.fields = fields;
   },
 
-  build_table: function(headers, rows, column_config) {
+  build_table: function(dataset, headers, rows, column_config) {
     var presenter = require("client/views/presenter");
 
     // TODO: data formatting / munging goes on where?
@@ -155,7 +155,7 @@ module.exports = {
     var fields = this.fields;
     _.each(headers, function(col) {
       td = $("<th>");
-      var display_name = presenter.get_field_name(col);
+      var display_name = presenter.get_field_name(dataset, col);
       td.attr('data-name', col);
       td.html(display_name);
       row.append(td);
@@ -284,6 +284,33 @@ module.exports = {
     }
 
     return cell;
+  },
+
+  confirm_action: function(options, cb) {
+    options.confirm = options.confirm || 'do it';
+    var footerEl = $("<div />");
+    var dismissButton = $('<button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>');
+    var deleteButton = $('<button class="btn btn-primary really_drop">' + options.confirm + '</button> </div>');
+
+    footerEl
+      .append(dismissButton)
+      .append(deleteButton);
+
+    $C("modal", {
+      title: options.title,
+      body: options.body,
+      footer: footerEl.html()
+    }, function(cmp) {
+      var reallyDropEl = cmp.$el.find(".really_drop");
+      reallyDropEl.on("click", function() {
+        cmp.hide();
+        cb();
+      });
+
+      cmp.show();
+    });
+
+
   },
 
   row_key: row_key,
