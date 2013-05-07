@@ -43,11 +43,23 @@ module.exports = {
             config.metadata.columns[name] = {};
           }
 
-          _.extend(config.metadata.columns[name], col);
+          var col_meta = config.metadata.columns[name];
+          _.extend(col_meta, col);
+          if (col_meta.type_str === "integer" && col_meta.groupable === "true") {
+            col_meta.final_type = "string";
+          } else {
+            col_meta.final_type = col_meta.type_str;
+          }
+
         });
 
-        var col_types = _.groupBy(cols, function(col) {
-          return col.type_str;
+        var col_types = _.groupBy(cols, function(col_meta) {
+          if (col_meta.type_str === "integer" && col_meta.groupable === "true") {
+            col_meta.final_type = "string";
+          } else {
+            col_meta.final_type = col_meta.type_str;
+          }
+          return col_meta.final_type;
         });
 
         config.metadata.col_types = col_types;

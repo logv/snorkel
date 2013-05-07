@@ -69,6 +69,49 @@ function multiply_cols_by_weight(cols, weight_col, group_by) {
   return [];
 }
 
+function cast_columns(translate, cols, weight_col, group_by) {
+  var projection = {};
+
+  var translated = {};
+  _.each(translate, function(tr) {
+    var orig_name = "$" + tr.from_type + "." + tr.name;
+    var to_name = tr.to_type + "." + tr.name;
+    translated[to_name] = true;
+
+    projection[to_name] = orig_name;
+
+  });
+
+  _.each(cols, function(col) {
+    if (translated["integer." + col]) {
+      return;
+    }
+
+    projection["integer." + col] = 1;
+  });
+
+  if (weight_col) {
+    projection["integer." + weight_col] = 1;
+  }
+
+  _.each(group_by, function(field) {
+    if (translated["string." + field]) {
+      return;
+    }
+
+    projection["string." + field] = 1;
+  });
+
+  // Also grab the time column
+  projection["integer.time"] = 1;
+
+  if (Object.keys(projection).length) {
+    return [{ $project: projection }];
+  }
+
+  return [];
+}
+
 function query_table(opts) {
   var dims = opts.dims, cols = opts.cols;
   var agg = opts.agg;
@@ -144,7 +187,7 @@ function query_time_series(opts) {
 
 // TODO: supply buckets by hand that can be queried
 // Has to go through transformations, later
-function query_hist(opts) {
+function query_hist(opts, col_config) {
   var col = opts.col, bucket_size = opts.hist_bucket;
 
   if (!col && opts.cols) {
@@ -153,6 +196,17 @@ function query_hist(opts) {
 
   if (!col) {
     console.log("COULDNT FIND FIELD FOR DISTRIBUTION QUERY");
+  }
+
+  if (!bucket_size) {
+    var col_meta = col_config[col];
+    if (col_meta.max_value && col_meta.min_value) {
+      var col_range = Math.abs(col_meta.max_value - col_meta.min_value);
+      bucket_size = parseInt(col_range / 100, 10) + 1;
+      console.log("INFERRING BUCKET SIZE", bucket_size);
+    } else {
+      bucket_size = 100;
+    }
   }
 
   var pipeline = [];
@@ -184,8 +238,8 @@ function query_samples(opts) {
   opts = opts || {};
   var pipeline = [];
 
+  pipeline.push({$sort: { "integer.time" : -1}});
   pipeline.push({$limit: opts.limit || 100 });
-  pipeline.push({ $sort: { "integer.time" : -1}});
   return pipeline;
 }
 
@@ -197,20 +251,52 @@ function get_stats(table, cb) {
   });
 }
 
+var _cached_columns = {};
+function clear_cache(table, cb) {
+  if (_cached_columns[table]) {
+    delete _cached_columns[table];
+  }
+
+  if (cb) {
+    cb();
+  }
+}
+
 function get_columns(table, cb) {
-  var pipeline = query_samples();
-  pipeline.push({$limit: 100});
+
+  if (_cached_columns[table]) {
+    console.log("Using cached column results");
+    var cached_for = (Date.now() - _cached_columns[table].updated) / 1000;
+    cb(_cached_columns[table].results);
+    cb = function() { };
+    if (cached_for < 60 * 10) {
+      return;
+    }
+  }
+
+  console.log("Updating cached column results for table", table);
+
+  // First, check if we have a relatively up to date metadata definition.
+  var pipeline = query_samples({ limit: 500 });
   var schema = {};
   var collection = snorkle_db.get(DATASET_PREFIX + table);
   cb = context.wrap(cb);
 
+  var values = {};
   collection.aggregate(pipeline, function(err, data) {
     _.each(data, function(sample) {
       _.each(sample, function(fields, field_type) {
         _.each(fields, function(value, field) {
-          if (!schema[field]) { schema[field] = {}; }
-          if (!schema[field][field_type]) { schema[field][field_type] = 0; }
+          if (!schema[field]) {
+            schema[field] = {};
+            values[field] = {};
+          }
+          if (!schema[field][field_type]) {
+            schema[field][field_type] = 0;
+            values[field][field_type] = [];
+          }
           schema[field][field_type] += 1;
+          values[field][field_type].push(value);
         });
       });
     });
@@ -228,14 +314,36 @@ function get_columns(table, cb) {
         if (count > max) {
           predicted_type = type;
           max = count;
+
         }
       });
 
-      cols.push({
+      var col_meta = {
         name: field,
-        type_str: predicted_type});
+        type_str: predicted_type};
+
+      // can we auto-windsorize these values?
+      if (predicted_type === "integer") {
+        var int_values = values[field].integer;
+        int_values.sort(function(a, b) { return a - b; });
+
+        var high_p = parseInt(0.975 * int_values.length, 10);
+        var low_p = parseInt(0.025 * int_values.length, 10);
+
+        if (int_values.length > 100) {
+          col_meta.max_value = int_values[high_p];
+          col_meta.min_value = int_values[low_p];
+        }
+      }
+
+      cols.push(col_meta);
 
     });
+
+    _cached_columns[table] = {
+      results: cols,
+      updated: Date.now()
+    };
 
     cb(cols);
   });
@@ -314,7 +422,7 @@ function add_time_range(start, end) {
 }
 
 // matches full integer samples, avoiding the 'null' cell problem
-function match_full_samples(cols) {
+function trim_and_match_full_samples(cols, col_config) {
   var conditions = [];
 
   if (!cols.length) {
@@ -329,11 +437,25 @@ function match_full_samples(cols) {
       $or: conds
     });
 
-    
+
     _.each(["$gte", "$lt"], function(op) {
       var cond = {};
       cond[column] = {};
       cond[column][op] = 0;
+
+      var col_meta = col_config[col];
+
+      if (col_meta) {
+        if (op === "$lt" && col_meta.max_value) {
+            cond[column][op] = col_meta.max_value;
+        }
+
+
+        if (op === "$gte" && col_meta.min_value) {
+            cond[column][op] = col_meta.min_value;
+        }
+      }
+
       cond[column].$ne = NaN;
 
       conds.push(cond);
@@ -355,8 +477,10 @@ function run_pipeline(collection_name, pipeline, unweight, cb) {
   var collection = snorkle_db.get(DATASET_PREFIX + collection_name);
   cb = context.wrap(cb);
 
-  collection.aggregate(pipeline, function(err, data) {
+  // Before doing anything, we need to massage the data to its expected form (cast columns)
 
+
+  collection.aggregate(pipeline, function(err, data) {
     if (unweight) {
       _.each(data, function(result) {
         var count = result.count;
@@ -430,12 +554,14 @@ module.exports = {
   // Filters
   add_filters: add_filters,
   time_range: add_time_range,
-  full_samples: match_full_samples,
+  full_samples: trim_and_match_full_samples,
+  cast_columns: cast_columns,
 
   // Metadata
   get_columns: get_columns,
   get_stats: get_stats,
   get_tables: get_tables,
+  clear_cache: clear_cache,
 
 
   // Execution

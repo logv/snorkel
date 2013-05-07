@@ -1,10 +1,13 @@
 <% set_default("selected", false) %>
+<% set_default("order", false) %>
 
 <select name="<%= name %>" class="span2">
-  <% _.each(options, function(label, value) { %>
+  <% ordered_keys = order || Object.keys(options) %>
+  <% _.each(ordered_keys, function(value) { %>
+    <% var label = options[value]; %>
       <option value="<%= value %>" 
       <% if (selected && selected == value) { %>
-        selected="true"
+        selected=1
       <% } %>>
       <%= label %>
       </option>

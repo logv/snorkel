@@ -147,8 +147,6 @@ var TableView = BaseView.extend({
     var dataset = this.data.parsed.table;
     var table = helpers.build_table(this.table, this.headers, this.rows, jank.controller().get_fields(dataset));
 
-    console.log("RENDERING", dataset, table);
-
     this.$el
       .append(table)
       .fadeIn();

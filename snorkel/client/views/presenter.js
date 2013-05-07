@@ -23,7 +23,7 @@ module.exports = {
   },
 
   get_field_type: function(dataset, col) {
-    return this.get_col_attr(dataset, col, 'type_str', 'unknown');
+    return this.get_col_attr(dataset, col, 'final_type', 'unknown');
 
   },
 

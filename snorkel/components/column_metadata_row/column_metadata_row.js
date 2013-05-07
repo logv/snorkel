@@ -47,6 +47,18 @@ module.exports = {
       });
     });
 
+    $C("xeditable", {}, function() {
+      that.$el.find("td .editable[data-name='groupable']").editable({
+        source: [
+          {value: 'true', text: 'true'},
+          {value: 'false', text: 'false'}
+        ],
+        mode: 'popup',
+        type: 'select'
+      });
+    });
+
+
   },
 
   get_name: function() {

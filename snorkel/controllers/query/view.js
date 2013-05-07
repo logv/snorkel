@@ -13,6 +13,7 @@ var BLACKLIST = require_root("controllers/query/filters").BLACKLIST;
 
 var GROUPABLE_TYPE = "string";
 var AGGREGABLE_TYPE = "integer";
+var SET_TYPE = "set";
 
 
 var HELP_STRINGS = {
@@ -209,13 +210,13 @@ var time_bucket_opts = {
 };
 
 function get_time_bucket_row() {
-  var opts = {};
-  _.each(time_bucket_opts, function(bucket, name) { opts[bucket] = name; });
+  var opts = _.invert(time_bucket_opts);
   var max_results_input = $C("selector", { name: "time_bucket", options: opts });
   return add_control("time_bucket", "Time Slice", max_results_input.toString());
 }
 
 var hist_bucket_opts = [
+  "auto",
   "10",
   "20",
   "50",
@@ -230,7 +231,7 @@ var hist_bucket_opts = [
 function get_hist_bucket_row() {
   var opts = {};
   _.each(hist_bucket_opts, function(o) { opts[o] = o; });
-  var max_results_input = $C("selector", { name: "hist_bucket", options: opts });
+  var max_results_input = $C("selector", { name: "hist_bucket", options: opts, selected: "auto", order:  hist_bucket_opts});
   return add_control("hist_bucket", "Bucket", max_results_input.toString());
 }
 
@@ -310,15 +311,15 @@ function get_controls(columns) {
   var control_box = $("<div>");
 
   var groupable_columns = _.filter(columns, function(col) {
-    return col.type_str === GROUPABLE_TYPE && col.hidden !== 'true';
+    return col.final_type === GROUPABLE_TYPE && col.hidden !== 'true';
   });
 
   var agg_columns = _.filter(columns, function(col) {
-    return col.type_str === AGGREGABLE_TYPE && col.name !== "time" && col.hidden !== 'true';
+    return col.final_type === AGGREGABLE_TYPE && col.name !== "time" && col.hidden !== 'true';
   });
 
   var tag_columns = _.filter(columns, function(col) {
-    return col.type_str.match("set_") && col.hidden !== 'true';
+    return col.final_type === SET_TYPE && col.hidden !== 'true';
   });
 
 
@@ -353,7 +354,7 @@ module.exports = {
 
         var typed_fields = {};
         _.each(columns, function(field) {
-          if (BLACKLIST[field.name] || BLACKLIST[field.type_str] || field.hidden === 'true') {
+          if (BLACKLIST[field.name] || BLACKLIST[field.final_type] || field.hidden === 'true') {
             return;
           }
 

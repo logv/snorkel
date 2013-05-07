@@ -9,9 +9,14 @@ module.exports = {
     "click .logout" : "handle_logout",
     "click .save" : "handle_save_metadata",
     "click .cancel" : "handle_discard_metadata",
+    "click .clear_cache" : "handle_clear_metadata",
     "click .add_dashboard" : "handle_new_dashboard"
   },
   initialize: function() {
+    jank.socket().on("cleared_cache", function() {
+      $C("modal", { title: "Successful Success!", body: "The metadata cache was cleared" });
+    });
+
   },
 
   initialize_editor: function() {
@@ -103,6 +108,11 @@ module.exports = {
     });
   },
 
+  handle_clear_metadata: function() {
+    var dataset = this.table;
+    console.log("CLEARING METADATA CACHE", dataset);
+    jank.socket().emit("clear_cache", dataset);
+  },
   delegates: {
     handle_delete_clicked: function(obj) {
       var dataset = obj.dataset;

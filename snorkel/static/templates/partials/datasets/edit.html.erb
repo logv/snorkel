@@ -12,6 +12,9 @@
     <div class="btn cancel">
       Discard Changes
     </div>
+    <div class="btn clear_cache">
+      Clear Metadata Cache
+    </div>
   </div>
 
   <div class="clearfix">&nbsp;</div>
@@ -44,7 +47,7 @@
         <% if (col_types.integer && col_types.integer.length) { %>
           <h3>Integer</h3>
           <table class="table">
-            <%= render_table_header() %>
+            <%= render_table_header(true) %>
             <% _.each(col_types.integer, function(datum) { %>
                 <%= render_column(datum) %>
             <% }) %>

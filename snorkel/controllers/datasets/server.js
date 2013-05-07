@@ -179,11 +179,14 @@ module.exports = {
       return colCmp.toString();
     }
 
-    function render_table_header() {
+    function render_table_header(add_cast) {
       var header = $("<tr>");
-      _.map([
-        "name", "display name", "hidden"
-      ], function(col) {
+      var headers = [ "name", "display name", "hidden" ];
+      if (add_cast) {
+        headers.push("groupable");
+      }
+
+      _.map(headers, function(col) {
         header.append($("<th>").html(col));
       });
 
@@ -234,7 +237,12 @@ module.exports = {
           fn("OK");
         }
       });
-      
+    });
+
+    socket.on("clear_cache", function(dataset) {
+      // Validate this is an easily droppable dataset
+      backend.clear_cache(dataset);
+      socket.emit("cleared_cache");
     });
 
     socket.on("drop", function(dataset) {

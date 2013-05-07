@@ -123,7 +123,7 @@ function marshall_query(form_data) {
   }
 
 
-  var hist_bucket = parseInt(value_of(form_data, 'hist_bucket', 10), 10);
+  var hist_bucket = parseInt(value_of(form_data, 'hist_bucket', null), 10);
 
   // TODO: have views take more part in augmenting query data?
   query_data.hist_bucket = hist_bucket;
@@ -251,7 +251,7 @@ var QUERIES = {
 
 };
 
-function build_pipeline(params) {
+function build_pipeline(params, meta) {
   var query = QUERIES[params.view];
 
   if (!query) {
@@ -261,7 +261,11 @@ function build_pipeline(params) {
 
 
 
-  var pipeline = query(params);
+  var pipeline = query(params, meta.metadata.columns);
+
+  if (params.cast_cols && params.view !== "samples") {
+    pipeline = backend.cast_columns(params.cast_cols, params.cols, params.weight_col, params.dims).concat(pipeline);
+  }
 
   var start_s = parseInt(params.start_ms / 1000, 10);
   var end_s = parseInt(params.end_ms / 1000, 10);
@@ -281,7 +285,7 @@ function build_pipeline(params) {
     }
   }
 
-  var non_null_ints = backend.full_samples(params.cols);
+  var non_null_ints = backend.full_samples(params.cols, meta.metadata.columns);
 
   return timeline
     .concat(non_null_ints)
@@ -346,7 +350,11 @@ function get_index() {
           }
 
           var obj = arr.pop();
-          console.log("Found saved query, sending cached results to client", hashid || client_id);
+          if (!obj) {
+            bridge.controller("query", "run_startup_query");
+            return flush(empty_str);
+
+          }
 
           var input_view = _.find(obj.input, function(r) {
             return r.name === "view";
@@ -500,8 +508,8 @@ function log_query(query_data, user) {
   return sample;
 }
 
-function handle_new_query(query_id, query_data, socket, done) {
-  var pipeline = build_pipeline(query_data);
+function handle_new_query_with_meta(meta, query_id, query_data, socket, done) {
+  var pipeline = build_pipeline(query_data, meta);
   var compare_pipeline;
   var compare_data;
 
@@ -519,7 +527,7 @@ function handle_new_query(query_id, query_data, socket, done) {
       compare_data.filters = query_data.compare_filters;
     }
 
-    compare_pipeline = build_pipeline(compare_data);
+    compare_pipeline = build_pipeline(compare_data, meta);
     query_data.compare_mode = true;
   }
 
@@ -587,6 +595,26 @@ function handle_new_query(query_id, query_data, socket, done) {
       .flush();
 
     done(results);
+  });
+}
+
+function handle_new_query(query_id, query_data, socket, done) {
+  var metadata = require_root("server/metadata");
+  metadata.get(query_data.table, function(meta) {
+    var column_casts = [];
+    _.each(meta.metadata.columns, function(col) {
+      if (col.cast_str) {
+        console.log("CASTING ", col);
+        column_casts.push({
+          name: col.name,
+          to_type: col.cast_str,
+          from_type: col.type_str
+        });
+      }
+    });
+
+    query_data.cast_cols = column_casts;
+    handle_new_query_with_meta(meta, query_id, query_data, socket, done);
   });
 }
 

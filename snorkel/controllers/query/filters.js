@@ -42,7 +42,7 @@ var typed_fields = {};
 var field_types = {};
 function set_fields(fields) {
   _.each(fields, function(field) {
-    if (BLACKLIST[field.name] || BLACKLIST[field.type_str]) {
+    if (BLACKLIST[field.name] || BLACKLIST[field.final_type]) {
       return;
     }
 
@@ -54,8 +54,18 @@ function set_fields(fields) {
 var compare_area, filter_area, container;
 function set_container(el) {
   container = el;
-  compare_area = el.find(".compare_filters");
-  filter_area = el.find(".query_filters");
+}
+
+function get_compare_area() {
+  compare_area = container.find(".compare_filters");
+  return compare_area
+
+}
+
+function get_filter_area() {
+  filter_area = container.find(".query_filters");
+  return filter_area;
+
 }
 
 var _filter_els = [];
@@ -72,10 +82,6 @@ function add_filter(filter, compare, force) {
   var filters = _filter_els;
 
   $C("filter_row", { fields: typed_fields, op: op, selected: val, field: field }, function(cmp) {
-    if (!filters.alive) {
-      return;
-    }
-
     filters.push(cmp.$el);
     cmp.set_field(field);
     cmp.set_value(val);
@@ -85,9 +91,9 @@ function add_filter(filter, compare, force) {
       cmp.$el.find(".filter_group")
         .attr("data-filter-type", "compare");
 
-      compare_area.append(cmp.$el);
+      get_compare_area().append(cmp.$el);
     } else {
-      filter_area.append(cmp.$el);
+      get_filter_area().append(cmp.$el);
     }
 
   });
@@ -98,20 +104,13 @@ function add_filter_compare(filter, force) {
 }
 
 function remove_filters_from_dom() {
-  compare_area.find(".filter_row").remove();
-  filter_area.find(".filter_row").remove();
+  get_compare_area().find(".filter_row").remove();
+  get_filter_area().find(".filter_row").remove();
 }
 
 // We need field data available here to even make the component... oh noes...
 // what should we do?
 function set_filter_data(filters, no_add_if_empty) {
-  _filter_els.alive = false;
-  _filter_els = [];
-  _filter_els.alive = true;
-  _.each(_filter_els, function(el) {
-    el.remove();
-  });
-
   var query = _.filter(filters.query, function(f) { return f[2]; });
   var compare = _.filter(filters.compare, function(f) { return f[2]; });
 

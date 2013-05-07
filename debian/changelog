@@ -1,3 +1,21 @@
+snorkel (0.0.10-2) unstable; urgency=low
+
+  * clearable metadata cache
+
+ -- okay <okay.zed@gmail.com>  Tue, 07 May 2013 09:10:16 -0700
+
+snorkel (0.0.10-1) unstable; urgency=low
+
+  * auto winsorise numbers integer values, when we can
+
+ -- okay <okay.zed@gmail.com>  Tue, 07 May 2013 09:10:16 -0700
+
+snorkel (0.0.9-3) unstable; urgency=low
+
+  * can change type of string / int columns, a little bit
+
+ -- okay <okay.zed@gmail.com>  Tue, 07 May 2013 09:10:16 -0700
+
 snorkel (0.0.9-2) unstable; urgency=low
 
   * query fix for dahsboards
