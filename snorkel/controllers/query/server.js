@@ -90,6 +90,7 @@ function marshall_query(form_data) {
   var end_str_ms = value_of(form_data, 'end', 'now');
   var now = Date.now();
 
+  query_data.field_two = value_of(form_data, 'field_two');
 
   // Now we should round the start and end to the time bucket
   query_data.start_ms = fuzzy_time(start_str_ms, now);
@@ -143,6 +144,9 @@ function marshall_query(form_data) {
     use_fields = fieldset;
   } else if (fields.length) {
     use_fields = fields;
+    if (query_data.field_two) {
+      use_fields.push(query_data.field_two);
+    }
   } else {
     console.log("Warning: no fields found for query");
     use_fields = [ ];
@@ -259,8 +263,6 @@ function build_pipeline(params, meta) {
     return [];
   }
 
-
-
   var pipeline = query(params, meta.metadata.columns);
 
   if (params.cast_cols && params.view !== "samples") {
@@ -278,8 +280,8 @@ function build_pipeline(params, meta) {
   var limit = [];
 
   if (params.limit) {
-    if (params.view !== "time" && 
-        params.view !== "area" && 
+    if (params.view !== "time" &&
+        params.view !== "area" &&
         params.views !== "distribution") {
       limit.push({$limit: params.limit || 100});
     }

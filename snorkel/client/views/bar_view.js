@@ -10,10 +10,17 @@ var BarView = BaseView.extend({
   finalize: function() {
     var that = this;
     var group_by = _.clone(this.data.parsed.dims);
+
     var cols = _.clone(this.data.parsed.cols);
+
+    if (!cols || !cols.length) {
+      cols = ['count'];
+      this.data.parsed.agg = '$count';
+    }
+
     var stacking = this.data.parsed.stacking === "stacked";
 
-    var metric = this.data.parsed.agg;
+    var metric = this.data.parsed.agg || '$count';
 
     var categories = [];
     var serieses = {};
@@ -21,7 +28,7 @@ var BarView = BaseView.extend({
     var compare_data = this.compare_data;
     var dataset = this.table;
 
-    _.each(this.data.parsed.cols, function(col) {
+    _.each(cols, function(col) {
       serieses[col] = {
         data: [],
         name: presenter.get_field_name(dataset, col),

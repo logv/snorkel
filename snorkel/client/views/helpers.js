@@ -320,7 +320,8 @@ module.exports = {
   ],
 
   STD_EXCLUDES: [
-    "field", "field_two", "time_bucket", "hist_bucket", "stacking", "sort_by"
+    "field", "field_two", "time_bucket", "hist_bucket", "stacking", "sort_by",
+    "field_one"
   ]
 
 };

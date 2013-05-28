@@ -187,7 +187,7 @@ var TimeView = BaseView.extend({
 
 jank.trigger("view:add", "time",  {
     include: helpers.STD_INPUTS.concat(["time_bucket", "compare", "sort_by"]),
-    exclude: ["field", "hist_bucket", "stacking", "max_results"],
+    exclude: ["field", "hist_bucket", "stacking", "max_results", "field_two"],
     icon: "noun/line.svg"
 }, TimeView);
 

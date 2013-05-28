@@ -117,7 +117,7 @@ var ScatterView = SamplesView.extend({
 });
 
 jank.trigger("view:add", "scatter",  {
-  include: helpers.STD_INPUTS.concat(["group_by", "fieldset"]),
-  exclude: [ "compare", "agg", "field", "compare", "time_bucket", "hist_bucket", "stacking", "sort_by" ]
+  include: helpers.STD_INPUTS.concat(["group_by", "field", "field_two"]),
+  exclude: [ "compare", "agg", "compare", "time_bucket", "hist_bucket", "stacking", "sort_by", "fieldset" ]
 }, ScatterView);
 module.exports = ScatterView;

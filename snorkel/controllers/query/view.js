@@ -285,15 +285,15 @@ function get_aggregate_row() {
   return $(aggregate_row);
 }
 
-function get_field_row(agg_columns) {
+function get_field_row(agg_columns, name, display_name) {
   var agg_names = {};
   _.each(agg_columns, function(m) { agg_names[m.name] = m.display_name || m.name; });
 
   var field_selector = $C("selector", {
-    name: "field",
+    name: name || "field",
     options: agg_names
   });
-  return add_control("field", "Field", field_selector.toString());
+  return add_control(name || "field", display_name || "Field", field_selector.toString());
 }
 
 function get_fieldset_row(agg_columns) {
@@ -315,7 +315,7 @@ function get_controls(columns) {
   });
 
   var agg_columns = _.filter(columns, function(col) {
-    return col.final_type === AGGREGABLE_TYPE && col.name !== "time" && col.hidden !== 'true';
+    return col.final_type === AGGREGABLE_TYPE && col.hidden !== 'true';
   });
 
   var tag_columns = _.filter(columns, function(col) {
@@ -339,6 +339,7 @@ function get_controls(columns) {
   control_box.append(get_hist_bucket_row());
   control_box.append(get_aggregate_row());
   control_box.append(get_field_row(agg_columns));
+  control_box.append(get_field_row(agg_columns, "field_two", "Field (2)"));
   control_box.append(get_fieldset_row(agg_columns));
   control_box.append(get_stacking_row());
 

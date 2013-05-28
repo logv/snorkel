@@ -89,7 +89,7 @@ var SamplesView = BaseView.extend({
 
 jank.trigger("view:add", "samples",  {
   include: helpers.STD_INPUTS,
-  exclude: [ "group_by", "compare", "agg", "field", "fieldset", "compare", "time_bucket", "hist_bucket", "stacking", "sort_by" ],
+  exclude: [ "group_by", "compare", "agg", "field", "fieldset", "compare", "time_bucket", "hist_bucket", "stacking", "sort_by", "field_two" ],
   icon: "noun/pin.svg"
 }, SamplesView);
 
