@@ -166,6 +166,7 @@ function marshall_query(form_data) {
 
   function parse_filters(form_filters, use_falsey) {
     var filters = {};
+    var now = Date.now();
     // I don't know the field types over here. Oops.
     _.each(form_filters, function(filter) {
       var field = filter.shift();
@@ -178,7 +179,14 @@ function marshall_query(form_data) {
       }
 
       if (field.match(/integer/)) {
-        val = parseInt(val, 10);
+        var parsed_val = parseInt(val, 10);
+
+        if (!_.isNumber(parsed_val) || _.isNaN(parsed_val)) {
+          parsed_val = fuzzy_time(val, now);
+          val = parsed_val;
+        } else {
+          val = parsed_val;
+        }
 
         if (!_.isNumber(val)) {
           return;

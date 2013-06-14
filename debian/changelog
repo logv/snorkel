@@ -1,3 +1,9 @@
+snorkel (0.0.10-5) unstable; urgency=low
+
+  * integer filters will try date timestamps if it doesn't look like an int
+
+ -- okay <okay.zed@gmail.com>  Fri, 14 Jun 2013 09:10:16 -0700
+
 snorkel (0.0.10-4) unstable; urgency=low
 
   * bar graph
