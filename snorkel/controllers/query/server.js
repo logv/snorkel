@@ -8,6 +8,7 @@ var config = require_root("server/config");
 var context = require_root("server/context");
 var controller = require_root("server/controller");
 var db = require_root("server/db");
+var http = require("http");
 var page = require_root("server/page");
 var bridge = require_root("server/bridge");
 var querystring = require("querystring");
@@ -280,8 +281,11 @@ function build_pipeline(params, meta) {
   var start_s = parseInt(params.start_ms / 1000, 10);
   var end_s = parseInt(params.end_ms / 1000, 10);
 
-  var sort = [ {$sort: { }} ];
-  sort[0].$sort[params.sort_by] = -1;
+  var sort = [];
+  if (params.view !== "samples") {
+    sort =  [{$sort: { }}];
+    sort[0].$sort[params.sort_by] = -1;
+  }
 
   var timeline = backend.time_range(start_s, end_s);
   var filters = backend.add_filters(params.filters);
@@ -311,6 +315,42 @@ function run_query(table_name, pipeline, query_type, do_weighting, cb) {
 }
 
 
+var empty_str = "";
+function load_saved_query(conditions, cb) {
+  var collection = db.get("query", "results");
+  cb = context.wrap(cb);
+
+  collection.find(conditions, context.wrap(function(err, cur) {
+    if (err || !cur) {
+      return cb(null);
+    }
+
+    cur.limit(1).sort({ updated: -1 });
+
+    cur.toArray(context.wrap(function(err, arr) {
+      if (err) {
+        console.log(err);
+        return cb(null);
+      }
+
+      var obj = arr.pop();
+      if (!obj) {
+        return cb(null);
+
+      }
+
+      var input_view = _.find(obj.input, function(r) {
+        return r.name === "view";
+      });
+
+      if (!input_view) {
+        obj.input.push({name: "view", value: obj.parsed.view});
+      }
+
+      return cb(obj);
+    }));
+  }));
+}
 
 function get_index() {
   if (controller.require_https()) { return; }
@@ -342,44 +382,15 @@ function get_index() {
         return flush(empty_str);
       }
 
-      var collection = db.get("query", "results");
-      flush = context.wrap(flush);
-
-      collection.find(conditions, context.wrap(function(err, cur) {
-        if (err || !cur) {
+      load_saved_query(conditions, function(obj) {
+        if (obj) {
+          bridge.controller("query", "load_saved_query", obj);
+        } else {
           bridge.controller("query", "run_startup_query");
-          return flush(empty_str);
         }
 
-        cur.limit(1).sort({ updated: -1 });
-
-        cur.toArray(context.wrap(function(err, arr) {
-          if (err) {
-            console.log(err);
-            return flush("ERROR", err);
-          }
-
-          var obj = arr.pop();
-          if (!obj) {
-            bridge.controller("query", "run_startup_query");
-            return flush(empty_str);
-
-          }
-
-          var input_view = _.find(obj.input, function(r) {
-            return r.name === "view";
-          });
-
-          if (!input_view) {
-            obj.input.push({name: "view", value: obj.parsed.view});
-          }
-
-          bridge.controller("query", "load_saved_query", obj);
-
-          return flush(empty_str);
-        }));
-      }));
-
+        flush(empty_str);
+      });
 
 
     })();
@@ -487,6 +498,44 @@ function get_index() {
   page.render({content: template_str, header: header_str});
 
 }
+
+function post_bounce() {
+  if (controller.require_https()) { return; }
+  var req = context("req");
+  var res = context("res");
+
+  var results = req.body.data || "";
+  res.setHeader('Content-Length', results.length);
+  res.write(results, "binary");
+  res.end();
+}
+
+function get_download() {
+  if (controller.require_https()) { return; }
+  var client_id = context("req").query.client_id || context("req").query.c;
+  var hashid = context("req").query.hashid || context("req").query.h;
+  var conditions = { };
+
+  if (hashid) {
+    conditions.hashid = hashid;
+  } else if (client_id) {
+    conditions.clientid = client_id;
+  }
+
+  var req = context("req");
+  var res = context("res");
+
+  load_saved_query(conditions, function(query) {
+    if (query) {
+      var results = JSON.stringify(query.results);
+      res.setHeader('Content-Length', results.length);
+      res.write(results, 'binary');
+      res.end();
+    }
+  });
+
+}
+
 
 function log_query(query_data, user) {
   var sample_data = {
@@ -716,12 +765,68 @@ function refresh_query(form_data, __id, socket, cb) {
   });
 
 }
+
+function load_rss(table, cb) {
+  metadata.get(table, function(meta) {
+    var feed_url = meta.metadata.rss_feed || (config.rss_feed && config.rss_feed.url);
+
+    if (!feed_url) {
+      return cb();
+    }
+
+    http.get(feed_url, function(res) {
+      var data = "";
+      res.on('data', function(chunk) {
+        data += chunk.toString();
+      });
+
+      res.on('end', function() {
+        cb(data);
+      });
+    });
+
+  });
+}
+
+function load_annotations(table, cb) {
+  var collection = db.get("dataset", "annotations");
+
+  var annotations = {};
+  annotations.items = [];
+  annotations.rss = [];
+
+  var after = _.after(2, function() {
+    cb(annotations);
+  });
+
+  collection.find({}, function(err, cur) {
+    if (err || !cur) {
+      return cb(null);
+    }
+
+    cur.toArray(context.wrap(function(err, arr) {
+      annotations.items = arr;
+      console.log(arr);
+      after();
+    }));
+  });
+
+  load_rss(table, function(items) {
+    annotations.rss = items;
+    after();
+  });
+}
+
 module.exports = {
   routes: {
     "" : "index",
     "/saved": "saved",
     "/user" : "user",
-    "/dataset" : "dataset"
+    "/dataset" : "dataset",
+    "/download" : "download"
+  },
+  post_routes: {
+    "/bounce" : "bounce"
   },
 
   refresh: refresh_query,
@@ -775,6 +880,9 @@ module.exports = {
       dashboard_controller.update_portlet(socket, portlet);
     });
 
+    socket.on("load_rss", load_rss);
+    socket.on("load_annotations", load_annotations);
+
     socket.on("new_query", function(form_data) {
       var now = parseInt(Date.now() / 1000, 10);
       var query_id = user_id + "/" + __id + "/" + now;
@@ -804,5 +912,9 @@ module.exports = {
       });
     });
   },
-  index: auth.require_user(get_index)
+  index: auth.require_user(get_index),
+  download: auth.require_user(get_download),
+  bounce: post_bounce,
+  load_rss: load_rss,
+  load_annotations: load_annotations
 };

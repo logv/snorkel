@@ -1,5 +1,6 @@
 <%= set_default("name", "") %>
 <%= set_default("display_name", "") %>
+<%= set_default("rss_feed", "") %>
 <%= set_default("description", "") %>
 <%= set_default("col_types", []) %>
 
@@ -26,6 +27,7 @@
         <div> <a target=_blank href="/query?table=<%=name%>">(Open dataset)</a> </div>
         <h2><b>Display Name</b></h2> <div class="manual xeditable" data-name="display_name"><%= display_name %></div>
         <h2><b>Description</b></h2> <div class="manual xeditable" data-type="wysihtml5" data-name="description"><%= description %></div>
+        <h2><b>RSS Feed</b></h2> <div class="manual xeditable" data-name="rss_feed"><%= rss_feed %></div>
       </div>
 
       <div class="span1 clearfix"> </div>

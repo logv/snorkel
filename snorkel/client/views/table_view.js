@@ -4,6 +4,7 @@ var filter_helper = require("controllers/query/filters");
 var helpers = require("client/views/helpers");
 var presenter = require("client/views/presenter");
 var BaseView = require("client/views/base_view");
+var ResultsStore = require("client/js/results_store");
 
 var row_key = helpers.row_key;
 function get_wrapper_for_cell(el) {
@@ -97,6 +98,7 @@ var TableView = BaseView.extend({
     });
 
     var rows = [];
+    var csv_data = [];
     var compare_row_hash = {};
     var compare = this.data.parsed.compare_mode;
 
@@ -113,8 +115,10 @@ var TableView = BaseView.extend({
     _.each(this.data.results, function(result) {
       var key = row_key(group_by, result);
       var row = [];
+      var csv_row = [];
       _.each(group_by, function(group) {
         row.push(result._id[group]);
+        csv_row.push(result._id[group]);
       });
 
       that.data.count += result.weighted_count || result.count;
@@ -131,21 +135,40 @@ var TableView = BaseView.extend({
           cell_div = helpers.build_compare_cell(col_value);
         }
 
+        csv_row.push(col_value);
+
         row.push(cell_div);
       });
 
       rows.push(row);
+      csv_data.push(csv_row);
 
     });
 
     this.headers = headers;
     this.rows = rows;
 
+
+    this.csv_data = headers.join(",") + "\n" + _.map(csv_data, function(row) {
+      return row.join(",");
+    }).join("\n");
+
   },
 
   render: function() {
     var dataset = this.data.parsed.table;
+    console.log(this.data);
     var table = helpers.build_table(this.table, this.headers, this.rows, jank.controller().get_fields(dataset));
+
+    var csv_data = "data:text/csv;charset=utf-8," + encodeURIComponent(this.csv_data);
+
+    var csv_link = $("<a/>")
+      .attr('href', csv_data)
+      .addClass('mbl clearfix')
+      .attr('download', dataset + "_" + ResultsStore.to_server(this.data.parsed.id) + "_results.csv")
+      .html("Download as CSV");
+
+    this.$el.append(csv_link);
 
     this.$el
       .append(table)

@@ -238,7 +238,7 @@ function query_samples(opts) {
   opts = opts || {};
   var pipeline = [];
 
-  pipeline.push({$sort: { "integer.time" : -1}});
+  pipeline.push({$sort: { _id: -1}});
   pipeline.push({$limit: opts.limit || 100 });
   return pipeline;
 }
@@ -262,6 +262,7 @@ function clear_cache(table, cb) {
   }
 }
 
+var _pending = {};
 function get_columns(table, cb) {
 
   if (_cached_columns[table]) {
@@ -283,6 +284,14 @@ function get_columns(table, cb) {
   cb = context.wrap(cb);
 
   var values = {};
+
+  if (_pending[table]) {
+    _pending[table].push(cb);
+    return;
+  }
+
+  _pending[table] = [cb];
+
   collection.aggregate(pipeline, function(err, data) {
     _.each(data, function(sample) {
       _.each(sample, function(fields, field_type) {
@@ -345,7 +354,10 @@ function get_columns(table, cb) {
       updated: Date.now()
     };
 
-    cb(cols);
+    _.each(_pending[table], function(cb) {
+      cb(cols);
+    });
+    delete _pending[table];
   });
 
 }

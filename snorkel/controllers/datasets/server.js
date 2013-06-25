@@ -194,10 +194,12 @@ module.exports = {
     }
 
     var render_async = page.async(function(flush) {
-      metadata.get(table, function(config) {
-        _metadata = config.metadata;
+      metadata.get(table, function(meta) {
+        _metadata = meta.metadata;
+        var rss_feed = _metadata.rss_feed;
         var template_str = template.partial("datasets/edit.html.erb", {
           name: table,
+          rss_feed: rss_feed,
           display_name: _metadata.display_name || _metadata.name,
           description: _metadata.description,
           col_types: _metadata.col_types,

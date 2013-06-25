@@ -64,13 +64,13 @@ module.exports = {
     var $page = this.$page;
     function get_value_from_xeditable(name) {
       var val = $page.find(".dataset_config [data-name=" + name + "]").editable('getValue')[name];
-      console.log(name, val);
       return val;
     }
 
     var _metadata = {
       description: get_value_from_xeditable('description'),
       display_name: get_value_from_xeditable('display_name'),
+      rss_feed: get_value_from_xeditable('rss_feed'),
       columns: {}
     };
 

@@ -751,7 +751,7 @@ module.exports = {
     $C("modal", { title: "Query URL" }, function(cmp) {
       var div = $("<div>");
       var input = $("<input type='text' style='width: 100%' />");
-      var uri = window.location.host + window.location.pathname + '?table=' + table + '&h='  + _query_id;
+      var uri = window.location.protocol + '//' + window.location.host + window.location.pathname + '?table=' + table + '&h='  + _query_id;
 
       input.val(uri);
       div.append(input);

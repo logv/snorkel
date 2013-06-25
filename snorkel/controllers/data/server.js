@@ -95,6 +95,41 @@ function subscribe_to_rabbit_queue() {
   });
 }
 
+function add_annotation(body, cb) {
+  var collection = db.get("dataset", "annotations");
+
+  var annotation = {};
+  annotation.title = body.title;
+  if (body.description) {
+    annotation.description = body.description;
+  }
+  annotation.dataset = body.dataset || "*";
+
+  if (body.time) {
+    annotation.time = body.time;
+  }
+
+  if (body.timestamp) {
+    annotation.time = +new Date(body.timestamp);
+  }
+
+  annotation.timestamp = new Date(annotation.time).toString();
+  if (!annotation.title || !annotation.time) {
+    cb(null);
+  } else {
+    collection.insert(annotation, function(err, obj) { if (err) {
+        cb(null);
+      } else {
+        console.log("Added annotation to", annotation.dataset, ": ", annotation.timestamp, annotation.title);
+        inserted_samples("dataset/annotations", 1, "UDP");
+        cb(obj);
+      }
+    });
+  }
+}
+
+
+
 
 function setup_udp_socket() {
   if (!config.udp) {
@@ -119,15 +154,20 @@ function setup_udp_socket() {
     }
 
     try {
-      backend.add_sample(parsed_data.dataset, parsed_data.subset, parsed_data.sample, function(err) {
-        if (err) {
-          errored_samples(get_table(parsed_data.dataset, parsed_data.subset), 1, null, "UDP");
-        } else {
-          inserted_samples(get_table(parsed_data.dataset, parsed_data.subset), 1, "UDP");
-        }
-      });
+
+      if (parsed_data.annotation) {
+        add_annotation(parsed_data.annotation, function() { 
+        });
+      } else {
+        backend.add_sample(parsed_data.dataset, parsed_data.subset, parsed_data.sample, function(err) {
+          if (err) {
+            errored_samples(get_table(parsed_data.dataset, parsed_data.subset), 1, null, "UDP");
+          } else {
+            inserted_samples(get_table(parsed_data.dataset, parsed_data.subset), 1, "UDP");
+          }
+        });
+      }
     } catch (e) {
-      // TODO: log where this bad sample is coming from
       errored_samples(get_table(parsed_data.dataset, parsed_data.subset), 1, null, "UDP");
     }
   });
@@ -148,6 +188,7 @@ module.exports = {
 
   post_routes: {
     "/import" : "add_sample",
+    "/annotate" : "add_event",
     "/import_csv" : "read_csv"
   },
 
@@ -204,6 +245,20 @@ module.exports = {
       } else {
         inserted_samples(get_table(dataset, subset), samples.length, "POST");
         res.end("INSERTED " + (samples.length) + " SAMPLE(S)");
+      }
+    });
+
+  },
+
+  add_event: function() {
+    var body = context("req").body;
+    var res = context("res");
+
+    add_annotation(body, function(obj) {
+      if (!obj) {
+        res.write("ERROR");
+      } else {
+        res.write("OK");
       }
     });
 

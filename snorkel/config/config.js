@@ -32,6 +32,9 @@ module.exports = {
     authorized_users: false
   },
   behind_proxy: false,
+  rss_feed: {
+    url: null
+  },
   // This is the default max data size of the collection. Each dataset will
   // only grow to this size and no further, ideally
   default_max_dataset_size: 1024 * 1024 * 100 // 100 MB

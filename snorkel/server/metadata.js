@@ -74,6 +74,7 @@ module.exports = {
 
   set: function(table, metadata, cb) {
     var collection = db.get("dataset", "metadata");
+
     collection.findOne({table: table}, function(err, obj) {
       if (err || !obj) {
         collection.insert({ table: table, metadata: metadata }, function(err, obj) {

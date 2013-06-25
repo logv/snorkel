@@ -39,7 +39,7 @@ var TimeView = BaseView.extend({
         var group_label = dims.join(",");
         var field_label = group_label + " " + presenter.get_field_name(dataset, field);
         var full_label = field_label;
-  
+
         _labels[full_label] = group_label || full_label;
 
         if (!series[field_label]) {
@@ -52,13 +52,13 @@ var TimeView = BaseView.extend({
 
 
         // denormalize the time bucket into ms for highcharts benefit
-        var pt = { 
-          x: result._id.time_bucket * 1000, 
+        var pt = {
+          x: result._id.time_bucket * 1000,
           y: parseInt(value, 10),
           samples: result.count,
           compare: is_compare
         };
-        
+
         series[field_label].data.push(pt);
       });
     });
@@ -129,10 +129,10 @@ var TimeView = BaseView.extend({
             var valDiv = $("<div class='pull-right mlm' />")
                           .html(helpers.number_format(point.y));
             ptDiv.append(valDiv);
-            
+
             el.append(ptDiv);
 
-          
+
             var samples = point.point.samples;
             if (samples) {
               valDiv.append($("<div class='mlm pull-right' />").html("(" + samples + "samples)"));
@@ -143,7 +143,7 @@ var TimeView = BaseView.extend({
         }
       },
       plotOptions: {
-        series: { 
+        series: {
           point: {
               events: {
                   mouseOver: function (evt) {
@@ -168,16 +168,94 @@ var TimeView = BaseView.extend({
     var data = this.data.concat(this.compare_data || []);
 
     var options = this.getChartOptions();
-    options.series = data;
     var $el = this.$el;
-    $C("highcharter", {skip_client_init: true}, function(cmp) {
-      // get rid of query contents...
-      $el
-        .append(cmp.$el)
-        .show();
+    var table = this.table;
 
-      // There's a little setup cost to highcharts, maybe?
-      cmp.client(options);
+    options.series = data;
+
+    function getValue(item, key) {
+      return $(item).find(key).text();
+    }
+
+    function doRSSFeed(cb) {
+
+      window.jank.socket().emit("load_annotations", table, function(annotations) {
+        var feed = annotations.rss;
+        var items = [];
+        if (feed) {
+          var parsedFeed = $.parseXML(feed);
+
+          $(parsedFeed).find("item").each(function() {
+            var timeStamp = new Date(getValue(this, 'pubDate'));
+            var item = {
+              title: getValue(this, 'title'),
+              link: getValue(this, 'link'),
+              description: getValue(this, 'description'),
+              time: +timeStamp,
+              timestamp: getValue(this, 'pubDate')
+            };
+
+            items.push(item);
+          });
+        }
+
+        if (annotations.items) {
+          items = items.concat(annotations.items);
+        }
+
+        cb(items);
+      });
+    }
+
+    function doDrawGraph() {
+      $C("highcharter", {skip_client_init: true}, function(cmp) {
+        // get rid of query contents...
+        $el
+          .append(cmp.$el)
+          .show();
+
+        var annotations = $("<div class='annotations' />");
+        annotations.css({
+          height: "200px"
+        });
+
+        $el.append(annotations);
+
+        // There's a little setup cost to highcharts, maybe?
+        cmp.client(options);
+      });
+    }
+
+    doRSSFeed(function(items) {
+      if (items && items.length) {
+        if (!options.yAxis) {
+          options.xAxis = {};
+        }
+
+        console.log(items);
+
+        options.xAxis.plotLines = [];
+        _.each(items, function(item) {
+          options.xAxis.plotLines.push({
+            color: "rgba(240, 240, 240, 80)",
+            value: item.time,
+            width: "10",
+            events: {
+              mouseover: function() {
+
+                var details = $("<div />");
+                details.append($("<h2>").html(item.title));
+                details.append($("<a>").html(item.timestamp).attr("href", item.link));
+                details.append($("<p class='mtl'>").html(item.description));
+
+                $el.find(".annotations").html(details);
+              }
+            }
+          });
+        });
+      }
+
+      doDrawGraph();
     });
 
   }

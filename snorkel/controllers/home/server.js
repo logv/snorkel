@@ -13,9 +13,14 @@ function index() {
   context("title", "welcoem");
 
 
-  var template_str = template.render("controllers/home.html.erb", {});
+  
+  if (context('req').isAuthenticated()) { 
+    context('res').redirect('/datasets');
+  } else {
+    var template_str = template.render("controllers/home.html.erb", {});
 
-  page.render({ content: template_str });
+    page.render({ content: template_str });
+  }
 }
 
 module.exports = {

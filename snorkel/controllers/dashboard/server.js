@@ -293,12 +293,16 @@ module.exports = {
   },
 
   socket: function(socket) {
-    socket.on("refresh_query", function(query_data) {
-      // Avoid circular deps, please
-      var query_controller = require_root("controllers/query/server");
+    // Avoid circular deps, please
+    var query_controller = require_root("controllers/query/server");
 
+    socket.on("refresh_query", function(query_data) {
       query_controller.refresh(query_data, 'ukn', socket);
     });
+
+    socket.on("load_rss", query_controller.load_rss);
+    socket.on("load_annotations", query_controller.load_annotations);
+
 
     socket.on("save_query", function(query, name, info) {
       // Avoid circular deps, please
