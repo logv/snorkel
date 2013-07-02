@@ -1,8 +1,14 @@
+snorkel (0.0.12-2) unstable; urgency=low
+
+  * Query History Browser
+
+ -- okay <okay.zed@gmail.com>  Tue, 02 Jul 2013 09:10:16 -0700
+
 snorkel (0.0.12-1) unstable; urgency=low
 
   * initial annotation support
 
- -- okay <okay.zed@gmail.com>  Sat, 29 Jun 2013 09:10:16 -0700
+ -- okay <okay.zed@gmail.com>  Sat, 22 Jun 2013 09:10:16 -0700
 
 snorkel (0.0.11-1) unstable; urgency=low
 

@@ -854,6 +854,25 @@ module.exports = {
       });
     });
 
+    socket.on("get_past_results", function(hashid, cb) {
+      queries.get_past_results(hashid, function(arr) {
+        if (cb) {
+          cb(hashid, arr);
+        } else {
+          socket.emit("past_results", hashid, arr);
+        }
+      });
+    });
+
+    socket.on("load_query_data", function(query, cb) {
+      queries.get_saved_query(query, function(err, arr) {
+        if (!err) {
+          cb(arr);
+        }
+      });
+    });
+
+
     socket.on("save_query", function(query, name, description) {
       save_query(socket, query, name, description);
     });

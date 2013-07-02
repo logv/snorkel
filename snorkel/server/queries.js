@@ -28,19 +28,25 @@ function get_saved_queries(conditions, options, cb) {
   collection.find(conditions, options, function(err, cur) {
     cur.sort({ updated: -1 });
     cur.limit(options.limit || 30);
+    var ret;
+
     cur.toArray(function(err, arr) {
-      _.each(arr, function(query) {
-        if (visited[query.hashid]) {
-          if ((visited[query.hashid].updated || 0) < query.updated) {
+      if (!options.no_dedupe) {
+        _.each(arr, function(query) {
+          if (visited[query.hashid]) {
+            if ((visited[query.hashid].updated || 0) < query.updated) {
+              visited[query.hashid] = query;
+            }
+          } else {
             visited[query.hashid] = query;
           }
-        } else {
-          visited[query.hashid] = query;
-        }
 
-      });
+        });
+        ret = _.map(visited, function(v, k) { return v; });
+      } else {
+        ret = arr;
+      }
 
-      var ret = _.map(visited, function(v, k) { return v; });
       if (cb) { cb(ret); }
     });
 
@@ -95,6 +101,21 @@ function get_recent_queries_for_user(username, dataset, cb) {
   });
 }
 
+function get_past_results(hashid, cb) {
+  var conditions = {
+    hashid: hashid
+  };
+
+  get_saved_queries(conditions, { limit: 100000, no_dedupe: true }, function(arr) {
+    var ret = _.map(arr, function(r) { return {
+      updated: r.updated,
+      _id: r._id
+    };});
+
+    cb(ret);
+  });
+}
+
 
 function get_saved_query(conditions, cb) {
   var collection = db.get("query", "results");
@@ -118,5 +139,6 @@ module.exports = {
   get_query_from_db: get_query_from_db,
   get_saved_queries: get_saved_queries,
   get_saved_for_user: get_saved_for_user,
-  get_saved_for_dataset: get_saved_for_dataset
+  get_saved_for_dataset: get_saved_for_dataset,
+  get_past_results: get_past_results
 };

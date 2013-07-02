@@ -327,6 +327,39 @@ module.exports = {
       // gotta show a little dealie for old queries
     });
 
+
+    var _history_modal;
+
+    jank.controller().on("show_query_history", function(query) {
+      jank.socket().emit("get_past_results", query.hashid, function(queryid, results) {
+        var outerDiv = $("<div />");
+        _.each(results, function(r) {
+          var innerDiv = $("<div />");
+          r.hashid = queryid;
+          $C("past_query_tile", { query: r, updated: r.updated }, function(tile) {
+            innerDiv.append(tile.$el);
+          });
+
+          outerDiv.append(innerDiv);
+        });
+
+        $C("modal", {title: "History"}, function(cmp) {
+          cmp.$el.find(".modal-body").append(outerDiv);
+          _history_modal = cmp;
+        
+        });
+
+      });
+      // gotta show a little dealie for old queries
+    });
+
+    jank.controller().on("query_id_clicked", function(short_query) {
+      jank.socket().emit("load_query_data", { hashid: short_query.hashid, updated: short_query.updated }, function(query) {
+        _history_modal.hide();
+        jank.controller().trigger("query_tile_clicked", query);
+      });
+    });
+
     jank.controller().on("query_tile_clicked", function(query) {
 
       // TODO: this should be better encapsulated into a modal hider/shower

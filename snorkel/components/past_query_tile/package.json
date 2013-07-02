@@ -1,0 +1,7 @@
+{
+  "main" : "past_query_tile",
+  "helpers": [],
+  "style": "past_query_tile.css",
+  "styles": [],
+  "template": "past_query_tile.html.erb"
+}
