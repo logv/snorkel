@@ -278,6 +278,7 @@
     .save_button,
     .dash_button,
     .share_button,
+    .download_button,
     .go_button {
       margin-left: 5px;
       margin-right: 5px;
@@ -307,6 +308,7 @@
 
   .dash_button,
   .save_button,
+  .download_button,
   .share_button {
     padding: 8px;
   }

@@ -199,8 +199,9 @@ var TableView = BaseView.extend({
 
     var col_name = $th.attr('data-name');
     var col_type = presenter.get_field_type(this.table, col_name);
+    var col_value = $td.find(".value_cell").attr("data-value") || $td.html();
 
-    div.attr("data-value", $td.find(".value_cell").attr("data-value") || $td.html());
+    div.attr("data-value", col_value);
     div.attr("data-name", col_name);
     div.attr("data-type", col_type);
 
@@ -214,15 +215,17 @@ var TableView = BaseView.extend({
       }, 200);
 
     var that = this;
-    $C("table_popover", { type: col_type, name: col_name, row: $td.parents("tr"), cell: $td }, function(cmp) {
-      that.popover = cmp;
-      div.popover({
-        trigger: 'manual',
-        placement: 'bottom',
-        content: cmp.$el,
-        html: true
-      }).popover('show');
-    });
+    $C("table_popover", 
+      { type: col_type, name: col_name, row: $td.parents("tr"), cell: $td}, 
+      function(cmp) {
+        that.popover = cmp;
+        div.popover({
+          trigger: 'manual',
+          placement: 'bottom',
+          content: cmp.$el,
+          html: true
+        }).popover('show');
+      });
   },
 
   handle_popover_filter_clicked: function(evt) {

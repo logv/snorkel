@@ -58,6 +58,14 @@ module.exports = {
       });
     });
 
+    $C("xeditable", {}, function() {
+      that.$el.find("td .editable[data-name='formatter']").editable({
+        mode: 'popup',
+        type: 'textarea'
+      });
+    });
+
+
 
   },
 

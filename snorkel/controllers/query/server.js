@@ -435,14 +435,22 @@ function get_index() {
       });
       dash_button.set_title("Add query to dashboard");
 
+      var download_button = $C("button", {
+        name: "",
+        delegate: { "click" : "download_clicked" },
+        classes: "download_button mll btn"
+      });
+      download_button.set_title("Download raw query results");
 
 
       save_button.$el.append($("<i class='icon-star' />"));
       share_button.$el.append($("<i class='icon-share' />"));
+      download_button.$el.append($("<i class='icon-download' />"));
       dash_button.$el.append($("<i class='icon-plus' />"));
 
       barEl.append(go_button.toString());
       var leftSideEl = $("<div class='mrl aux_buttons' />");
+      leftSideEl.append(download_button.toString());
       leftSideEl.append(share_button.toString());
       leftSideEl.append(dash_button.toString());
       leftSideEl.append(save_button.toString());

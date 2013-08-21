@@ -346,7 +346,7 @@ module.exports = {
         $C("modal", {title: "History"}, function(cmp) {
           cmp.$el.find(".modal-body").append(outerDiv);
           _history_modal = cmp;
-        
+
         });
 
       });
@@ -499,6 +499,9 @@ module.exports = {
     },
     share_clicked: function(el) {
       this.share_query();
+    },
+    download_clicked: function(el) {
+      this.download_query();
     },
     dashboard_clicked: function(el) {
       this.dashboard_query();
@@ -796,6 +799,12 @@ module.exports = {
       input.select();
 
     });
+  },
+
+  download_query: function() {
+    var query_id = _query_id;
+    var url = window.location.pathname + '/download?h=' + query_id;
+    window.open(url, '_blank');
   },
 
   dashboard_query: function() {

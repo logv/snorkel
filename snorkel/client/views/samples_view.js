@@ -53,12 +53,20 @@ var SamplesView = BaseView.extend({
     _.each(data.results, function(result) {
       var row = [];
       _.each(all_cols, function(field) {
+        var col_formatter = presenter.get_field_formatter(dataset, field);
+        console.log(col_formatter);
         var types = result[lookup[field]];
         if (!types) {
           row.push("");
           return;
         }
-        row.push(result[lookup[field]][field]);
+
+        var value = result[lookup[field]][field];
+        if (col_formatter) {
+          value = col_formatter(value);
+        }
+
+        row.push(value);
       });
 
       rows.push(row);

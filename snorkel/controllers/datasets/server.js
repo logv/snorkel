@@ -169,6 +169,10 @@ module.exports = {
       var client_options = {};
       _.extend(data, col_meta);
       _.extend(client_options, col_meta);
+      if (!data.formatter) {
+        data.formatter = "";
+      }
+
       data.client_options = {
         metadata: client_options
       };
@@ -181,7 +185,7 @@ module.exports = {
 
     function render_table_header(add_cast) {
       var header = $("<tr>");
-      var headers = [ "name", "display name", "hidden" ];
+      var headers = [ "name", "display name", "hidden", "formatter" ];
       if (add_cast) {
         headers.push("groupable");
       }

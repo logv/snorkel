@@ -152,6 +152,7 @@ module.exports = {
     var row = $("<tr />");
     var td;
 
+    var col_formatters = [];
     var fields = this.fields;
     _.each(headers, function(col) {
       td = $("<th>");
@@ -159,7 +160,9 @@ module.exports = {
       td.attr('data-name', col);
       td.html(display_name);
       row.append(td);
+      col_formatters.push(presenter.get_field_formatter(dataset, col));
     });
+
 
     header.append(row);
 
@@ -171,9 +174,10 @@ module.exports = {
       // shadowing row above
       var rowEl = $("<tr />");
 
-      _.each(row, function(col) {
+      _.each(row, function(col, index) {
         td = $("<td />");
-        td.html(col);
+        var col_formatter = col_formatters[index];
+        td.html(col_formatter(col));
         rowEl.append(td);
       });
 
@@ -212,8 +216,12 @@ module.exports = {
     }
 
     return color_hashes[hash];
+  },
+
+  format_cell: function(table, value) {
 
   },
+
   build_compare_cell: function(col_value, compare_value) {
     if (col_value === null || typeof col_value === "undefined") {
       return 'n/a';
