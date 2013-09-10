@@ -523,24 +523,44 @@ function get_download() {
   var client_id = context("req").query.client_id || context("req").query.c;
   var hashid = context("req").query.hashid || context("req").query.h;
   var conditions = { };
-
-  if (hashid) {
-    conditions.hashid = hashid;
-  } else if (client_id) {
-    conditions.clientid = client_id;
-  }
-
+  var now = parseInt(Date.now() / 1000, 10);
+  var query_id = "api/" + now;
   var req = context("req");
   var res = context("res");
 
-  load_saved_query(conditions, function(query) {
-    if (query) {
-      var results = JSON.stringify(query.results);
+
+
+  function use_saved_query() {
+    load_saved_query(conditions, function(query) {
+      if (query) {
+        var results = JSON.stringify(query.results);
+        res.setHeader('Content-Length', results.length);
+        res.write(results, 'binary');
+        res.end();
+      }
+    });
+  }
+
+  if (hashid) {
+    conditions.hashid = hashid;
+    use_saved_query();
+  } else if (client_id) {
+    conditions.clientid = client_id;
+    use_saved_query();
+  } else { // running a new query
+    var query_form_data = [];
+    _.each(context("req").query, function(v, k) {
+      query_form_data.push({ name: k, value: v });
+    });
+
+    var query_data = marshall_query(query_form_data);
+    handle_new_query(query_id, query_data, null, function(results) {
+      results = JSON.stringify(results);
       res.setHeader('Content-Length', results.length);
       res.write(results, 'binary');
       res.end();
-    }
-  });
+    });
+  }
 
 }
 
@@ -600,7 +620,7 @@ function handle_new_query_with_meta(meta, query_id, query_data, socket, done) {
 
 
   var user = "anon";
-  if (socket.manager.__user) {
+  if (socket && socket.manager.__user) {
     user = socket.manager.__user.username || "__awkward__";
   }
 
@@ -634,7 +654,11 @@ function handle_new_query_with_meta(meta, query_id, query_data, socket, done) {
       run_query(query_data.table, pipeline, '', weight_cols, function(err, data) {
         query_data.id = query_id;
         var query_results = { parsed: query_data, results: data, error: err, id: query_id, created: start};
-        socket.emit("query_results", query_results);
+
+        if (socket) {
+          socket.emit("query_results", query_results);
+        }
+
         results.query = query_results;
         sample.add_integer("query_duration", Date.now() - start);
 
@@ -648,7 +672,10 @@ function handle_new_query_with_meta(meta, query_id, query_data, socket, done) {
       run_query(query_data.table, compare_pipeline, 'comparison', weight_cols, function(err, data) {
         compare_data.id = query_id;
         var compare_results = { parsed: compare_data, results: data, error: err, id: query_id, created: start};
-        socket.emit("compare_results", compare_results);
+
+        if (socket) {
+          socket.emit("compare_results", compare_results);
+        }
         sample.add_integer("compare_duration", Date.now() - start);
         results.compare = compare_results;
 
@@ -940,7 +967,14 @@ module.exports = {
     });
   },
   index: auth.require_user(get_index),
-  download: auth.require_user(get_download),
+  download: function() {
+    if (!config.no_api_auth) {
+      auth.require_user(get_download)();
+    } else {
+      get_download();
+
+    }
+  },
   bounce: post_bounce,
   load_rss: load_rss,
   load_annotations: load_annotations

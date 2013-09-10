@@ -21,6 +21,7 @@ module.exports = {
   max_https_sockets: 1000,
   require_https: true,
   hostname: "localhost",
+  no_api_auth: false, // require user authentication to use API endpoint
   google_auth: {
     enabled: false,
     // require_domain: 'my_custom_domain.com',
