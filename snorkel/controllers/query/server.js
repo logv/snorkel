@@ -550,7 +550,13 @@ function get_download() {
   } else { // running a new query
     var query_form_data = [];
     _.each(context("req").query, function(v, k) {
-      query_form_data.push({ name: k, value: v });
+      if (_.isArray(v)) {
+        _.each(v, function(vv) {
+          query_form_data.push({ name: k, value: vv });
+        });
+      } else {
+        query_form_data.push({ name: k, value: v });
+      }
     });
 
     var query_data = marshall_query(query_form_data);
