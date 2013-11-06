@@ -14,7 +14,6 @@ module.exports = {
     jank.controller().trigger("delete_query", this.options.query, function() {
        $el.fadeOut(function() {
          $el.remove();
-
        });
     });
   }

@@ -1,7 +1,0 @@
-{
-  "main" : "kitten_tile",
-  "helpers": [],
-  "style": "kitten_tile.css",
-  "styles": ["kitten_list"],
-  "template": "kitten_tile.html.erb"
-}

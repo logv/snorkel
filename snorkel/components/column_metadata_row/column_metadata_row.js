@@ -65,6 +65,13 @@ module.exports = {
       });
     });
 
+    $C("xeditable", {}, function() {
+      that.$el.find("td .editable[data-name='description']").editable({
+        mode: 'popup',
+        type: 'textarea'
+      });
+    });
+
 
 
   },

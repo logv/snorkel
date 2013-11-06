@@ -1,6 +1,6 @@
 "use strict";
 
-var ResultsStore = require("client/js/results_store");
+var ResultsStore = require("app/client/results_store");
 
 module.exports = {
   events: {

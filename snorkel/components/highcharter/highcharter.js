@@ -1,15 +1,5 @@
 "use strict";
 
-function generate_series(number, low, high) {
-  var ser = [], i;
-
-  for (i = 0; i < number; i++ ) {
-    ser.push(Math.random() * (high - low) + low);
-  }
-
-  return ser;
-}
-
 module.exports = {
   tagName: "div",
   className: "",

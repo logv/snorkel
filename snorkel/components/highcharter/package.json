@@ -1,7 +1,8 @@
 {
   "main" : "highcharter",
-  "helpers": [ "vendor/highcharts" ],
+  "helpers": [ "vendor/highcharts3" ],
   "style": "highcharter.css",
   "styles": [],
+  "no_redefine" : true,
   "template": "highcharter.html.erb"
 }

@@ -1,3 +1,9 @@
+snorkel (0.0.15-1) unstable; urgency=low
+
+  * new views, new backends, split cores
+
+ -- okay <okay.zed@gmail.com>  Wed, 06 Nov 2013 09:10:16 -0700
+
 snorkel (0.0.14-1) unstable; urgency=low
 
   * Add unauthenticated API endpoint

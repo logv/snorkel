@@ -10,7 +10,7 @@ fi
 CONTROLLER=""
 if [[ $# == 1 ]] ; then
   PARTIAL="$1"
-  DEST=static/templates/helpers/${CONTROLLER}/
+  DEST=app/static/templates/helpers/${CONTROLLER}/
 fi
 
 if [[ $# == 2 ]] ; then
@@ -18,7 +18,7 @@ if [[ $# == 2 ]] ; then
   CONTROLLER="$1"
   PARTIAL="$2"
 
-  DEST=static/templates/partials/${CONTROLLER}/
+  DEST=app/static/templates/partials/${CONTROLLER}/
 fi
 
 mkdir -p $DEST 
