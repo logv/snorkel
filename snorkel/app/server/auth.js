@@ -95,7 +95,7 @@ module.exports = {
 
 
           if (config.google_auth.require_domain) {
-            if (domain.downcase() !== config.google_auth.require_domain.toLowerCase()) {
+            if (domain.toLowerCase() !== config.google_auth.require_domain.toLowerCase()) {
               return done("Your email account domain is not authorized to use this instance.");
             }
           }
