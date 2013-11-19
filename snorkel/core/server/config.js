@@ -21,7 +21,7 @@ if (env) {
     _.extend(_config, override);
     console.log("Using custom overrides in config/" + env);
   } catch(e) {
-    console.log("Couldn't load Environment config from config/" + env);
+    console.log("Couldn't load Environment config from config/" + env, e);
   }
 } else {
   try {

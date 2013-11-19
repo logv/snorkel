@@ -1,5 +1,6 @@
 "use strict";
 
+var config = require('./config');
 var host = "localhost";
 var server_options = {
   auto_reconnect: true
@@ -17,16 +18,30 @@ var EventEmitter = require("events").EventEmitter;
 
 var separator = "/";
 function collection_builder(db_name, before_create) {
-
+  var db_url = config.backend && config.backend.db_url;
   var _db;
   var _created = {};
-  var mongoserver = new mongodb.Server(host, port, server_options);
-  var db_connector = new mongodb.Db(db_name, mongoserver, db_options);
   var arbiter = new EventEmitter();
-  db_connector.open(function(err, db) {
+
+  if (db_url) {
+    var options = {
+      uri_decode_auth: true,
+      server: server_options,
+      db: db_options
+    };
+    mongodb.connect(db_url, options, onOpened);
+  } else {
+    var mongoserver = new mongodb.Server(host, port, server_options);
+    var db_connector = new mongodb.Db(db_name, mongoserver, db_options);
+    db_connector.open(onOpened);
+  }
+  
+  function onOpened(err, db) {
+    // TODO: report errors somewhere?
+    if (err) return;
     _db = db;
     arbiter.emit("db_open", db);
-  });
+  }
 
   return {
     get: function() {
