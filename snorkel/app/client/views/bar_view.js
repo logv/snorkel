@@ -119,6 +119,7 @@ var BarView = BaseView.extend({
       chart: {
         type: 'column'
       },
+      legend: {enabled: true},
       tooltip: {
         shared: false,
         useHTML: true,

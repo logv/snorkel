@@ -102,6 +102,7 @@ var TimeView = BaseView.extend({
         zoomType: "x",
         type: this.chart_type || 'line'
       },
+      legend: {enabled: true},
       tooltip: {
         useHTML: true,
         formatter: function() {
