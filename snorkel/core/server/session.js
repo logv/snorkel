@@ -1,16 +1,18 @@
 "use strict";
 
+var config = require('./config');
 var express = require('express');
 var package_json = require_core("../package.json");
 var app_name = package_json.name;
 var MongoStore = require('connect-mongo')(express);
-var _store = new MongoStore({ db: app_name } );
 
-var _session;
+var _store, _session;
 
 var SESSION_SECRET = 'keyboard cat';
+
 module.exports = {
   install: function(app) {
+    _store = new MongoStore({url: config.backend.db_url, db: app_name } );
     _session = express.session({
         secret: SESSION_SECRET,
         store: _store
