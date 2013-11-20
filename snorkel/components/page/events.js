@@ -6,6 +6,6 @@ module.exports = {
   },
 
   handle_template_click: function(evt) {
-    jank.trigger("page:clicked");
+    SF.trigger("page:clicked");
   }
 };

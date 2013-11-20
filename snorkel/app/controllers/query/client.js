@@ -204,7 +204,7 @@ function handle_query_saved(query_details) {
 }
 
 function handle_portlet_update(data) {
-  jank.socket().emit("update_portlet", data);
+  SF.socket().emit("update_portlet", data);
 }
 
 function insert_query_tiles(container, queries, in_order) {
@@ -274,7 +274,7 @@ function set_query(query) {
     var param_str = params.join('&');
 
     var url = window.location.pathname + '?' + param_str;
-    jank.replace(url, true);
+    SF.replace(url, true);
   }
 
   replace_id_in_params();
@@ -314,30 +314,30 @@ function load_shared_queries(queries) {
 module.exports = {
   init: function() {
     // this is initializing component interactions
-    jank.controller().on("rename_query", function(query, name, info) {
-      jank.socket().emit("save_query", query, name, info);
+    SF.controller().on("rename_query", function(query, name, info) {
+      SF.socket().emit("save_query", query, name, info);
     });
 
-    jank.controller().on("delete_query", function(query, cb) {
-      jank.socket().emit("delete_query", query);
+    SF.controller().on("delete_query", function(query, cb) {
+      SF.socket().emit("delete_query", query);
       if (cb) { cb(); }
       // gotta show a little dealie for old queries
     });
 
-    jank.controller().on("update_portlet", function(portlet) {
+    SF.controller().on("update_portlet", function(portlet) {
       handle_portlet_update(portlet);
     });
 
-    jank.controller().on("refresh_query", function(query) {
-      jank.socket().emit("refresh_query", query);
+    SF.controller().on("refresh_query", function(query) {
+      SF.socket().emit("refresh_query", query);
       // gotta show a little dealie for old queries
     });
 
 
     var _history_modal;
 
-    jank.controller().on("show_query_history", function(query) {
-      jank.socket().emit("get_past_results", query.hashid, function(queryid, results) {
+    SF.controller().on("show_query_history", function(query) {
+      SF.socket().emit("get_past_results", query.hashid, function(queryid, results) {
         var outerDiv = $("<div />");
         _.each(results, function(r) {
           var innerDiv = $("<div />");
@@ -359,14 +359,14 @@ module.exports = {
       // gotta show a little dealie for old queries
     });
 
-    jank.controller().on("query_id_clicked", function(short_query) {
-      jank.socket().emit("load_query_data", { hashid: short_query.hashid, updated: short_query.updated }, function(query) {
+    SF.controller().on("query_id_clicked", function(short_query) {
+      SF.socket().emit("load_query_data", { hashid: short_query.hashid, updated: short_query.updated }, function(query) {
         _history_modal.hide();
-        jank.controller().trigger("query_tile_clicked", query);
+        SF.controller().trigger("query_tile_clicked", query);
       });
     });
 
-    jank.controller().on("query_tile_clicked", function(query) {
+    SF.controller().on("query_tile_clicked", function(query) {
 
       // TODO: this should be better encapsulated into a modal hider/shower
       // thats shared across modules
@@ -386,34 +386,34 @@ module.exports = {
         server_id = ResultsStore.to_server(client_id);
       }
 
-      jank.go("/query?table=" + this.table + "&h=" + server_id);
+      SF.go("/query?table=" + this.table + "&h=" + server_id);
       set_query(query);
 
       views.redraw(client_id, query);
     });
 
-    jank.controller().on("swap_panes", function(show_pane) {
+    SF.controller().on("swap_panes", function(show_pane) {
       this.toggle_pane(!show_pane);
     });
 
     var that = this;
-    jank.controller().on("switch_views", function(view) {
+    SF.controller().on("switch_views", function(view) {
       that.update_view(view);
     });
 
-    jank.controller().on("set_control", function(key, value) {
+    SF.controller().on("set_control", function(key, value) {
       views.set_control(key, value);
     });
 
-    jank.controller().on("hide_compare_filters", function() {
+    SF.controller().on("hide_compare_filters", function() {
       that.hide_compare_filters();
     });
 
-    jank.controller().on("show_compare_filters", function() {
+    SF.controller().on("show_compare_filters", function() {
       that.show_compare_filters();
     });
 
-    jank.subscribe("popstate", function() {
+    SF.subscribe("popstate", function() {
       var form_str = window.location.search.substring(1);
       var data = $.deparam(form_str);
       var id = data.c;
@@ -465,7 +465,7 @@ module.exports = {
   run_startup_query: function() {
     var that = this;
     var query_str = window.location.search.substring(1);
-    jank.do_when(this.fields, 'query:fields', function() {
+    SF.do_when(this.fields, 'query:fields', function() {
       that.run_query(query_str, true);
       that.set_dom_from_query(query_str);
     });
@@ -618,7 +618,7 @@ module.exports = {
     if (filters.query || filters.compare) {
       var filterEl = this.$page.find("#filters");
       // one level of dependencies?
-      jank.do_when(this.fields, 'query:fields', function() {
+      SF.do_when(this.fields, 'query:fields', function() {
         filter_helper.empty();
         filter_helper.set(filters);
       });
@@ -734,7 +734,7 @@ module.exports = {
 
   set_dom_from_input: function(input) {
     var that = this;
-    jank.do_when(this.fields, 'query:fields', function() {
+    SF.do_when(this.fields, 'query:fields', function() {
       var form_str = serialized_array_to_str(input);
       that.set_dom_from_query(form_str);
     });
@@ -761,7 +761,7 @@ module.exports = {
 
   set_table: function(table) {
     this.table = table;
-    jank.trigger('query:table');
+    SF.trigger('query:table');
   },
 
   set_dashboards: function(dashboards) {
@@ -771,7 +771,7 @@ module.exports = {
   set_fields: function(data) {
 
     var that = this;
-    jank.do_when(that.table, 'query:table', function() {
+    SF.do_when(that.table, 'query:table', function() {
       that.fields = data;
 
       var weight_col;
@@ -786,7 +786,7 @@ module.exports = {
       filter_helper.set_fields(that.fields);
       helpers.set_fields(that.fields);
       presenter.set_fields(that.table, that.fields);
-      jank.trigger('query:fields', that.fields);
+      SF.trigger('query:fields', that.fields);
     });
   },
 
@@ -799,7 +799,7 @@ module.exports = {
   },
 
   handle_pane_toggle_clicked: _.debounce(function(e) {
-    jank.controller().trigger("swap_panes", _show_controls);
+    SF.controller().trigger("swap_panes", _show_controls);
   }, 50),
 
   share_query: function() {
@@ -864,9 +864,9 @@ module.exports = {
     }
 
     if (!keep_url) {
-      jank.go("/query?" + serialized.string);
+      SF.go("/query?" + serialized.string);
     } else {
-      jank.replace("/query?" + serialized.string);
+      SF.replace("/query?" + serialized.string);
 
     }
 
@@ -879,7 +879,7 @@ module.exports = {
     var table = $("select[name=table]").first().val();
     serialized.data.push({ name: 'table', value: table});
 
-    jank.socket().emit("new_query", serialized.data);
+    SF.socket().emit("new_query", serialized.data);
 
     this.$page.find("#query_content").empty();
 

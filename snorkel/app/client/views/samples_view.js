@@ -86,7 +86,7 @@ var SamplesView = BaseView.extend({
   },
 
   render: function() {
-    var table = helpers.build_table(this.table, this.data.headers, this.data.rows, jank.controller().get_fields(this.table));
+    var table = helpers.build_table(this.table, this.data.headers, this.data.rows, SF.controller().get_fields(this.table));
 
     this.$el
       .append(table)
@@ -125,9 +125,9 @@ var SamplesView = BaseView.extend({
 
 
     if (filters.length) {
-      if (jank.controller().compare_mode()) {
+      if (SF.controller().compare_mode()) {
         filter_helper.add_or_update(filters, filters);
-        jank.controller().show_compare_filters();
+        SF.controller().show_compare_filters();
       } else {
         filter_helper.add_or_update(filters);
       }
@@ -147,17 +147,17 @@ var SamplesView = BaseView.extend({
     }
 
     if (field) {
-      jank.controller().trigger("set_control", "field", field);
-      jank.controller().trigger("set_control", "fieldset", fields);
+      SF.controller().trigger("set_control", "field", field);
+      SF.controller().trigger("set_control", "fieldset", fields);
     }
 
     if (agg) {
-      jank.controller().trigger("set_control", "agg", agg);
+      SF.controller().trigger("set_control", "agg", agg);
     }
 
 
-    jank.controller().trigger("swap_panes", false);
-    jank.controller().trigger("switch_views", to_view);
+    SF.controller().trigger("swap_panes", false);
+    SF.controller().trigger("switch_views", to_view);
 
     // update location
   },
@@ -193,7 +193,7 @@ var SamplesView = BaseView.extend({
     $td.append(div);
 
     _.delay(function() {
-        jank.once("page:clicked", function() {
+        SF.once("page:clicked", function() {
           div.popover('destroy');
           div.remove();
         });
@@ -216,7 +216,7 @@ var SamplesView = BaseView.extend({
   icon: "noun/pin.svg"
 });
 
-jank.trigger("view:add", "samples",  {
+SF.trigger("view:add", "samples",  {
   include: helpers.inputs.TIME_INPUTS
     .concat(helpers.inputs.LIMIT),
   icon: "noun/pin.svg"

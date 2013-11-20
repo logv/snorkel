@@ -7,9 +7,9 @@ module.exports = {
   },
 
   see_query_history: function() {
-    jank.controller().trigger("show_query_history", this.options.query);
+    SF.controller().trigger("show_query_history", this.options.query);
   },
   refresh_query: function() {
-    jank.controller().trigger("refresh_query", this.options.query);
+    SF.controller().trigger("refresh_query", this.options.query);
   }
 };

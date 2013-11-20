@@ -629,7 +629,7 @@ var DistView = BaseView.extend({
 var excludes = helpers.inputs.GROUP_BY
   .concat(helpers.inputs.MULTI_AGG);
 
-jank.trigger("view:add", "dist",  {
+SF.trigger("view:add", "dist",  {
     include: _.difference(helpers.STD_INPUTS
       .concat(helpers.inputs.SINGLE_AGG)
       .concat(helpers.inputs.HIST_BUCKET)

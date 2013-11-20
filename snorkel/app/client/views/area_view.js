@@ -27,7 +27,7 @@ var AreaView = TimeView.extend({
 });
 
 
-jank.trigger("view:add", "area",  {
+SF.trigger("view:add", "area",  {
   include: helpers.STD_INPUTS.concat(helpers.inputs.TIME_BUCKET),
   icon: "noun/line.svg"
 }, AreaView);

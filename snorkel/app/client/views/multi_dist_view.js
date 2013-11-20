@@ -345,7 +345,7 @@ var MultiDistView = DistView.extend({
 
 
 var excludes = helpers.inputs.MULTI_AGG;
-jank.trigger("view:add", "multidist",  {
+SF.trigger("view:add", "multidist",  {
     include: _.difference(helpers.STD_INPUTS
       .concat(helpers.inputs.SINGLE_AGG)
       .concat(helpers.inputs.GROUP_BY)

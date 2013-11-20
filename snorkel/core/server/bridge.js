@@ -7,6 +7,17 @@ context.setDefault("BRIDGE_CALLS", []);
 
 var __id = 0;
 var _ = require_vendor("underscore");
+
+function marshall_args() {
+  var args = _.toArray(arguments);
+  _.each(args, function(arg, index) {
+    if (arg.isComponent) {
+      args[index] = { id: arg.id, isComponent: true };
+    }
+  });
+
+  return args;
+}
 module.exports = {
   // @params:
   //
@@ -14,7 +25,7 @@ module.exports = {
   // func
   // args
   call: function() {
-    var args = _.toArray(arguments);
+    var args = marshall_args.apply(null, arguments);
     var module = args.shift();
     var func = args.shift();
     
@@ -26,7 +37,7 @@ module.exports = {
   },
 
   controller: function() {
-    var args = _.toArray(arguments);
+    var args = marshall_args.apply(null, arguments);
 
     context("BRIDGE_CALLS").push(["core/client/controller", "call", args]);
   },

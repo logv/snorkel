@@ -117,7 +117,7 @@ var ScatterView = SamplesView.extend({
 });
 
 var excludes = helpers.inputs.MULTI_AGG;
-jank.trigger("view:add", "scatter",  {
+SF.trigger("view:add", "scatter",  {
   include: _.difference(
     helpers.STD_INPUTS
       .concat(helpers.inputs.GROUP_BY)

@@ -10,6 +10,6 @@ module.exports = {
     var dashboard = this.$el.find(".dashboard select").val() || this.options.dashboard;
     data += "&dashboard=" + dashboard;
 
-    jank.controller().trigger("update_portlet", data);
+    SF.controller().trigger("update_portlet", data);
   }
 };

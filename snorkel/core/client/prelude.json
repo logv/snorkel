@@ -1,6 +1,7 @@
 {
   "files" : [
-    "core/client/prelude.js"
+    "core/client/prelude.js",
+    "app/client/prelude.js"
   ],
   "vendor" : [
     "core/static/vendor/underscore.js",
@@ -14,7 +15,7 @@
     "app/static/vendor/hex-rgb.src.js"
   ],
   "styles" : [
-    "app/static/styles/bootstrap/bootstrap.cosmo.css",
+    "app/static/styles/bootstrap/bootstrap.override.css",
     "app/static/styles/bootstrap/responsive.css",
     "app/static/styles/bootstrap/overrides.css",
     "app/static/styles/box.css",

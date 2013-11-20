@@ -20,7 +20,14 @@ var Component = require_root("components/component");
 
 Component.load = function(component) {
   var base_dir = "./components/" + component + "/";
-  var package_data = readfile(base_dir + "package.json");
+  var package_data;
+  try {
+    package_data = readfile(base_dir + "package.json");
+  } catch (e) {
+    console.log("Couldn't find package.json for ", component, ". Are you sure the component is named that?");
+    throw new Error("Missing Component " + component);
+  }
+
   var pkg = JSON.parse(package_data);
   // Look for package.json file in component dir
   // this will contain dependencies, stylesheets, etc
@@ -83,6 +90,9 @@ Component.build_package = function(component, cb) {
   ];
 
   var named = _.isObject(pkg.helpers);
+  if (_.isArray(pkg.helpers)) {
+    named = false;
+  }
 
   _.each(pkg.helpers, function(helper, name) {
     jobs.push(process_file(cmp.helpers, js_dir + helper + ".js", (named && name) || helper));
@@ -141,6 +151,7 @@ Component.build = function(component, options, cb) {
   cmpInstance.$el.attr("class", className);
   cmpInstance.id = id;
   cmpInstance.render();
+  cmpInstance.isComponent = true;
 
   if (cmpInstance.server) {
     cmpInstance.server();
@@ -153,7 +164,8 @@ Component.build = function(component, options, cb) {
   // like:
   //    * marshalling data to the client
   //    * making sure that client behaviors get installed.
-  cmpInstance.toString = function() {
+  //
+  function marshallToClient(cmpInstance) {
     // TODO: This needs to only be called after the component is rendered
     // toString'd the first time
     cmpInstance.toString = oldToString;
@@ -190,7 +202,15 @@ Component.build = function(component, options, cb) {
 
     bridge.call("core/client/component", "instantiate", client_options);
     return ret;
+  }
+
+  cmpInstance.toString = function() {
+    return marshallToClient(cmpInstance);
   };
+
+  cmpInstance.marshall = function() {
+    return marshallToClient(cmpInstance);
+  }
 
   if (cb) {
     cb(cmpInstance);

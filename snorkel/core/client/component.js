@@ -9,6 +9,26 @@ var __id = 0;
 var bootloader = window.bootloader,
     _packages = window._packages;
 
+var _components = {};
+var _pending = {};
+function register_component(id, instance) {
+  _components[id] = instance;
+  if (_pending[id]) {
+    _.each(_pending[id], function(cb) {
+      cb(instance);
+    });
+    delete _pending[id];
+  }
+}
+
+function get_component(id, cb) {
+  if (!_components[id]) {
+    _pending[id] = _pending[id] || [];
+    _pending[id].push(cb);
+  } else {
+    cb(_components[id]);
+  }
+}
 
 function load(component, cb) {
   bootloader.pkg(component, function(data) {
@@ -68,6 +88,8 @@ function build(component, options, cb) {
         }
       }
 
+
+      register_component(id, cmpInstance);
       cmpInstance.render();
       cmpInstance.delegateEvents();
     }
@@ -94,7 +116,7 @@ function build(component, options, cb) {
           cmpInstance.events[k] = function() {
             var that = this;
             var args = _.toArray(arguments);
-            var ctrl = jank.controller(controller);
+            var ctrl = SF.controller(controller);
 
             if (!ctrl.delegates) {
               console.log("Warning, trying to run delegate function on controller that doesn't supporter it");
@@ -113,6 +135,7 @@ function build(component, options, cb) {
 
         cmpInstance.delegateEvents();
       }
+      _components[id] = cmpInstance;
 
 
     }
@@ -217,9 +240,13 @@ function create(component, options, cb) {
   return options.el;
 }
 
+window.$G = get_component;
 window.$C = create;
+
+SF.trigger("core/client/component");
 module.exports = {
   instantiate: instantiate,
   build: build,
-  load: load
+  load: load,
+  get: get_component
 };

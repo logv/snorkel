@@ -222,7 +222,7 @@ function marshall_query(form_data) {
       }
 
       // there is no real support for $eq in mongo, instead using $all. even though
-      // its more janky.
+      // its more SFy.
       if (op === "$eq") {
         val = [val];
         op = "$all";

@@ -21,9 +21,9 @@ module.exports = {
 
   toggle_reordering: function() {
     if (this.$el.hasClass("fullscreen")) {
-      jank.controller().trigger("stop_dragging");
+      SF.controller().trigger("stop_dragging");
     } else {
-      jank.controller().trigger("start_dragging");
+      SF.controller().trigger("start_dragging");
     }
   },
 
@@ -32,7 +32,7 @@ module.exports = {
     delete options.el;
     delete options.id;
 
-    options.dashboard = jank.controller().get_dashboard();
+    options.dashboard = SF.controller().get_dashboard();
 
     $C("query_portlet_modal", options, function(cmp) { });
   },
@@ -48,7 +48,7 @@ module.exports = {
   },
 
   handle_remove_click: function(evt) {
-    jank.controller().trigger("remove_portlet", { hashid: this.hashid});
+    SF.controller().trigger("remove_portlet", { hashid: this.hashid});
   },
 
   handle_portlet_click: function(evt) {
@@ -58,6 +58,6 @@ module.exports = {
   },
 
   handle_refresh_query: function() {
-    jank.controller().trigger("refresh_query", this.hashid);
+    SF.controller().trigger("refresh_query", this.hashid);
   }
 };

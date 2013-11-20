@@ -23,7 +23,7 @@ module.exports = {
       this.show();
 
       _.delay(function() {
-          jank.once("page:clicked", function() {
+          SF.once("page:clicked", function() {
             self.hide();
           });
         }, 100);

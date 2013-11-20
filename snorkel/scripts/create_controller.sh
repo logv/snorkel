@@ -2,19 +2,32 @@
 
 COMPONENT=$1
 
-mkdir app/controllers/${COMPONENT}/
+mkdir -p app/controllers/${COMPONENT}/
 
 cat > app/controllers/${COMPONENT}/client.js << CLIENT
+"use strict";
+
 module.exports = {
   click_handler_uno: function() {
     console.log("Handling a click");
+  },
+  init: function() {
+
   }
 };
 CLIENT
 
 cat > app/controllers/${COMPONENT}/server.js << SERVER
+"use strict";
+
+var controller = require_core("server/controller");
 var page = require_core("server/page");
 var template = require_core("server/template");
+
+// Helpers for serialized form elements
+var value_of = controller.value_of,
+    array_of = controller.array_of;
+    
 
 module.exports = {
   routes: {

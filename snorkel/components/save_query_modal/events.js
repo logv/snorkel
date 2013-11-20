@@ -19,6 +19,6 @@ module.exports = {
       hashid: query_id
     };
 
-    jank.controller().trigger("rename_query", query, title, description);
+    SF.controller().trigger("rename_query", query, title, description);
   }
 };

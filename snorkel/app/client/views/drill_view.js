@@ -358,7 +358,7 @@ var DrillView = BaseView.extend({
 });
 
 var excludes = _.clone(helpers.STD_EXCLUDES);
-jank.trigger("view:add", "drill", {
+SF.trigger("view:add", "drill", {
   include: helpers.STD_INPUTS
     .concat(helpers.inputs.COMPARE),
   icon: "noun/table.svg"

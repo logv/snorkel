@@ -13,7 +13,7 @@ module.exports = {
     "click .add_dashboard" : "handle_new_dashboard"
   },
   initialize: function() {
-    jank.socket().on("cleared_cache", function() {
+    SF.socket().on("cleared_cache", function() {
       $C("modal", { title: "Successful Success!", body: "The metadata cache was cleared" });
     });
 
@@ -51,7 +51,7 @@ module.exports = {
       var reallyAddEl = cmp.$el.find(".really_add");
       reallyAddEl.on("click", function() {
         var val = cmp.$el.find(".dashboard").val();
-        jank.socket().emit("new_dashboard", val, function(res) {
+        SF.socket().emit("new_dashboard", val, function(res) {
           if (res === "OK") {
             window.location = "/dashboard?id=" + val;
           }
@@ -78,7 +78,7 @@ module.exports = {
       _metadata.columns[col.get_name()] = col.get_config();
     });
 
-    jank.socket().emit("set_metadata", this.table, _metadata);
+    SF.socket().emit("set_metadata", this.table, _metadata);
     $page.find(".xeditable").removeClass("editable-unsaved");
     $page.find(".editable").removeClass("editable-unsaved");
   },
@@ -111,7 +111,7 @@ module.exports = {
   handle_clear_metadata: function() {
     var dataset = this.table;
     console.log("CLEARING METADATA CACHE", dataset);
-    jank.socket().emit("clear_cache", dataset);
+    SF.socket().emit("clear_cache", dataset);
   },
   delegates: {
     handle_delete_clicked: function(obj) {
@@ -122,7 +122,7 @@ module.exports = {
         confirm: "Drop dataset"
       }, function() {
         _datasets[dataset] = obj;
-        jank.socket().emit("drop", dataset);
+        SF.socket().emit("drop", dataset);
 
       });
     }

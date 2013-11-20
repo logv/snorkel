@@ -8,7 +8,7 @@ module.exports = {
   handle_query_click: function(e) {
     var $el = this.$el;
     console.log(" TILE CLICKED", this);
-    jank.controller().trigger("query_id_clicked", this.options.query, function() {
+    SF.controller().trigger("query_id_clicked", this.options.query, function() {
       console.log("THIS OPTIONS", this.option);
     });
   }

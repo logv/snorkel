@@ -223,7 +223,7 @@ var BarView = BaseView.extend({
 });
 
 var excludes = _.clone(helpers.STD_EXCLUDES);
-jank.trigger("view:add", "bar", {
+SF.trigger("view:add", "bar", {
   include: helpers.STD_INPUTS
     .concat(helpers.inputs.COMPARE)
     .concat(helpers.inputs.STACKING)

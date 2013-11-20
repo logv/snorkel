@@ -7,6 +7,8 @@ var context = require_core("server/context");
 var config = require_core("server/config");
 var readfile = require("./readfile");
 var htpasswd = require("htpasswd");
+var session = require_core("server/session");
+var parseCookie = require("express").cookieParser(session.secret());
 
 var https = require('https');
 
@@ -15,6 +17,32 @@ module.exports = {
   install: function(app, io) {
     this.app = app;
     this.io = io;
+
+
+    io.set('authorization', function(handshake_data, cb) {
+      var that = this;
+      var cookie = handshake_data.headers.cookie;
+      parseCookie(handshake_data, null, function() {
+        var sid = handshake_data.signedCookies['connect.sid'];
+        var store = session.store();
+
+        if (sid) {
+          try {
+            store.get(sid, function(err, session) {
+              if (err) {
+                return cb(err, false);
+              }
+
+              handshake_data.sid = sid;
+              cb(null, true);
+            });
+          } catch(e) {
+            cb(e, false);
+          }
+        }
+
+      });
+    });
   },
 
   setup_ssl_server: function(app) {

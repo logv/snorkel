@@ -10,6 +10,8 @@ globals.install();
 
 var config = require_core("server/config");
 
+var package_json = require_core("../package.json");
+var app_name = package_json.name;
 
 // setup() fills these in
 var socket,
@@ -18,6 +20,9 @@ var socket,
 
 
 function setup() {
+  // Better stack traces
+  require("longjohn");
+
   if (config.behind_proxy) {
     app.enable('trust proxy');
   }
@@ -32,13 +37,6 @@ function setup() {
 
   http.globalAgent.maxSockets = config.max_http_sockets;
 
-  // Authorization
-  var passport = require('passport');
-
-
-  // Better stack traces
-  require("longjohn");
-
   // Add timestamps
   require("./console").install();
 
@@ -49,8 +47,14 @@ function setup() {
 
   var session = require("./session");
   session.install(app);
-  app.use(passport.initialize());
-  app.use(passport.session());
+
+
+  // Opportunity for Authorization and other stuff
+  var main = require_app("main");
+  if (main.setup_app) {
+    main.setup_app(app);
+  }
+
 
 
   // parse POST request body bits
@@ -99,6 +103,7 @@ function try_restart(server, port) {
   };
 }
 module.exports = {
+  name: app_name,
   run: function() {
     var services = { web_server: true };
     if (!config.separate_services) { services.collector = true; }

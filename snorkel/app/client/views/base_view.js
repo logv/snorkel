@@ -19,7 +19,7 @@ var BaseView = window.Backbone.View.extend({
       this.options.throbber.set_text_function(get_text);
     }
 
-    jank.do_when(presenter.get_fields(this.table),
+    SF.do_when(presenter.get_fields(this.table),
       'query:fields',
       _.bind(function() {
         this.server_data = data;
@@ -42,7 +42,7 @@ var BaseView = window.Backbone.View.extend({
   },
   handle_compare: function(data) {
     this.compare_query = data;
-    jank.do_when(presenter.get_fields(this.table),
+    SF.do_when(presenter.get_fields(this.table),
       'query:fields',
       _.bind(function() {
         this.compare_data = this.prepare(data);
@@ -67,7 +67,7 @@ var BaseView = window.Backbone.View.extend({
 
     // If finalize throws an error...
     if (error) {
-      jank.trigger("query:no_samples", this.server_data);
+      SF.trigger("query:no_samples", this.server_data);
       return;
     }
 

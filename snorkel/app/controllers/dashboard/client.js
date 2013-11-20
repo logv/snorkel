@@ -13,7 +13,7 @@ var _dashboard;
 var default_refresh = 60 * 1000;
 
 function handle_refresh_query(hashid) {
-  jank.socket().emit("refresh_query", {
+  SF.socket().emit("refresh_query", {
     hashid: hashid
   });
 }
@@ -27,7 +27,7 @@ function refresh_query(hashid) {
 
 function get_query(hashid) {
   return function() {
-    jank.socket().emit("refresh_query", {
+    SF.socket().emit("refresh_query", {
       hashid: hashid,
       intermediate: true
     });
@@ -56,7 +56,7 @@ function handle_new_portlet(obj, el) {
 function handle_query_results(data) {
   ResultsStore.add_results_data(data);
 
-  jank.do_when(ResultsStore.to_server(data.parsed.id), 'portlet:' + data.parsed.id, function() {
+  SF.do_when(ResultsStore.to_server(data.parsed.id), 'portlet:' + data.parsed.id, function() {
     views.insert_graph(data.parsed.view, data);
   });
 }
@@ -64,7 +64,7 @@ function handle_query_results(data) {
 function handle_query_id(data) {
   ResultsStore.identify(data);
   views.set_container(_containers[data.server_id], { clientid: data.client_id });
-  jank.trigger('portlet:' + data.client_id);
+  SF.trigger('portlet:' + data.client_id);
 }
 
 
@@ -79,29 +79,29 @@ function handle_portlet_remove(data) {
     body: "Are you sure you want to delete this portlet?",
     confirm: "Yah, yah"
   }, function() {
-    jank.socket().emit("remove_portlet", _dashboard, data);
+    SF.socket().emit("remove_portlet", _dashboard, data);
   });
 }
 
 function handle_portlet_update(data) {
-  jank.socket().emit("update_portlet", _dashboard, data);
+  SF.socket().emit("update_portlet", _dashboard, data);
 }
 
 module.exports = {
   init: function() {
-    jank.controller().on("new_portlet", handle_new_portlet);
-    jank.controller().on("refresh_query", handle_refresh_query);
-    jank.controller().on("update_portlet", handle_portlet_update);
-    jank.controller().on("remove_portlet", handle_portlet_remove);
-    jank.controller().on("rename_query", function(query, name, info) {
-      jank.socket().emit("save_query", query, name, info);
+    SF.controller().on("new_portlet", handle_new_portlet);
+    SF.controller().on("refresh_query", handle_refresh_query);
+    SF.controller().on("update_portlet", handle_portlet_update);
+    SF.controller().on("remove_portlet", handle_portlet_remove);
+    SF.controller().on("rename_query", function(query, name, info) {
+      SF.socket().emit("save_query", query, name, info);
     });
 
     var that = this;
-    jank.controller().on("stop_dragging", function() {
+    SF.controller().on("stop_dragging", function() {
       that.stop_dragging(); 
     });
-    jank.controller().on("start_dragging", function() {
+    SF.controller().on("start_dragging", function() {
       that.start_dragging();
     });
 
@@ -125,7 +125,7 @@ module.exports = {
 
           $(window).resize();
 
-          jank.socket().emit("order_portlets", _dashboard, queries);
+          SF.socket().emit("order_portlets", _dashboard, queries);
         }
       }).disableSelection();
     } else {
@@ -152,7 +152,7 @@ module.exports = {
       body: "Are you sure you want to delete this dashboard?",
       confirm: "Delete dashboard"
     }, function() {
-      jank.socket().emit("remove_dashboard", _dashboard, function() {
+      SF.socket().emit("remove_dashboard", _dashboard, function() {
         window.location = "/datasets";
       });
     });
@@ -178,7 +178,7 @@ module.exports = {
   set_metadata: function(all) {
     this.metadata = all;
     presenter.set_metadata(all);
-    jank.trigger("dashboard:metadata");
+    SF.trigger("dashboard:metadata");
   },
 
   get_fields: function(dataset) {

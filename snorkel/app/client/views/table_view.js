@@ -51,7 +51,7 @@ var TableView = BaseView.extend({
       cols.unshift("weighted_count");
     }
 
-    var col_metadata = jank.controller().get_fields(this.table);
+    var col_metadata = SF.controller().get_fields(this.table);
 
     var headers = [];
     _.each(group_by.concat(cols), function(col) {
@@ -118,7 +118,7 @@ var TableView = BaseView.extend({
 
   render: function() {
     var dataset = this.data.parsed.table;
-    var table = helpers.build_table(this.table, this.headers, this.rows, jank.controller().get_fields(dataset));
+    var table = helpers.build_table(this.table, this.headers, this.rows, SF.controller().get_fields(dataset));
 
     var csv_data = "data:text/csv;charset=utf-8," + encodeURIComponent(this.csv_data);
 
@@ -168,7 +168,7 @@ var TableView = BaseView.extend({
     $td.append(div);
 
     _.delay(function() {
-        jank.once("page:clicked", function() {
+        SF.once("page:clicked", function() {
           div.popover('destroy');
           div.remove();
         });
@@ -220,9 +220,9 @@ var TableView = BaseView.extend({
 
 
     if (filters.length) {
-      if (jank.controller().compare_mode()) {
+      if (SF.controller().compare_mode()) {
         filter_helper.add_or_update(filters, filters);
-        jank.controller().show_compare_filters();
+        SF.controller().show_compare_filters();
       } else {
         filter_helper.add_or_update(filters);
       }
@@ -242,17 +242,17 @@ var TableView = BaseView.extend({
     }
 
     if (field) {
-      jank.controller().trigger("set_control", "field", field);
-      jank.controller().trigger("set_control", "fieldset", fields);
+      SF.controller().trigger("set_control", "field", field);
+      SF.controller().trigger("set_control", "fieldset", fields);
     }
 
     if (agg) {
-      jank.controller().trigger("set_control", "agg", agg);
+      SF.controller().trigger("set_control", "agg", agg);
     }
 
 
-    jank.controller().trigger("swap_panes", false);
-    jank.controller().trigger("switch_views", to_view);
+    SF.controller().trigger("swap_panes", false);
+    SF.controller().trigger("switch_views", to_view);
 
     // update location
   },
@@ -355,7 +355,7 @@ var TableView = BaseView.extend({
   icon: "noun/table.svg"
 });
 
-jank.trigger("view:add", "table", {
+SF.trigger("view:add", "table", {
   include: helpers.STD_INPUTS
     .concat(helpers.inputs.SORT_BY)
     .concat(helpers.inputs.COMPARE),

@@ -45,7 +45,7 @@ module.exports = {
       cmp.on("save", function(evt, data) {
         editing = false;
         var newValue = data.newValue;
-        jank.controller().trigger("rename_query", query, newValue);
+        SF.controller().trigger("rename_query", query, newValue);
       });
 
       cmp.on("shown", function() {

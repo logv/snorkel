@@ -23,7 +23,7 @@ module.exports = {
 
     _.delay(function() {
       var after = _.after(cells.length, function() {
-        jank.controller().trigger("new_column_metadata", that);
+        SF.controller().trigger("new_column_metadata", that);
       });
 
       _.each(cells, function(cell) {

@@ -27,7 +27,7 @@ function get_container(query) {
 }
 
 
-jank.on("view:add", function(view, details, view_class) {
+SF.on("view:add", function(view, details, view_class) {
   if (VIEW_INPUTS[view]) {
     console.log("Warning, trying to redefine", view, "as a view");
   }
@@ -150,7 +150,7 @@ function no_samples(data, error) {
   });
 }
 
-jank.on("query:no_samples", function(data) {
+SF.on("query:no_samples", function(data) {
   console.log("NO SAMPLES");
   no_samples(data, (data && data.error));
 });

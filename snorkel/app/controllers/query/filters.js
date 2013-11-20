@@ -132,9 +132,9 @@ function set_filter_data(filters, no_add_if_empty) {
   filter_area.show();
 
   if (hide_compare) {
-    jank.controller().trigger("hide_compare_filters");
+    SF.controller().trigger("hide_compare_filters");
   } else {
-    jank.controller().trigger("show_compare_filters", true);
+    SF.controller().trigger("show_compare_filters", true);
   }
 
 }

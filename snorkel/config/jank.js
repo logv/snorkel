@@ -1,6 +1,6 @@
 module.exports = {
   sockets: false,
-  hostname: 'jank.nicesho.es',
+  hostname: 'SF.nicesho.es',
   google_auth: {
     enabled: true
   },

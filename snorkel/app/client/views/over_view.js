@@ -363,7 +363,7 @@ var OverView = BaseView.extend({
   icon: "noun/pin.svg"
 });
 
-jank.trigger("view:add", "overview",  {
+SF.trigger("view:add", "overview",  {
   include: helpers.inputs.TIME_INPUTS
     .concat(helpers.inputs.LIMIT)
 }, OverView);

@@ -11,7 +11,6 @@ module.exports = {
   superuser: {
     "admin" : true
   },
-
   // setting to true will make the UDP collector and the web server run as
   // different processes, for stability reasons
   separate_services: false,
@@ -23,6 +22,7 @@ module.exports = {
   backend: {
     driver: "mongo"
   },
+  db_name: "jank",
   hostname: "localhost",
   no_api_auth: false, // require user authentication to use API endpoint
   google_auth: {

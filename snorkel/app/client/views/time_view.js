@@ -180,7 +180,7 @@ var TimeView = BaseView.extend({
 
     function doRSSFeed(cb) {
 
-      window.jank.socket().emit("load_annotations", table, function(annotations) {
+      window.SF.socket().emit("load_annotations", table, function(annotations) {
         var feed = annotations.rss;
         var items = [];
         if (feed) {
@@ -264,7 +264,7 @@ var TimeView = BaseView.extend({
   icon: "noun/line.svg"
 });
 
-jank.trigger("view:add", "time",  {
+SF.trigger("view:add", "time",  {
     include: helpers.STD_INPUTS
       .concat(helpers.inputs.TIME_BUCKET)
       .concat(helpers.inputs.COMPARE)

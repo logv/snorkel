@@ -104,13 +104,15 @@ var render_page = function(page_options) {
     header: page_options.header,
     sidebar: sidebar_content,
     controller: controller,
-    title: $$.title || "Jank",
+    socket: page_options.socket,
+    title: $$.title || "SF",
     id: context("id"),
     js_header: template.js_header(), // TODO: make this the dynamic list of modules to load
     css_header: template.css_header() // TODO: make this the packaged CSS early dependency file
     });
 
-  var pageStr = page.toString();
+  var pagePrefix = "<!DOCTYPE html>\n";
+  var pageStr = pagePrefix + page.toString();
 
   // TODO: work on how the order of things are initialized happens
   try {

@@ -5,6 +5,6 @@ module.exports = {
 
   "go_clicked": function() {
     // TODO: accessing this data should be cleaner
-    jank.sync("kitten", jank.get("kitten"));
+    SF.sync("kitten", SF.get("kitten"));
   }
 }

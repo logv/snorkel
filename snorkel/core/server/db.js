@@ -10,7 +10,9 @@ var db_options = {
   journal: 1
 };
 
+var package_json = require_core("../package.json");
 var context = require_core("server/context");
+var config = require_core("server/config");
 var mongodb = require("mongodb"),
     port = mongodb.Connection.DEFAULT_PORT;
 
@@ -90,9 +92,9 @@ function collection_builder(db_name, before_create) {
   };
 }
 
-var jank_db = collection_builder("jank");
+var SF_db = collection_builder(config.db_name || package_json.name);
 module.exports = {
-  get: jank_db.get,
-  raw: jank_db.raw,
+  get: SF_db.get,
+  raw: SF_db.raw,
   db: collection_builder
 };
