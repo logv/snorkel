@@ -1,5 +1,7 @@
 "use strict";
 
+var fs = require("fs");
+
 var load_controller = require("./controller").load;
 var context = require_core("server/context");
 var _handlers = {};
@@ -10,6 +12,44 @@ var _sockets = [];
 var _dirty = false;
 
 var _controller_caches = {};
+
+function setup_new_socket(controller_cache, name, controller, socket) {
+  if (controller.socket) {
+    controller.socket(socket);
+  }
+
+  socket.handshake.controller = name;
+
+  _sockets.push(socket);
+
+  _.each(controller_cache, function(v, k) {
+    socket.emit('store', {
+      key: k,
+      value: v,
+      controller: name
+    });
+  });
+
+  socket.on('store', function(data) {
+    var controller_cache = _controller_caches[data.controller];
+    _dirty = true;
+
+    controller_cache[data.key] = data.value;
+
+    // TODO: validate this before sending it to other clients.
+    socket.broadcast.emit("store", data);
+  });
+
+  socket.on('validate_versions', function(versions, cb) {
+    var bootloader = require_core("controllers/bootloader/server");
+    bootloader.validate_versions(versions, socket);
+  });
+
+  socket.on('close', function() {
+    _sockets = _.without(_sockets, socket);
+  });
+
+}
 module.exports = {
   setup_io: function(app, server) {
     // Setup Socket.IO
@@ -121,37 +161,27 @@ module.exports = {
         }
 
         controller_socket.on('connection', function(socket) {
-          if (controller.socket) {
-            controller.socket(socket);
-          }
-          socket.handshake.controller = name;
+          context.create({ socket: socket }, function(ctx) {
+            var old_on = socket.on;
 
-          _sockets.push(socket);
+            // Wrapping the context forward (or so i think)
+            socket.on = function() {
+              var args = _.toArray(arguments);
+              var last_func = args.pop();
+              last_func = context.wrap(last_func);
+              args.push(last_func);
 
-          _.each(controller_cache, function(v, k) {
-            socket.emit('store', {
-              key: k,
-              value: v,
-              controller: name
-            });
-          });
+              old_on.apply(socket, args);
+            };
 
-          socket.on('store', function(data) {
-            var controller_cache = _controller_caches[data.controller];
-            _dirty = true;
-
-            controller_cache[data.key] = data.value;
-
-            // TODO: validate this before sending it to other clients.
-            socket.broadcast.emit("store", data);
-          });
-
-          socket.on('close', function() {
-            _sockets = _.without(_sockets, socket);
+            try {
+              setup_new_socket(controller_cache, name, controller, socket);
+            } catch(e) {
+              console.log("Couldn't setup socket for new client on", name, "controller", e);
+            }
           });
 
         });
-
       });
     });
   },

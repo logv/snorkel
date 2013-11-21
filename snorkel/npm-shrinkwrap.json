@@ -1,6 +1,6 @@
 {
   "name": "snorkel",
-  "version": "0.0.2",
+  "version": "0.0.9",
   "dependencies": {
     "express": {
       "version": "3.1.0",
@@ -253,7 +253,7 @@
       "dependencies": {
         "pkginfo": {
           "version": "0.2.3",
-          "from": "https://registry.npmjs.org/pkginfo/-/pkginfo-0.2.3.tgz",
+          "from": "pkginfo@0.2.3",
           "resolved": "https://registry.npmjs.org/pkginfo/-/pkginfo-0.2.3.tgz"
         }
       }
@@ -265,7 +265,7 @@
       "dependencies": {
         "pkginfo": {
           "version": "0.2.3",
-          "from": "https://registry.npmjs.org/pkginfo/-/pkginfo-0.2.3.tgz",
+          "from": "pkginfo@0.2.3",
           "resolved": "https://registry.npmjs.org/pkginfo/-/pkginfo-0.2.3.tgz"
         }
       }
@@ -343,21 +343,67 @@
         }
       }
     },
+    "json-stable-stringify": {
+      "version": "0.0.1",
+      "from": "json-stable-stringify@",
+      "resolved": "https://registry.npmjs.org/json-stable-stringify/-/json-stable-stringify-0.0.1.tgz",
+      "dependencies": {
+        "jsonify": {
+          "version": "0.0.0",
+          "from": "jsonify@~0.0.0",
+          "resolved": "https://registry.npmjs.org/jsonify/-/jsonify-0.0.0.tgz"
+        }
+      }
+    },
     "passport-google": {
       "version": "0.3.0",
-      "from": "passport-google@",
+      "from": "passport-google@0.3.0",
       "dependencies": {
         "pkginfo": {
           "version": "0.2.3",
-          "from": "pkginfo@0.2.x"
+          "from": "pkginfo@0.2.3",
+          "resolved": "https://registry.npmjs.org/pkginfo/-/pkginfo-0.2.3.tgz"
         },
         "passport-openid": {
           "version": "0.3.1",
-          "from": "passport-openid@0.3.x",
+          "from": "passport-openid@0.3.1",
+          "resolved": "https://registry.npmjs.org/passport-openid/-/passport-openid-0.3.1.tgz",
           "dependencies": {
             "openid": {
               "version": "0.5.1",
-              "from": "openid@0.5.x"
+              "from": "openid@0.5.1",
+              "resolved": "https://registry.npmjs.org/openid/-/openid-0.5.1.tgz"
+            }
+          }
+        }
+      }
+    },
+    "squel": {
+      "version": "1.2.1",
+      "from": "squel@",
+      "resolved": "https://registry.npmjs.org/squel/-/squel-1.2.1.tgz"
+    },
+    "pg": {
+      "version": "2.7.0",
+      "from": "pg@",
+      "dependencies": {
+        "generic-pool": {
+          "version": "2.0.3",
+          "from": "generic-pool@2.0.3"
+        },
+        "buffer-writer": {
+          "version": "1.0.0",
+          "from": "buffer-writer@1.0.0",
+          "dependencies": {
+            "cloned": {
+              "version": "0.0.1",
+              "from": "cloned@0.0.1",
+              "dependencies": {
+                "rmdir": {
+                  "version": "1.0.0",
+                  "from": "rmdir@~1.0.0"
+                }
+              }
             }
           }
         }

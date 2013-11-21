@@ -54,19 +54,26 @@ _.extend(module.exports, {
     }
   },
 
-  create: function(req, res, cb) {
-    var ctx = {
-      req: req,
-      res: res,
-      id: __id++,
-      name: app_name
-    };
-
+  create: function(defaults, cb) {
+    defaults = defaults || {};
     var d = domain.create();
-    d.domain = ctx.id;
-    d.add(req);
-    d.add(res);
+    _.each(defaults, function(v) {
+      d.add(v);
+    });
 
+    var ctx = _.extend(defaults, {
+      id: __id++,
+      name: app_name,
+      domain: d,
+      wrap: function(f) {
+        var self = this;
+        d.run(function() {
+          f.apply(self, arguments);
+        });
+      }
+    });
+
+    d.domain = ctx.id;
     d.on('error', function(err) {
       console.log("Error", err, "happened in context", ctx.id);
     });

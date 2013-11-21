@@ -1,11 +1,12 @@
 "use strict";
 
+
 var _name;
 var _mod;
 
 var _loaded = {};
 var _arbiter = _.clone(window.Backbone.Events);
-function call(controller, func, args) {
+function call(controller, func, args, hash) {
   SF.controller(controller, function(ctrl) {
     if (ctrl[func]) {
       ctrl[func].apply(ctrl, args);
@@ -17,7 +18,7 @@ function call(controller, func, args) {
 
 module.exports = {
   // Sets up the controller and the page
-  set: function(controller, pageId) {
+  set: function(controller, pageId, signature) {
     _name = controller;
     var page = window.document.getElementById(pageId);
 
@@ -44,7 +45,7 @@ module.exports = {
       _loaded[controller] = true;
 
       _arbiter.trigger(controller);
-    });
+    }, signature);
   },
 
   get: function() {
@@ -56,12 +57,13 @@ module.exports = {
     var args = _.toArray(arguments);
     var controller = args.shift();
     var func = args.shift();
+    var hash = args.pop();
 
     if (_loaded[controller]) {
-      call(controller, func, args);
+      call(controller, func, args, hash);
     } else {
       _arbiter.once(controller, function() {
-        call(controller, func, args);
+        call(controller, func, args, hash);
       });
     }
   }

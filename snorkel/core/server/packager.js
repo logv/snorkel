@@ -5,6 +5,7 @@ var module_grapher = require("module-grapher");
 var async = require("async");
 var _ = require_vendor("underscore");
 var less = require("less");
+var quick_hash = require_core("server/hash");
 
 function package_less(includes, cb) {
   var included = _.map(includes, function(s) { return s.trim(); });
@@ -12,10 +13,18 @@ function package_less(includes, cb) {
   var ret = {};
   async.each(included, function(module, done) {
     fs.readFile(module + ".css", function(err, data) {
-      less.render(data.toString(), function(err, css) {
-        ret[module] = css;
+      if (!err) {
+        var hash = quick_hash(data.toString());
+        less.render(data.toString(), function(err, css) {
+          ret[module] = {
+            code: css,
+            signature: hash
+          };
+          done();
+        });
+      } else {
         done();
-      });
+      }
     });
 
   }, function(err) {
@@ -28,8 +37,12 @@ function package_and_scope_less(component, module, cb) {
   fs.readFile(module + ".css", function(err, data) {
     var module_css = "[data-cmp=" + component + "] {\n";
     var module_end = "\n}";
+    var hash = quick_hash(data.toString());
     less.render(module_css + data.toString() + module_end, function(err, css) {
-      ret[module] = css;
+      ret[module] = {
+        code: css,
+        signature: hash
+      };
 
       cb(ret);
     });
@@ -70,7 +83,11 @@ function package_js(includes, cb) {
               if (err) {
                 console.log("TROUBLE READING", module);
               } else {
-                ret[module] = data.toString();
+                var read = data.toString();
+                ret[module] = {
+                  code: read,
+                  signature: quick_hash(read)
+                };
               }
               done();
             });

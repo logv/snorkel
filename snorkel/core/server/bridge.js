@@ -2,6 +2,9 @@
 
 var context = require("./context");
 var template = require("./template");
+var readfile = require_core("server/readfile");
+var quick_hash = require_core("server/hash");
+
 
 context.setDefault("BRIDGE_CALLS", []);
 
@@ -28,8 +31,10 @@ module.exports = {
     var args = marshall_args.apply(null, arguments);
     var module = args.shift();
     var func = args.shift();
-    
-    context("BRIDGE_CALLS").push([module, func, args]);
+
+    var hash = quick_hash(readfile(module + ".js"));
+
+    context("BRIDGE_CALLS").push([module, func, args, hash]);
   },
 
   raw: function(str) {
@@ -39,7 +44,14 @@ module.exports = {
   controller: function() {
     var args = marshall_args.apply(null, arguments);
 
-    context("BRIDGE_CALLS").push(["core/client/controller", "call", args]);
+    var data = readfile("app/controllers/" + args[0] + "/client.js");
+    var hash = quick_hash(data);
+    args.push(hash);
+
+    var chash = quick_hash(readfile("core/client/controller.js"));
+
+
+    context("BRIDGE_CALLS").push(["core/client/controller", "call", args, chash]);
   },
 
   flush_data: function(data, id, cb) {
@@ -55,7 +67,7 @@ module.exports = {
 
     // we strip extensions off CSS_DEPENDENCIES, because the bootloader knows
     // they are .css already
-    var css_deps = _.map(context("CSS_DEPS"), 
+    var css_deps = _.map(context("CSS_DEPS"),
         function(val, dependency) { return dependency.replace(/\.css$/, ''); });
 
     var options = {
@@ -101,7 +113,8 @@ module.exports = {
         json_data: JSON.stringify({
           module: call[0],
           func: call[1],
-          args: call[2]})
+          args: call[2],
+          hash: call[3]})
       });
 
     });

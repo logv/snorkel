@@ -73,7 +73,9 @@ open http://localhost:3000 in your browser and get started :-)
     # bump the capped collection size to 200MB
     scripts/change_collection_size.sh test/data 200
 
-## Heroku Support (thanks rameshvk!)
+## Heroku Support
+
+(thanks @rameshvk)
 
 1. create an app (`heroku apps:create snorkelista`, for example)
 2. set environment variables on heroku for the app:

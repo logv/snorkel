@@ -5,6 +5,8 @@ var context = require("./context");
 var bridge = require("./bridge");
 var component = require("./component");
 var EventEmitter = require('events').EventEmitter;
+var quick_hash = require_core("server/hash");
+var readfile = require_core("server/readfile");
 
 var cheerio = require("cheerio");
 
@@ -100,10 +102,12 @@ var render_page = function(page_options) {
   controller = controller.replace(/^\/*/, '');
 
   // render into page format
+  var hash = quick_hash(readfile("app/controllers/" + controller + "/client.js"));
   var page = component.build("page", {
     header: page_options.header,
     sidebar: sidebar_content,
     controller: controller,
+    hash: hash,
     socket: page_options.socket,
     title: $$.title || "SF",
     id: context("id"),
@@ -117,12 +121,10 @@ var render_page = function(page_options) {
   // TODO: work on how the order of things are initialized happens
   try {
     $$.res.write(pageStr);
-    // update ASAP
-    bridge.raw("bootloader.__controller_name = '" + controller + "';");
 
     // Update the name of the controller on the page, when we can.
     // This also sets the $page element on the controller, inevitably
-    bridge.call("core/client/controller", "set", controller, page.id);
+    bridge.call("core/client/controller", "set", controller, page.id, hash);
 
     bridge.flush_data(page_options.content, "page_content");
 

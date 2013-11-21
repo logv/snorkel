@@ -60,6 +60,7 @@ function collection_builder(db_name, before_create) {
       var db_name = args.join(separator);
 
       if (!_db && !cb) {
+        console.trace();
         throw("Trying to access DB before its been initialized");
       } else if (!_db) {
         return arbiter.once("db_open", function(db) {

@@ -1,6 +1,10 @@
 {
   "files" : [
-    "core/client/prelude.js",
+    "core/client/prelude/prelude.js",
+    "core/client/prelude/bootloader.js",
+    "core/client/prelude/bridge.js",
+    "core/client/prelude/data_sync.js",
+    "core/client/prelude/hide_addressbar.js",
     "app/client/prelude.js"
   ],
   "vendor" : [

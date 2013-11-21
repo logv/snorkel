@@ -46,6 +46,8 @@ html, body {
   .pane_toggle {
     font-weight: bold;
     display: inline-block;
+    position: absolute;
+    left: 5px;
     width: 60px;
     z-index: 1000;
   }
@@ -299,6 +301,8 @@ html, body {
     .go_button {
       padding-left: 10px;
       padding-right: 10px;
+      padding-bottom: 8px;
+      padding-top: 8px;
       float: right;
     }
   }

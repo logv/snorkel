@@ -1,7 +1,7 @@
 <% set_default("selected", false) %>
 <% set_default("order", false) %>
 
-<select name="<%= name %>" class="span2">
+<select name="<%= name %>" class="span2 form-control">
   <% ordered_keys = order || Object.keys(options) %>
   <% _.each(ordered_keys, function(value) { %>
     <% var label = options[value]; %>

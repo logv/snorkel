@@ -3,7 +3,7 @@
 // TODO: add a component registrar for knowing when
 // components finish downloading
 
-var Component = require("components/component");
+require("components/component");
 
 var __id = 0;
 var bootloader = window.bootloader,
@@ -11,6 +11,7 @@ var bootloader = window.bootloader,
 
 var _components = {};
 var _pending = {};
+var _classes = {};
 function register_component(id, instance) {
   _components[id] = instance;
   if (_pending[id]) {
@@ -52,7 +53,7 @@ function build(component, options, cb) {
     var id = (options.id || "c" + __id++);
     exports = _.extend(exports, events);
 
-    var css = _packages[component].style;
+    var css = _packages[component].style.code;
 
     if (css) {
       bootloader.inject_css("component/" + component, css);
@@ -98,7 +99,7 @@ function build(component, options, cb) {
       // Serial fetches... what?
       if (options.behavior) {
         var b = bootloader.js([options.behavior], function(mods) {
-          var behaviors = bootloader.raw_import(mods[options.behavior]);
+          var behaviors = bootloader.raw_import(mods[options.behavior].code);
           _.extend(cmpInstance, behaviors);
 
           if (behaviors.events) {
@@ -141,49 +142,53 @@ function build(component, options, cb) {
     }
 
     function load_component() {
-      var cmpClass = _packages[component].class;
+      require("components/component", function(Component) {
+        var CmpClass = _classes[component];
+        if (_packages[component].schema.always_define || !CmpClass) {
+          CmpClass = Component.extend(_.clone(exports));
+          CmpClass.__created = true;
+          CmpClass.helpers = {};
+        }
+        _classes[component] = CmpClass;
 
-      if (!cmpClass) {
-        _packages[component].class = Component.extend(exports);
-        _packages[component].class.__created = true;
-        cmpClass = _packages[component].class;
-        cmpClass.helpers = {};
-      }
+        var cmpInstance = new CmpClass(_.extend({ id: id }, options));
 
-      var cmpInstance = new cmpClass(_.extend({ id: id }, options));
+        render_component(cmpInstance);
 
-      render_component(cmpInstance);
+        cmpInstance.helpers = {};
+        if (!cmpInstance.events) { 
+          cmpInstance.events = {};
+        }
+        _.each(_packages[component].helpers, function(helper, name) {
 
-      cmpInstance.helpers = {};
-      _.each(_packages[component].helpers, function(helper, name) {
+          if (CmpClass.helpers[name]) {
+            cmpInstance.helpers[name] = CmpClass.helpers[name];
+          } else {
+            CmpClass.helpers[name] = true;
+            var helper_instance = bootloader.raw_import(helper);
+            CmpClass.helpers[name] = helper_instance || true;
 
-        if (cmpClass.helpers[name]) {
-          cmpInstance.helpers[name] = cmpClass.helpers[name];
-        } else {
-          cmpClass.helpers[name] = true;
-          var helper_instance = bootloader.raw_import(helper);
-          cmpClass.helpers[name] = helper_instance || true;
+            if (helper_instance) {
+              name = helper_instance.name || name;
+            }
 
-          if (helper_instance) {
-            name = helper_instance.name || name;
+            cmpInstance.helpers[name] = helper_instance;
           }
+        });
 
-          cmpInstance.helpers[name] = helper_instance;
+        // instantiate client callbacks for component
+        if (cmpInstance.client && !options.skip_client_init) {
+          var cl = options.client_options || {};
+          _.extend(cl, options);
+          cmpInstance.client(cl);
+        }
+
+        install_handlers(cmpInstance);
+
+        if (cb) {
+          cb(cmpInstance);
         }
       });
-
-      // instantiate client callbacks for component
-      if (cmpInstance.client && !options.skip_client_init) {
-        var cl = options.client_options || {};
-        _.extend(cl, options);
-        cmpInstance.client(cl);
-      }
-
-      install_handlers(cmpInstance);
-
-      if (cb) {
-        cb(cmpInstance);
-      }
     }
 
     // Bootload all the styles for the component
@@ -209,15 +214,21 @@ function build(component, options, cb) {
 }
 
 // Meant for calls from server, usually
-function instantiate(options) {
+function instantiate(options, signature) {
   var component = options.component;
   var id = options.id;
   var behavior = options.behavior;
   var delegate = options.delegate;
   var client_options = options.client_options;
+
   // Need client side component loading library?
   // How about ask the server to send it all in a json blob?
   var el = $("#" + id);
+
+  var hash = options.hash;
+  if (hash) {
+    bootloader.versions.pkg[component] = hash;
+  }
 
   build(
     component,
@@ -244,6 +255,7 @@ window.$G = get_component;
 window.$C = create;
 
 SF.trigger("core/client/component");
+
 module.exports = {
   instantiate: instantiate,
   build: build,

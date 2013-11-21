@@ -13,10 +13,6 @@ module.exports = {
     "click .add_dashboard" : "handle_new_dashboard"
   },
   initialize: function() {
-    SF.socket().on("cleared_cache", function() {
-      $C("modal", { title: "Successful Success!", body: "The metadata cache was cleared" });
-    });
-
   },
 
   initialize_editor: function() {
@@ -95,6 +91,10 @@ module.exports = {
 
 
   socket: function(socket) {
+    socket.on("cleared_cache", function() {
+      $C("modal", { title: "Successful Success!", body: "The metadata cache was cleared" });
+    });
+
     socket.on("dropped", function(dataset) {
       console.log("DROPPED DATASET", dataset);
       _datasets[dataset].$el.fadeOut(function() {

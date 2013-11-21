@@ -7,6 +7,7 @@ var packager = require_core("server/packager");
 var Component = require_core("server/component");
 var async = require("async");
 var readfile = require_core("server/readfile");
+var quick_hash = require_core("server/hash");
 var less = require("less");
 
 function multi_pack(dir, extension, prepack) {
@@ -25,7 +26,11 @@ function multi_pack(dir, extension, prepack) {
         prepack([filename], function(data) {
           if (_.isObject(data)) {
             _.each(data, function(v, k) {
-              loaded[k] = v;
+              if (dir) {
+                loaded[k.replace(dir + "/", '')] = v;
+              } else {
+                loaded[k] = v;
+              }
             });
           } else if (_.isString(data)) {
             loaded[module] = data;
@@ -83,7 +88,7 @@ var js_prelude = function() {
     function(item, cb) {
       fs.readFile(item, function(err, data) {
         if (err) {
-          console.log("ERROR READING", item);
+          console.log("Error reading", item);
           return cb();
         }
 
@@ -167,6 +172,28 @@ var component = function() {
     });
 }
 
+function validate_versions(versions, socket) {
+  _.each(versions.css, function(old_hash, css) {
+    var hash = quick_hash(readfile("app/static/styles/" + css + ".css"));
+    if (hash != old_hash) {
+      socket.emit("update_version", 'css', css, old_hash, hash);
+    }
+  });
+  _.each(versions.js, function(old_hash, js) {
+    var hash = quick_hash(readfile(js + ".js"));
+    if (hash != old_hash) { 
+      socket.emit("update_version", 'js', js, old_hash, hash); 
+    }
+  });
+  _.each(versions.pkg, function(old_hash, pkg) {
+    Component.build_package(pkg, function(ret) {
+      if (old_hash != ret.signature) { 
+        socket.emit("update_version", 'pkg', pkg, old_hash, ret.signature); 
+      }
+    });
+  });
+}
+
 module.exports = {
   js: js,
   css: css,
@@ -174,6 +201,7 @@ module.exports = {
   css_prelude: css_prelude,
   component: component,
   get_status: get_status,
+  validate_versions: validate_versions,
 
   routes: {
     "/status" : "get_status",

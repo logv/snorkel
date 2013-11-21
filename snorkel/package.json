@@ -19,7 +19,10 @@
       "hashids" : "x",
       "amqp" : "x",
       "htpasswd" : "x",
-      "passport-google" : "x"
+      "json-stable-stringify" : "x",
+      "passport-google" : "x",
+      "squel" : "x",
+      "pg" : "x"
     }
 }
 

@@ -3,5 +3,6 @@
   "helpers": [],
   "style": "selector.css",
   "styles": [],
-  "template": "selector.html.erb"
+  "template": "selector.html.erb",
+  "always_define" : true
 }

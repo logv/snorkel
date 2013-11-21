@@ -769,7 +769,6 @@ module.exports = {
   },
 
   set_fields: function(data) {
-
     var that = this;
     SF.do_when(that.table, 'query:table', function() {
       that.fields = data;

@@ -12,11 +12,15 @@ var cheerio = require('cheerio');
 var template = require_core("server/template");
 var readfile = require_core("server/readfile");
 var packager = require_core("server/packager");
+var quick_hash = require_core("server/hash");
+var stringify = require("json-stable-stringify");
 
 
 Backbone.$ = cheerio;
 
 var Component = require_root("components/component");
+
+var _versions = {};
 
 Component.load = function(component) {
   var base_dir = "./components/" + component + "/";
@@ -46,6 +50,8 @@ Component.load = function(component) {
   return cmp;
 };
 
+// Need to cache these bad boys
+var _packages = {};
 Component.build_package = function(component, cb) {
   var package_ = {};
   var base_dir = "./components/" + component + "/";
@@ -53,9 +59,18 @@ Component.build_package = function(component, cb) {
   var pkg = JSON.parse(package_data);
   // Look for package.json file in component dir
   // this will contain dependencies, stylesheets, etc
+  //
+  if (_packages[component] && !_.isEmpty(_packages[component])) {
+    if (cb) {
+      cb(_packages[component]);
+    }
+
+    return;
+  }
 
   var cmp = {};
   cmp.helpers = {};
+  _packages[component] = cmp;
 
   function process_file(obj, file, key, cb) {
     return function(cb) {
@@ -71,7 +86,7 @@ Component.build_package = function(component, cb) {
   }
 
   function process_style(obj, style_file, key) {
-  
+
     return function(cb) {
       packager.scoped_less(component, style_file, function(data) {
         obj[key] = data[style_file];
@@ -103,6 +118,10 @@ Component.build_package = function(component, cb) {
   cmp.styles = pkg.styles;
 
   async.parallel(jobs, function(err, results) {
+    var hash = quick_hash(stringify(cmp));
+    _versions[component] = hash;
+
+    cmp.signature = hash;
     if (cb) {
       cb(cmp);
     }
@@ -141,7 +160,7 @@ Component.build = function(component, options, cb) {
 
     render_options = _.defaults(render_options, main.defaults);
 
-    var rendered = _.template(cmp.template, 
+    var rendered = _.template(cmp.template,
       template.setup_context(render_options));
 
     cmpInstance.html(rendered);
@@ -166,6 +185,7 @@ Component.build = function(component, options, cb) {
   //    * making sure that client behaviors get installed.
   //
   function marshallToClient(cmpInstance) {
+
     // TODO: This needs to only be called after the component is rendered
     // toString'd the first time
     cmpInstance.toString = oldToString;
@@ -199,8 +219,15 @@ Component.build = function(component, options, cb) {
       client_options.client_options = options.client_options;
     }
 
+    var page = require_core("server/page");
+    page.async(function(flush) {
+      Component.build_package(component, function() {
+        client_options.hash = _versions[component];
+        bridge.call("core/client/component", "instantiate", client_options);
+        flush();
+      });
+    })();
 
-    bridge.call("core/client/component", "instantiate", client_options);
     return ret;
   }
 
