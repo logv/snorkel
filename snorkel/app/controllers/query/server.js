@@ -85,6 +85,7 @@ function marshall_query(form_data) {
   query_data.dims = array_of(form_data, 'group_by', ["browser"]);
   query_data.view = value_of(form_data, 'view', 'overview');
   query_data.baseview = value_of(form_data, 'baseview', query_data.view);
+  query_data.time_field = value_of(form_data, 'time_field', 'time');
 
   var limit = 100;
   if (query_data.view === 'samples') {

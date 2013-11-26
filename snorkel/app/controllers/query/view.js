@@ -217,6 +217,17 @@ var time_bucket_opts = {
   "daily" : 24 * 60 * 60
 };
 
+function get_time_field_input(cols) {
+  _.each(cols, function (cc) { console.log('*** selection: ', cc.name, cc.display_name); });
+  var integer_names = {};
+  _.each(cols, function (cc) { integer_names[cc.name] = cc.display_name || cc.name; });
+  var field_selector = $C("selector", {
+    name: 'time_field',
+    options: integer_names
+  });
+  return add_control('time_field', 'Time Field', field_selector.toString());
+}
+
 function get_time_bucket_row() {
   var opts = _.invert(time_bucket_opts);
   var max_results_input = $C("selector", { name: "time_bucket", options: opts });
@@ -330,6 +341,9 @@ function get_controls(columns) {
     return col.final_type === SET_TYPE && col.hidden !== 'true';
   });
 
+  var time_field_columns = _.filter(columns, function (col) {
+    return col.final_type == AGGREGABLE_TYPE && col.hidden !== 'true';
+  });
 
   var table_row = get_table_row();
   table_row.addClass("visible-phone");
@@ -338,7 +352,7 @@ function get_controls(columns) {
   control_box.append(get_view_selector_row());
 
   control_box.append(get_time_inputs());
-
+  control_box.append(get_time_field_input(time_field_columns));
   control_box.append($("<div id='rollup' style='position: relative; top: -40px'>"));
   control_box.append(get_group_by_row(groupable_columns));
   control_box.append(get_sort_by_row(agg_columns));

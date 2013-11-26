@@ -413,6 +413,7 @@ var INPUTS = {
   STACKING: [ "stacking" ],
   SORT: [ "sort_by" ],
   TIME_BUCKET: [ "time_bucket" ],
+  TIME_FIELD: [ "time_field" ],
   HIST_BUCKET: [ "hist_bucket" ],
   COMPARE: ["compare"],
   TWO_FIELDS: [

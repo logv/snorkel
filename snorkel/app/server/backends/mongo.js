@@ -68,7 +68,7 @@ function add_filters(filters) {
 
   return pipeline;
 }
-function add_time_range(start, end) {
+function add_time_range(time_field, start, end) {
   var conditions = [];
   if (start) {
     conditions.push({value: start, op: "$gt"});
@@ -79,7 +79,7 @@ function add_time_range(start, end) {
   }
 
   var pipeline = add_filters([{
-    column: "integer.time",
+    column: "integer." + time_field,
     conditions: conditions
   }]);
 
@@ -99,7 +99,7 @@ function weight_column(col, weight_col, out_col) {
 }
 
 // multiply_cols_by_weight
-function multiply_cols_by_weight(cols, weight_col, group_by) {
+function multiply_cols_by_weight(time_field, cols, weight_col, group_by) {
 
   var projection = {};
   _.each(cols, function(col) {
@@ -113,7 +113,7 @@ function multiply_cols_by_weight(cols, weight_col, group_by) {
   });
 
   // Also grab the time column
-  projection["integer.time"] = 1;
+  projection["integer." + time_field] = 1;
 
   if (Object.keys(projection).length) {
     return [{ $project: projection }];
@@ -122,7 +122,7 @@ function multiply_cols_by_weight(cols, weight_col, group_by) {
   return [];
 }
 
-function cast_columns(translate, cols, weight_col, group_by) {
+function cast_columns(time_field, translate, cols, weight_col, group_by) {
   var projection = {};
 
   var translated = {};
@@ -156,7 +156,7 @@ function cast_columns(translate, cols, weight_col, group_by) {
   });
 
   // Also grab the time column
-  projection["integer.time"] = 1;
+  projection["integer." + time_field] = 1;
 
   if (Object.keys(projection).length) {
     return [{ $project: projection }];
@@ -169,10 +169,11 @@ function cast_columns(translate, cols, weight_col, group_by) {
 function query_table_to_mongo(opts, col_config) {
   var dims = opts.dims, cols = opts.cols;
   var agg = opts.agg;
+  var time_field = opts.time_field || 'time';
   var pipeline = [];
 
   if (opts.weight_col) {
-    var weighting = multiply_cols_by_weight(opts.cols, opts.weight_col, opts.dims);
+    var weighting = multiply_cols_by_weight(time_field, opts.cols, opts.weight_col, opts.dims);
     pipeline = pipeline.concat(weighting);
   }
 
@@ -204,10 +205,11 @@ function query_table_to_mongo(opts, col_config) {
 function query_time_series_to_mongo(opts, col_config) {
   var dims = opts.dims, cols = opts.cols;
   var agg = opts.agg;
+  var time_field = opts.time_field || 'time';
   var pipeline = [];
 
   if (opts.weight_col) {
-    var weighting = multiply_cols_by_weight(opts.cols, opts.weight_col, opts.dims);
+    var weighting = multiply_cols_by_weight(time_field, opts.cols, opts.weight_col, opts.dims);
     pipeline = pipeline.concat(weighting);
   }
 
@@ -218,7 +220,7 @@ function query_time_series_to_mongo(opts, col_config) {
     dim_groups[dim] = "$string." + dim;
   });
 
-  dim_groups = _.extend(dim_groups, round_column("time", "time_bucket", time_bucket));
+  dim_groups = _.extend(dim_groups, round_column(time_field, "time_bucket", time_bucket));
 
   var group_by = {$group: { _id: dim_groups, count: { $sum: 1 } }};
   if (opts.weight_col) {
@@ -383,10 +385,12 @@ function get_query_pipeline(spec) {
 function query_to_pipeline(query) {
   var params = query.params;
   var meta = query.meta;
+  var opts = query.opts || {};
+  var time_field = opts.time_field || 'time';
 
   var pipeline = get_query_pipeline(query);
   if (params.cast_cols && !backend.SAMPLE_VIEWS[params.view]) {
-    pipeline = cast_columns(params.cast_cols, params.cols, params.weight_col, params.dims).concat(pipeline);
+    pipeline = cast_columns(time_field, params.cast_cols, params.cols, params.weight_col, params.dims).concat(pipeline);
   }
 
   var start_s = parseInt(params.start_ms / 1000, 10);
@@ -400,7 +404,7 @@ function query_to_pipeline(query) {
     sort[0].$sort[params.sort_by] = -1;
   }
 
-  var timeline = add_time_range(start_s, end_s);
+  var timeline = add_time_range(time_field, start_s, end_s);
   var filters = add_filters(params.filters);
   var limit = [];
 
@@ -466,6 +470,7 @@ function run(collection_name, query_spec, unweight, cb) {
     if (err) {
       console.log("Mongo Error", err);
     }
+
 
     // Before doing anything, we need to massage the data to its expected form (cast columns)
     if (unweight) {
