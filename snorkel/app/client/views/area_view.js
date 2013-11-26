@@ -28,7 +28,9 @@ var AreaView = TimeView.extend({
 
 
 SF.trigger("view:add", "area",  {
-  include: helpers.STD_INPUTS.concat(helpers.inputs.TIME_BUCKET),
+  include: helpers.STD_INPUTS
+    .concat(helpers.inputs.TIME_BUCKET)
+    .concat(helpers.inputs.TIME_FIELD),
   icon: "noun/line.svg"
 }, AreaView);
 

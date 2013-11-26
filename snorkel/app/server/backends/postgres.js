@@ -90,7 +90,7 @@ function marshall_count(from, to) {
 
 }
 
-function marshall_time_rows(rows, cols, dims) {
+function marshall_time_rows(time_col, rows, cols, dims) {
   var ret = [];
   _.each(rows, function(r) {
     var row = {};
@@ -103,7 +103,7 @@ function marshall_time_rows(rows, cols, dims) {
       row[c] = parseInt(r[PREFIX + c], 10);
     });
 
-    if (r._time) {
+    if (r['_' + time_col]) {
       row._id.time_bucket = parseInt(r._time, 10);
     }
 
@@ -264,10 +264,11 @@ function do_query(query_spec, stmt, cb) {
 
   // i guess we should first translate to a lateral view, so the statement looks cleaner.
   // cols, dims and filters need to be pulled?
+  var time_field = query_spec.opts.time_field || "time";
 
   // need to translate start_ms and end_ms to time filters
-  stmt.pre.where(get_column("time", "float", false) + " > " + query_spec.opts.start_ms / 1000);
-  stmt.pre.where(get_column("time", "float", false) + " < " + query_spec.opts.end_ms / 1000);
+  stmt.pre.where(get_column(time_field, "float", false) + " > " + query_spec.opts.start_ms / 1000);
+  stmt.pre.where(get_column(time_field, "float", false) + " < " + query_spec.opts.end_ms / 1000);
 
   if (query_spec.opts.limit) {
     if (query_spec.opts.view !== "time" &&
@@ -415,11 +416,12 @@ function build_time_view(query_spec, stmt, unweight, cb) {
   var opts = query_spec.params;
   var dims = opts.dims, cols = opts.cols;
   var agg = opts.agg;
+  var time_field = query_spec.time_field || "time";
   var pipeline = [];
 
   stmt
     .field("COUNT(1) AS _count")
-    .group("_time");
+    .group("_" + time_field);
 
   var time_bucket = opts.time_bucket || 60 * 60 * 6; // 6 hours?
 
@@ -430,7 +432,7 @@ function build_time_view(query_spec, stmt, unweight, cb) {
       .group(PREFIX + dim);
   });
 
-  stmt.field(round_column("time", time_bucket));
+  stmt.field(round_column(time_field, time_bucket));
 
 
   _.each(cols, function(col) {
@@ -440,7 +442,7 @@ function build_time_view(query_spec, stmt, unweight, cb) {
 
   do_query(query_spec, stmt, function(err, result) {
 
-    var marshalled = marshall_time_rows(result.rows,
+    var marshalled = marshall_time_rows(query_spec.opts.time_field || "time", result.rows,
       opts.cols /* columns */,
       opts.dims /* dimensions */);
 
@@ -574,10 +576,6 @@ var PGDriver = _.extend(driver.Base, {
     pg_run(stmt.toString(), [], function(err, result) {
       if (!err) {
         var cols = driver.Base.predict_column_types(marshall_rows(result.rows));
-
-        cols = _.filter(cols, function(c) {
-          return c.name !== "time";
-        });
 
         cb(cols);
       } else {

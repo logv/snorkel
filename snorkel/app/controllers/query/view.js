@@ -223,7 +223,8 @@ function get_time_field_input(cols) {
   _.each(cols, function (cc) { integer_names[cc.name] = cc.display_name || cc.name; });
   var field_selector = $C("selector", {
     name: 'time_field',
-    options: integer_names
+    options: integer_names,
+    selected: "time"
   });
   return add_control('time_field', 'Time Field', field_selector.toString());
 }
