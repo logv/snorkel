@@ -267,6 +267,7 @@ var TimeView = BaseView.extend({
 SF.trigger("view:add", "time",  {
     include: helpers.STD_INPUTS
       .concat(helpers.inputs.TIME_BUCKET)
+      .concat(helpers.inputs.TIME_FIELD)
       .concat(helpers.inputs.COMPARE)
       .concat(helpers.inputs.SORT_BY),
     icon: "noun/line.svg"
