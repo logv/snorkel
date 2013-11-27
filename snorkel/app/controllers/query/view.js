@@ -218,7 +218,6 @@ var time_bucket_opts = {
 };
 
 function get_time_field_input(cols) {
-  _.each(cols, function (cc) { console.log('*** selection: ', cc.name, cc.display_name); });
   var integer_names = {};
   _.each(cols, function (cc) { integer_names[cc.name] = cc.display_name || cc.name; });
   var field_selector = $C("selector", {

@@ -324,7 +324,7 @@ var MultiDistView = DistView.extend({
     $C("tabs", { tabs: tabs, active: "Numbers" } , function(cmp) {
       tabEl.prepend(cmp.$el);
 
-      cmp.$el.find('a[data-toggle]').on('shown', function (e) {
+      cmp.$el.find('a[data-toggle]').on('shown.bs.tab', function (e) {
         var tab_id = $(e.target).attr("data-target");
         if (!tab_id) { return; }
 

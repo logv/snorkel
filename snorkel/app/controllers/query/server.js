@@ -1,8 +1,6 @@
 "use strict";
 
 
-console.log("LOADING QUERY CONTROLLER");
-
 var querystring = require("querystring");
 var http = require("http");
 var async = require("async");
@@ -317,7 +315,6 @@ function load_saved_query(conditions, cb) {
 }
 
 function get_index() {
-  console.log("GETTING INDEX");
 
   if (controller.require_https()) { return; }
 
@@ -325,14 +322,12 @@ function get_index() {
   if (_.isArray(table)) {
     table = table.pop();
   }
-  console.log("GOT DEFAULT TABLE");
 
   context("query_table", table);
   context("title", "snorkel");
 
   bridge.controller("query", "set_table", table);
 
-  console.log("SETTING TABLE");
   function render_query_content() {
 
     return page.async(function(flush) {
@@ -464,8 +459,6 @@ function get_index() {
         .html();
     }
   });
-
-  console.log("READ TEMPLATE STRING");
 
   var template_str = template.render("controllers/query.html.erb", {
       render_query_content: render_query_content,
@@ -668,7 +661,6 @@ function handle_new_query(query_id, query_data, socket, done) {
     var column_casts = [];
     _.each(meta.metadata.columns, function(col) {
       if (col.cast_str) {
-        console.log("CASTING ", col);
         column_casts.push({
           name: col.name,
           to_type: col.cast_str,
