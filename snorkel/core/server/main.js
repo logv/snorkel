@@ -66,8 +66,10 @@ function setup() {
 
 
   // setup static helpers
-  app.use(express.static('app/static'));
-  app.use(express.static('core/static'));
+  var oneDay = 1000 * 60 * 60 * 24;
+  var oneYear = oneDay * 365;
+  app.use(express.static('app/static', { maxAge: oneYear }));
+  app.use(express.static('core/static', { maxAge: oneYear }));
 
   // setup error handling
   //var errorHandlers = require_core("server/error_handlers");

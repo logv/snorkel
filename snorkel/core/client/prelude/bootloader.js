@@ -28,21 +28,6 @@
     _component_storage = _blank_storage;
   }
 
-  try {
-    var signatures = JSON.parse(_component_storage.getItem("_signatures"));
-    _.extend(_signatures, signatures);
-  } catch(e) {}
-
-  try {
-    var versions = JSON.parse(_component_storage.getItem("_versions"));
-    _.each(versions, function(def, type) {
-      _.extend(_versions[type], def);
-      _.extend(_signatures, _.object(_.map(def, function(v, k) {
-        return [v, k];
-      })));
-    });
-  } catch(ee) {}
-
   window.SF.once("bridge/socket", function(socket) {
     socket.on("update_version", function(type, entry, old_hash, new_hash) {
       var component = _signatures[old_hash];
@@ -65,10 +50,31 @@
     });
   });
 
+  function sync_metadata() {
 
-  // We need to sync our _versions with server versions
-  setInterval(function() {
-    var key;
+    try {
+      var signatures = JSON.parse(_component_storage.getItem("_signatures"));
+      _.extend(_signatures, signatures);
+    } catch(e) {}
+
+    try {
+      var versions = JSON.parse(_component_storage.getItem("_versions"));
+      _.each(versions, function(def, type) {
+        _.extend(_versions[type], def);
+        _.extend(_signatures, _.object(_.map(def, function(v, k) {
+          return [v, k];
+        })));
+      });
+    } catch(ee) {}
+
+  }
+
+  function sync_storage() {
+
+    // read metadata
+    sync_metadata();
+
+    // write metadata
     _component_storage.setItem("_versions", JSON.stringify(_versions));
 
     // sync versions and signatures to our known ones
@@ -81,6 +87,8 @@
 
     _component_storage.setItem("_signatures", JSON.stringify(_signatures));
 
+    // remove old keys
+    var key;
     for (key in localStorage) {
       if (key === "_versions" || key === "_signatures") {
         continue;
@@ -88,14 +96,17 @@
 
       if (!_signatures[key] ) {
         try {
-          var val = JSON.parse(localStorage.getItem(key));
+          console.log("Removing old localStorage key", key);
           localStorage.removeItem(key);
-          console.log("Removing old localStorage entry", key, val.module || val.schema.main);
         } catch(e) {};
       }
 
     }
-  }, 3000);
+  }
+
+  // We need to sync our _versions with server versions
+  setInterval(sync_storage, 10000);
+  sync_storage();
 
   if (window._query.clear_storage) {
     console.log("Clearing Storage");
@@ -143,8 +154,10 @@
 
       var loaded_modules = {};
       var necessary_modules = _.filter(modules, function(k) {
-        var version = _versions[type][k];
-        if (version) { load_def_from_storage(module_dict, k, version, type, postload); }
+        if (!module_dict[k]) {
+          var version = _versions[type][k];
+          if (version) { load_def_from_storage(module_dict, k, version, type, postload); }
+        }
 
         if (module_dict[k]) {
           loaded_modules[k] = module_dict[k];
@@ -213,10 +226,6 @@
     var first_define = !_packages[component];
 
     if (!definition.schema.no_redefine || first_define) {
-      if (!_component_storage.getItem(definition.signature)) {
-        _component_storage.setItem(definition.signature, JSON.stringify(definition));
-      }
-
       _packages[component] = definition;
 
       // marshalling some JSONified code into code
@@ -273,8 +282,14 @@
         _versions.pkg[k] = v.signature;
         _signatures[v.signature] = k;
 
+        if (!_component_storage.getItem(v.signature)) {
+          _component_storage.setItem(v.signature, JSON.stringify(v));
+        }
+
+
         define_package(k, v);
         loaded_modules[k] = _packages[k];
+
       });
 
       if (cb) {

@@ -25,6 +25,13 @@ function collection_builder(db_name, before_create) {
   var _created = {};
   var arbiter = new EventEmitter();
 
+  function onOpened(err, db) {
+    // TODO: report errors somewhere?
+    if (err) { return ; }
+    _db = db;
+    arbiter.emit("db_open", db);
+  }
+
   if (db_url) {
     var options = {
       uri_decode_auth: true,
@@ -36,13 +43,6 @@ function collection_builder(db_name, before_create) {
     var mongoserver = new mongodb.Server(host, port, server_options);
     var db_connector = new mongodb.Db(db_name, mongoserver, db_options);
     db_connector.open(onOpened);
-  }
-  
-  function onOpened(err, db) {
-    // TODO: report errors somewhere?
-    if (err) return;
-    _db = db;
-    arbiter.emit("db_open", db);
   }
 
   return {
