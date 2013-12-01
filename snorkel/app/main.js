@@ -3,12 +3,14 @@
 var auth = require_app("server/auth");
 var perf = require_app("server/perf");
 var config = require_core("server/config");
+var express = require('express');
 
 module.exports = {
   setup_app: function(app) {
     var passport = require('passport');
     app.use(passport.initialize());
     app.use(passport.session());
+    app.use(express.bodyParser());
   },
   setup: function(options) {
     if (options.collector) {
@@ -25,4 +27,4 @@ module.exports = {
     perf.setup();
     auth.install();
   }
-}
+};

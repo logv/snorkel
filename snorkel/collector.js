@@ -1,2 +1,2 @@
-var server = require('./server/main');
+var server = require('superfluous');
 server.run_collector();

@@ -41,7 +41,7 @@ module.exports = {
         _.each(columns, function(col, name) {
           if (!config.metadata.columns[name]) {
             config.metadata.columns[name] = {
-              description: '' 
+              description: ''
             };
           }
 
@@ -99,23 +99,46 @@ module.exports = {
   all: function(cb) {
     cb = context.wrap(cb);
 
+    var results = {};
+    var after = _.after(2, function() {
+      cb(results);
+    });
+
     var collection = db.get("dataset", "metadata");
     collection.find({}, function(err, ret) {
       if (err) {
-        cb([]);
-      } else {
-        ret.toArray(function(err, docs) {
-          var grouped = _.groupBy(docs, function(d) {
-            return d.table;
-          });
-
-          _.each(grouped, function(configs, key) {
-            grouped[key] = configs[0];
-          });
-
-          cb(grouped);
-        });
+        cb(results);
+        return;
       }
+
+      ret.toArray(function(err, docs) {
+        if (err) {
+          cb([]);
+          return;
+        }
+
+        var grouped = _.groupBy(docs, function(d) {
+          return d.table;
+        });
+
+        _.each(grouped, function(configs, key) {
+          grouped[key] = configs[0];
+        });
+
+        _.extend(results, grouped);
+
+        after();
+      });
+    });
+
+    backend.get_tables(function(tables) {
+      var next_after = _.after(tables.length, after);
+      _.each(tables, function(table) {
+        module.exports.get(table, function(data) {
+          results[table.table_name] = data;
+          next_after();
+        });
+      });
     });
   }
 };

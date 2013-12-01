@@ -1,2 +1,2 @@
-var server = require('./core/server/main');
+var server = require('superfluous');
 server.run();
