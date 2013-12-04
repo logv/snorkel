@@ -4,7 +4,7 @@
     "version": "0.0.9",
     "private": true,
     "dependencies": {
-      "superfluous" : "x",
+      "superfluous" : "0.0.6",
       "hashids" : "x",
       "amqp" : "x",
       "htpasswd" : "x",

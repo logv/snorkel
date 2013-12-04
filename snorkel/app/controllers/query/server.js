@@ -589,8 +589,8 @@ function handle_new_query_with_meta(meta, query_id, query_data, socket, done) {
 
 
   var user = "anon";
-  if (socket && socket.manager.__user) {
-    user = socket.manager.__user.username || "__awkward__";
+  if (socket && socket.session.__user) {
+    user = socket.session.__user.username || "__awkward__";
   }
 
   var sample = log_query(query_data, user);
@@ -707,8 +707,8 @@ function refresh_query(form_data, __id, socket, cb) {
   if (!form_data || !form_data.hashid) {
     return;
   }
-  var user_id = socket.manager.__user.id || parseInt(Math.random() * 10000, 10);
-  var user_name = socket.manager.__user.username;
+  var user_id = socket.session.__user.id || parseInt(Math.random() * 10000, 10);
+  var user_name = socket.session.__user.username;
 
   queries.get_saved_query({ hashid: form_data.hashid}, function(err, saved_query) {
     if (!saved_query) {
@@ -830,8 +830,9 @@ module.exports = {
   save: save_query,
   socket: function(socket) {
     var __id = 1;
-    var user_id = socket.manager.__user.id || parseInt(Math.random() * 10000, 10);
-    var user_name = socket.manager.__user.username;
+
+    var user_id = socket.session.__user.id || parseInt(Math.random() * 10000, 10);
+    var user_name = socket.session.__user.username;
 
     socket.on("get_saved_queries", function(dataset) {
       queries.get_saved_for_user(user_name, dataset, function(arr) {

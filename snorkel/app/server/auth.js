@@ -143,11 +143,11 @@ module.exports = {
         return res.redirect(next +'?user=' + req.user.id);
       });
 
-    io.set('authorization', function(handshake_data, cb) {
+    io.authorize(function(req, cb) {
       var that = this;
-      var cookie = handshake_data.headers.cookie;
-      parseCookie(handshake_data, null, function() {
-        var sid = handshake_data.signedCookies['connect.sid'];
+      var cookie = req.headers.cookie;
+      parseCookie(req, null, function() {
+        var sid = req.signedCookies['connect.sid'];
         var store = session.store();
 
 
@@ -162,7 +162,9 @@ module.exports = {
             // this is used by query server to log which user is on which
             // socket. maybe i should just make a look up table over here
             // instead, though.
-            that.__user = {
+            //
+            req.headers.session = session;
+            req.headers.session.__user = {
               username: user,
               sid: sid
             };
