@@ -1,0 +1,7 @@
+{
+  "main" : "button",
+  "helpers": [],
+  "style": "button.css",
+  "styles": [ "box" ],
+  "template": "button.html.erb"
+}

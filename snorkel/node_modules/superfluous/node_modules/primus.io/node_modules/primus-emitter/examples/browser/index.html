@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Primus-Emitter example</title>
+  <script src="/primus/primus.js"></script>
+</head>
+<body>
+
+  <h1>Welcome to Primus-Emitter example.</h2>
+
+  <script>
+
+    var primus = new Primus('http://localhost:8081/');
+
+    primus.emit('news', '[CLIENT] => Hi server', function(msg){      
+      console.log(msg);
+    });
+
+    primus.on('news', function(msg, fn){
+      console.log(msg);
+      fn('[CLIENT ACK] => Message received');
+    });
+
+  </script>

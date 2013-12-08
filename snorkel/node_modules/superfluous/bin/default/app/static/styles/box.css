@@ -1,0 +1,94 @@
+.mts {
+  margin-top: 3px;
+}
+
+.mtm {
+  margin-top: 5px;
+}
+
+.mlm {
+  margin-left: 5px;
+}
+
+.mam {
+  margin: 5px;
+}
+
+.mbm {
+  margin-bottom: 5px;
+}
+
+.mth {
+  margin-top: 15px;
+}
+
+.mtl {
+  margin-top: 10px;
+}
+
+.mll {
+  margin-left: 10px
+}
+
+.mrl {
+  margin-right: 10px;
+}
+
+.mal {
+  margin: 10px;
+}
+
+.mbl {
+  margin-bottom: 10px;
+}
+
+.lfloat {
+  float: left;
+}
+
+.rfloat {
+  float: right;
+}
+
+.pal {
+  padding: 10px;
+}
+
+.pll {
+  padding-left: 10px;
+}
+
+.prl {
+  padding-right: 10px;
+}
+
+.ptl {
+  padding-top: 10px;
+}
+
+.pam {
+  padding: 5px;
+}
+
+.pas {
+  padding: 2px;
+}
+
+.fwb {
+  font-weight: bold;
+}
+
+.fsi {
+  font-style: italic;
+}
+
+.eom {
+  @media (max-width: 767px) {
+    width: 95% !important
+  }
+}
+.com {
+  @media (max-width: 767px) {
+    display: none !important
+  }
+}

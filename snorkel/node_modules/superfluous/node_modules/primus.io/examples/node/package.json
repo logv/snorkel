@@ -1,0 +1,16 @@
+{
+  "name": "primus.io-node-test",
+  "version": "0.1.0",
+  "author": "Jonathan Brumley <cayasso@gmail.com>",
+  "main": "index.js",
+  "license": "MIT",
+  "dependencies": {
+    "socket.io-client": "~0.9.16",
+    "engine.io-client": "~0.6.3",
+    "sockjs-client-node": "0.0.0",
+    "engine.io": "~0.6.3",
+    "socket.io": "~0.9.16",
+    "ws": "~0.4.27",
+    "sockjs": "~0.3.7"
+  }
+}

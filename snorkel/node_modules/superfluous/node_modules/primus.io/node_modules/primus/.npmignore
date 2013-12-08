@@ -1,0 +1,8 @@
+node_modules
+.tern-port
+npm-debug.log
+test/primus.save.async.js
+test/primus.save.sync.js
+.DS_Store
+example/primus.js
+example/primus.browserify.js

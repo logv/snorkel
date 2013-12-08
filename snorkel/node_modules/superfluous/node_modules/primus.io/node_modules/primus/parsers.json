@@ -1,0 +1,12 @@
+{
+  "json": {},
+  "jsonh": {
+    "server": "jsonh"
+  },
+  "ejson": {
+    "server": "e-json"
+  },
+  "binary": {
+    "server": "binary-pack"
+  }
+}
