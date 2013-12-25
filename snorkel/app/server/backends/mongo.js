@@ -548,9 +548,12 @@ function get_tables(cb) {
     _.each(collections, function(collection) {
       var idx = collection.name.indexOf(DATASET_PREFIX);
       if (idx > -1) {
+        var table_name = collection.name.substr(idx + DATASET_PREFIX.length);
+
+        if (table_name === "undefined" || table_name === "[object Object]") { return; }
         datasets.push({
-            table_name: collection.name.substr(idx + DATASET_PREFIX.length)
-          });
+          table_name: table_name
+        });
       }
     });
 

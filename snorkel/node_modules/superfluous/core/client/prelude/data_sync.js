@@ -34,7 +34,7 @@
   // tells the server to store some data for us, too.
   // this is a first come, first served type of thing, btw.
   function data_store(k, v, ns) {
-    SF.socket().emit("store", {
+    SF.socket().emit("__store", {
       key: k,
       value: v,
       controller: ns || SF.controller().name });

@@ -1,0 +1,20 @@
+{
+  "files" : [
+    "core/client/prelude/hide_addressbar.js"
+  ],
+  "vendor" : [
+    "app/static/vendor/bootstrap.min.js",
+    "app/static/vendor/jquery.deserialize.js",
+    "app/static/vendor/jquery-deparam.js",
+    "app/static/vendor/fastclick.js",
+    "app/static/vendor/strtotime.js",
+    "app/static/vendor/hex-rgb.src.js"
+  ],
+  "styles" : [
+    "app/static/styles/bootstrap/bootstrap.override.css",
+    "app/static/styles/bootstrap/responsive.css",
+    "app/static/styles/bootstrap/overrides.css",
+    "app/static/styles/box.css",
+    "app/static/styles/scrollers.css"
+  ]
+}

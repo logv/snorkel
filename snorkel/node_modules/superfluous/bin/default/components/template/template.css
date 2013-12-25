@@ -1,16 +1,18 @@
 // mobile devices & portrait
-@media (max-width: 767px) {
+// 200 - 767px
+@media @device {
 
 }
 
-// PCs, Laptops & Netbooks
-// and mobile devices in landscape
-@media (min-width: 767px) 
-and (max-width: 1900px) {
+// netbooks, mobile devices in landscape
+// laptops, desktops
+// 768 - 1900px
+@media @computer {
 
 }
 
-// Huge Screens
-@media (min-width: 1900px) {
+// huge screens
+// 1900px
+@media @large_screen {
 
 }

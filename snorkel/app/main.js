@@ -7,13 +7,14 @@ var express = require('express');
 
 module.exports = {
   setup_app: function(app) {
+    console.log("SETTING UP APP");
     var passport = require('passport');
     app.use(passport.initialize());
     app.use(passport.session());
     app.use(express.bodyParser());
   },
-  setup: function(options) {
-    if (options.collector) {
+  after_ready: function() {
+    if (!config.separate_services) {
       require_app("controllers/data/server").setup_collector();
     }
 

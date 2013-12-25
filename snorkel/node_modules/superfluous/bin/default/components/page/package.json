@@ -1,7 +1,0 @@
-{
-  "main" : "page",
-  "helpers": [],
-  "style": "page.css",
-  "styles": [],
-  "template": "page.html.erb"
-}

@@ -5,7 +5,7 @@ function gracefulShutdown(io, cb) {
   var sockets = socket.get_open_sockets();
   console.log("we still have", sockets.length, "sockets open, shutting em down forcefully");
   _.each(sockets, function(socket) {
-    socket.emit("refresh", { auth: parseInt(Math.random() * 120098, 10)});
+    socket.emit("__refresh", { auth: parseInt(Math.random() * 120098, 10)});
   });
 
   cb();

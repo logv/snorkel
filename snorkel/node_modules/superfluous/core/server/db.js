@@ -1,3 +1,14 @@
+/**
+ *
+ * The DB is a simple API for grabbing collections from Mongo. It makes sure
+ * that the DB connection is created before accessing the collection. In
+ * general, this should not fail, but it might.
+ *
+ * @class db (server)
+ * @module Superfluous
+ * @submodule Server
+ */
+
 "use strict";
 
 var config = require('./config');
@@ -46,6 +57,14 @@ function collection_builder(db_name, before_create) {
   }
 
   return {
+    /**
+     * This function returns a collection from the mongo DB, making sure that
+     * the DB is created before using it.
+     *
+     * @method get
+     * @param {String} db_name* A namespaced name for the DB
+     * @param {Function} cb Function to run when the DB is returned.
+     */
     get: function() {
       var cb;
       var args = _.toArray(arguments);
@@ -87,6 +106,13 @@ function collection_builder(db_name, before_create) {
 
       return collection;
     },
+
+    /**
+     * Returns the raw database connection
+     *
+     * @method raw
+     * @return {Object} db Mongo DB Connection
+     */
     raw: function() {
       return _db;
     }

@@ -23,6 +23,15 @@ module.exports = function spark() {
     };
   }
 
+  // Object create shim
+  if ('undefined' === typeof Object.create) {
+    Object.create = function (o) {
+      function F() {}
+      F.prototype = o;
+      return new F();
+    };
+  }
+
   // shortcut to slice
   var slice = [].slice;
 
@@ -175,15 +184,6 @@ module.exports = function spark() {
     if (data) packet.push(data);
     return packet;
   };
-
-  // Object create shim
-  if ('undefined' === typeof Object.create) {
-    Object.create = function (o) {
-      function F() {}
-      F.prototype = o;
-      return new F();
-    };
-  }
 
   return Spark;
 }

@@ -1,3 +1,11 @@
+/**
+ * This module provides a simple synchronous readfile + caching mechanism.
+ *
+ * @class readfile (server)
+ * @module Superfluous
+ * @submodule Server
+ */
+
 "use strict";
 var fs = require("fs");
 var path = require("path");

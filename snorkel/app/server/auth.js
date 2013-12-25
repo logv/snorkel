@@ -46,6 +46,7 @@ module.exports = {
     var app = auth.app;
     var io = auth.io;
 
+
     passport.serializeUser(function(user, done) {
       _users[user] = user;
       done(null, user.username);
@@ -125,15 +126,13 @@ module.exports = {
     }));
 
     // TODO: via sockets!
-    app.post(
-      '/logout',
+    app.post('/logout',
       function(req, res) {
         req.logout();
         res.end("OK");
       });
 
-    app.post(
-      '/login',
+    app.post('/login',
       passport.authenticate(
         'local',
         { failureRedirect: '/login' }),

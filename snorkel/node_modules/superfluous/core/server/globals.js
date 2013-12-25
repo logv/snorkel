@@ -20,9 +20,7 @@ function install() {
     try {
       var root_path = "static/vendor/";
       return require_core(root_path + path);
-    } catch (e) {
-      console.log(e);
-    }
+    } catch (e) { }
 
     try {
       var root_path = "static/vendor/";

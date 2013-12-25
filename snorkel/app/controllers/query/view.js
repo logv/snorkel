@@ -110,7 +110,6 @@ function get_table_selector() {
         var table_options = {};
 
         _.each(tables, function(table) {
-          if (table.table_name === "undefined") { return; }
           table_options[table.table_name] = table.table_name;
 
           var config = configs[table.table_name];

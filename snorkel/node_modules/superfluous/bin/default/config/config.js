@@ -14,8 +14,8 @@ module.exports = {
   backend: {
 
   },
-  http_port: 3000,
-  https_port: 3443,
+  http_port: process.env.PORT || 3000,
+  https_port: process.env.HTTPS_PORT || 3443,
   max_http_sockets: 1000,
   max_https_sockets: 1000,
   require_https: true
