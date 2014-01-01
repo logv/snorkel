@@ -7,7 +7,7 @@ var backend = require_app("server/backend");
 var driver = require_app("server/backends/driver");
 var DATASET_PREFIX = "datasets/";
 
-var snorkle_db = require_core("server/db")
+var snorkle_db = require_app("server/db")
   .db("snorkel", function(db, db_name) {
     db.createCollection(db_name,
       {

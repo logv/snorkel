@@ -1,6 +1,6 @@
 "use strict";
 
-var db = require_core("server/db");
+var db = require_app("server/db");
 var context = require_core("server/context");
 
 function get_query_from_db(hashid, cb) {

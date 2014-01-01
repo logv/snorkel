@@ -18,7 +18,7 @@ function call(controller, func, args, hash) {
     if (ctrl[func]) {
       window.bootloader.controller_call(controller, ctrl[func], args);
     } else {
-      console.log(func, "isnt present in", controller, "WTF!");
+      SF.error(func, "isnt present in", controller, "WTF!");
     }
   });
 }
@@ -31,14 +31,14 @@ module.exports = {
 
     window.bootloader.__controller_name = controller;
 
-    console.log("Setting controller", controller, pageId);
+    SF.log("Setting controller", controller, pageId);
     SF.controller(controller, function(cmp) {
       if (!cmp) {
-        console.log("Tried to set server to", controller, "but fialed!");
+        SF.error("Tried to set server to", controller, "but failed!");
         return;
       }
 
-      console.log("Loaded controller", controller, cmp);
+      SF.log("Loaded controller", controller, cmp);
 
       cmp.page = page;
       cmp.setElement(page);

@@ -5,6 +5,10 @@
     "private": true,
     "dependencies": {
       "superfluous" : "x"
+    },
+    "scripts" : {
+      "test" : "bash scripts/run_tests.sh",
+      "start" : "node app.js"
     }
 }
 

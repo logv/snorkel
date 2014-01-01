@@ -2,7 +2,7 @@
 var Component = Backbone.View.extend({
   tagName: 'div',
 
-  className: 'button',
+  className: 'cmp',
 
   init: function(options) {
     Backbone.View.init(options);

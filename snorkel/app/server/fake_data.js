@@ -1,6 +1,6 @@
 "use strict";
 
-var db = require_core("server/db");
+var db = require_app("server/db");
 var Faker = require("Faker");
 
 var field_generator = {

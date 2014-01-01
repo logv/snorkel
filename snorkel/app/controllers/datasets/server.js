@@ -2,7 +2,7 @@
 
 var $ = require("cheerio");
 
-var db = require_core("server/db");
+var db = require_app("server/db");
 var config = require_core("server/config");
 var context = require_core("server/context");
 var page = require_core("server/page");

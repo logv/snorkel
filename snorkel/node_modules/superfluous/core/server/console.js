@@ -17,5 +17,11 @@ module.exports = {
       };
     });
 
+  },
+  uninstall: function() {
+    _.each(['info', 'log', 'warn', 'debug'], function(func) {
+      var old_func = console[func+"_no_ts"];
+      console[func] = old_func;
+    });
   }
-}
+};

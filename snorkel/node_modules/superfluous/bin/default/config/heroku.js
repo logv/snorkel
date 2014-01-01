@@ -5,10 +5,6 @@ module.exports = {
   http_port: process.env.PORT || 3000,
   max_http_sockets: 1000,
   max_https_sockets: 1000,
-  require_https: false,
   hostname: process.env.HTTPHOST || "localhost",
-  backend: {
-    db_url: process.env.MONGOHQ_URL
-  },
   behind_proxy: true
 };

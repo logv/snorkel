@@ -31,8 +31,9 @@ var config = require_core("server/config");
 var app_name = package_json.name;
 var USE_CLS = config.use_cls;
 
+var ns;
 if (USE_CLS) {
-  var ns = require("continuation-local-storage").createNamespace('superfluous');
+  ns = require("continuation-local-storage").createNamespace('superfluous');
 }
 
 var __id = 0;
@@ -70,7 +71,7 @@ _.extend(module.exports, {
       ctx = process.domain.ctx;
     }
 
-    if (!ctx) { throw("HOW IS THERE NO PROCESS DOMAIN CONTEXT"); }
+    if (!ctx) { console.trace(); throw("HOW IS THERE NO PROCESS DOMAIN CONTEXT"); }
 
     _.each(__defaults, function(v, k) {
       if (!ctx[k]) {
@@ -118,6 +119,10 @@ _.extend(module.exports, {
     var d;
     if (USE_CLS) {
       d = ns;
+      // setting up the active domain context, if it isn't existing?
+      if (!d.active) {
+        d.active = {};
+      }
     } else {
       d = domain.create();
     }
@@ -201,7 +206,10 @@ _.extend(module.exports, {
     } else {
       d = process.domain;
     }
-    if (!d) { return func; }
+
+    if (!d) { 
+      return func; 
+    }
 
     return function() {
       var args = arguments;

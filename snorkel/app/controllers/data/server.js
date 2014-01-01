@@ -4,7 +4,7 @@ var fs = require("fs");
 var page = require_core("server/page");
 var template = require_core("server/template");
 var context = require_core("server/context");
-var db = require_core("server/db");
+var db = require_app("server/db");
 var config = require_core("server/config");
 
 var auth = require_app("server/auth");

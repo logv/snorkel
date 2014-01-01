@@ -1,7 +1,7 @@
 "use strict";
 
 var _ = require_vendor("underscore");
-var db = require_core("server/db");
+var db = require_app("server/db");
 var backend = require_app("server/backend");
 var context = require_core("server/context");
 

@@ -2,7 +2,7 @@
 
 var bridge = require_core("server/bridge");
 var context = require_core("server/context");
-var db = require_core("server/db");
+var db = require_app("server/db");
 var template = require_core("server/template");
 var page = require_core("server/page");
 
