@@ -17,6 +17,15 @@ module.exports = {
     // Install our console.log slogger
     require_app("controllers/slog/server").install();
   },
+  insteadof_store: function() {
+    var package_json = require_core("../package.json");
+    var app_name = package_json.name;
+    var url = config.backend && config.backend.db_url;
+    var connect = require("connect");
+    var MongoStore = require('connect-mongo')(connect);
+    var store = new MongoStore({url: url, db: app_name, auto_reconnect: true } );
+    require_core("server/store").set(store);
+  },
   after_ready: function() {
     if (!config.separate_services) {
       require_app("controllers/data/server").setup_collector();

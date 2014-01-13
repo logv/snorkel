@@ -1,7 +1,8 @@
 {
   "/": "home",
+  "/slog": "slog",
   "/home": "home",
-  "/about" : "about",
+  "/tour" : "about",
   "/login" : "login",
   "/query" : "query",
   "/data" : "data",

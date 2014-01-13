@@ -1,0 +1,12 @@
+.container-fluid {
+  margin-top: 60px;
+  padding: 20px;
+}
+
+.slide_link {
+  cursor: pointer;
+}
+
+.slide {
+  border: 3px solid #ddd;
+}

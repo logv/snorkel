@@ -1,0 +1,20 @@
+<div class="row-fluid">
+  <div class="span2">
+    <% _.each(slides, function(s, index) { %>
+      <div>
+          <a class="slide_link" data-target="<%= s.title %>">
+            <%= s.title %>
+          </a>
+      </div>
+    <% }); %>
+  </div>
+
+  <div class="clearfix slides span8">
+    <% _.each(slides, function(s, index) { %>
+        <div class="slide" style="display: none;" data-id="<%= s.title %>">
+            <img src="<%= s.src %>" > </img>
+            <div class="caption"> </div>
+        </div>
+      <% }); %>
+  </div>
+</div>
