@@ -593,7 +593,7 @@ module.exports = {
         return;
       }
 
-      if ($(this).val()) {
+      if ($(this).val() && typeof query[name] !== "undefined") {
         $(this).val(query[name]);
         $(this).trigger("liszt:updated");
       }

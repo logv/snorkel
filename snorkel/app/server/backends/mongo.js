@@ -564,7 +564,7 @@ function get_tables(cb) {
 
 function get_cached_columns(table, cb) {
   if (_cached_columns[table]) {
-    console.log("Using cached column results");
+    console.log("Using cached column results for", table);
     var cached_for = (Date.now() - _cached_columns[table].updated) / 1000;
     cb(_cached_columns[table].results);
     cb = function() { };
