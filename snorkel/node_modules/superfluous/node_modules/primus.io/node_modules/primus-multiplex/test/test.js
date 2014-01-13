@@ -290,6 +290,36 @@ describe('primus-multiplex', function (){
     });
   });
 
+  describe('cleaning up client events', function () {
+    var EVENTS = [
+        'error',
+        'open',
+        'online',
+        'offline',
+        'reconnect',
+        'reconnecting'
+      ];
+
+    EVENTS.forEach(function createTest(event) {
+      it('should remove the ' + event + ' listener when client disconnects', function (done) {
+        var a = primus.channel('a');
+        srv.listen(function () {
+          a.on('disconnection', function (spark) {
+            expect(cl.listeners(event)).to.have.length(eventCount);          
+
+            done(); 
+          });
+        });
+
+        var cl = client(srv, primus)
+          , eventCount = cl.listeners(event).length
+          , ca = cl.channel('a');
+
+        ca.end();
+      });
+    });
+  });
+
   it('should `emit` close event when destroying a channel', function (done) {
     var a = primus.channel('a');
     srv.listen(function () {

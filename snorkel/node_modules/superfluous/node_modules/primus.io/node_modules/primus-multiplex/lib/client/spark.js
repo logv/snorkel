@@ -94,19 +94,34 @@ module.exports = function spark() {
     }
 
     function reemit(ev) {
-      spark.conn.on(ev, function onevs() {
-        spark.emit.apply(spark, [ev].concat(slice.call(arguments)));
+      spark.conn.on(ev, onevs);
+
+      spark.on('end', function () {
+        spark.conn.removeListener(ev, onevs);
       });
+
+      function onevs() {
+        spark.emit.apply(spark, [ev].concat(slice.call(arguments)));
+      }
     }
 
-    spark.conn.on('open', function onopen() {
-      if (spark.reconnect) spark.connect();
-      spark.reconnect = false;
+    spark.conn.on('open', onopen);
+
+    spark.conn.on('reconnect', onreconnect);
+
+    spark.on('end', function () {
+      spark.conn.removeListener('open', onopen);
+      spark.conn.removeListener('reconnect', onreconnect);
     });
 
-    spark.conn.on('reconnect', function onreconnect() {
+    function onopen() {
+      if (spark.reconnect) spark.connect();
+      spark.reconnect = false;
+    }
+
+    function onreconnect() {
       spark.reconnect = true;
-    });
+    }
 
     return this;
   };

@@ -23,9 +23,9 @@ function Adapter(){
 /**
  * Adds a socket from a room.
  *
- * @param {String} socket id
- * @param {String} room name
- * @param {Function} callback
+ * @param {String} id Socket id
+ * @param {String} room The room name
+ * @param {Function} fn Callback
  * @api public
  */
 
@@ -40,7 +40,7 @@ Adapter.prototype.add = function add(id, room, fn) {
 /**
  * Get rooms socket is subscribed to.
  *
- * @param {String} socket id
+ * @param {String} id Socket id
  * @param {Function} fn callback
  * @api public
  */
@@ -55,9 +55,9 @@ Adapter.prototype.get = function get(id, fn) {
 /**
  * Removes a socket from a room.
  *
- * @param {String} socket id
- * @param {String} room name
- * @param {Function} callback
+ * @param {String} id Socket id
+ * @param {String} room The room name
+ * @param {Function} fn Callback
  * @api public
  */
 
@@ -139,8 +139,8 @@ Adapter.prototype.broadcast = function broadcast(data, opts, clients) {
 /**
  * Get client ids connected to this room.
  *
- * @param {String} room
- * @param {Function} callback
+ * @param {String} room The room name
+ * @param {Function} fn Callback
  * @param {Array} clients
  * @api public
  */

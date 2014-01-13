@@ -8,7 +8,7 @@ tree.Rule = function (name, value, important, merge, index, currentFileInfo, inl
     this.index = index;
     this.currentFileInfo = currentFileInfo;
     this.inline = inline || false;
-    this.variable = (name.charAt(0) === '@');
+    this.variable = name.charAt && (name.charAt(0) === '@');
 };
 
 tree.Rule.prototype = {
@@ -31,16 +31,26 @@ tree.Rule.prototype = {
     toCSS: tree.toCSS,
     eval: function (env) {
         var strictMathBypass = false;
-        if (this.name === "font" && !env.strictMath) {
+        var name = this.name.map ? 
+            this.name.map( function(v) {
+                return v.eval ? v.eval(env).value : v;
+            }).join('') : this.name;
+        if (name === "font" && !env.strictMath) {
             strictMathBypass = true;
             env.strictMath = true;
         }
         try {
-            return new(tree.Rule)(this.name,
+            return new(tree.Rule)(name,
                               this.value.eval(env),
                               this.important,
                               this.merge,
                               this.index, this.currentFileInfo, this.inline);
+        }
+        catch(e) {
+            if (e.index === undefined) {
+                e.index = this.index;
+            }
+            throw e;
         }
         finally {
             if (strictMathBypass) {

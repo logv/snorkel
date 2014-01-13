@@ -40,13 +40,14 @@ tree.Color.prototype = {
         // is via `rgba`. Otherwise, we use the hex representation,
         // which has better compatibility with older browsers.
         // Values are capped between `0` and `255`, rounded and zero-padded.
-        if (this.alpha < 1.0) {
+        if (this.alpha < 1) {
             if (this.alpha === 0 && this.isTransparentKeyword) {
                 return transparentKeyword;
             }
             return "rgba(" + this.rgb.map(function (c) {
-                return Math.round(c);
-            }).concat(this.alpha).join(',' + (compress ? '' : ' ')) + ")";
+                return clamp(Math.round(c), 255);
+            }).concat(clamp(this.alpha, 1))
+                .join(',' + (compress ? '' : ' ')) + ")";
         } else {
             var color = this.toRGB();
 
@@ -70,24 +71,16 @@ tree.Color.prototype = {
     // we create a new Color node to hold the result.
     //
     operate: function (env, op, other) {
-        var result = [];
-
-        if (! (other instanceof tree.Color)) {
-            other = other.toColor();
-        }
-
+        var rgb = [];
+        var alpha = this.alpha * (1 - other.alpha) + other.alpha;
         for (var c = 0; c < 3; c++) {
-            result[c] = tree.operate(env, op, this.rgb[c], other.rgb[c]);
+            rgb[c] = tree.operate(env, op, this.rgb[c], other.rgb[c]);
         }
-        return new(tree.Color)(result, this.alpha + other.alpha);
+        return new(tree.Color)(rgb, alpha);
     },
 
     toRGB: function () {
-        return '#' + this.rgb.map(function (i) {
-            i = Math.round(i);
-            i = (i > 255 ? 255 : (i < 0 ? 0 : i)).toString(16);
-            return i.length === 1 ? '0' + i : i;
-        }).join('');
+        return toHex(this.rgb);
     },
 
     toHSL: function () {
@@ -143,12 +136,7 @@ tree.Color.prototype = {
         return { h: h * 360, s: s, v: v, a: a };
     },
     toARGB: function () {
-        var argb = [Math.round(this.alpha * 255)].concat(this.rgb);
-        return '#' + argb.map(function (i) {
-            i = Math.round(i);
-            i = (i > 255 ? 255 : (i < 0 ? 0 : i)).toString(16);
-            return i.length === 1 ? '0' + i : i;
-        }).join('');
+        return toHex([this.alpha * 255].concat(this.rgb));
     },
     compare: function (x) {
         if (!x.rgb) {
@@ -174,5 +162,15 @@ tree.Color.fromKeyword = function(keyword) {
     }
 };
 
+function toHex(v) {
+    return '#' + v.map(function (c) {
+        c = clamp(Math.round(c), 255);
+        return (c < 16 ? '0' : '') + c.toString(16);
+    }).join('');
+}
+
+function clamp(v, max) {
+    return Math.min(Math.max(v, 0), max); 
+}
 
 })(require('../tree'));

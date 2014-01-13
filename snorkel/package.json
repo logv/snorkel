@@ -8,12 +8,12 @@
       "hashids" : "x",
       "amqp" : "x",
       "htpasswd" : "x",
+      "connect" : "2.x",
       "json-stable-stringify" : "x",
       "passport-google" : "x",
       "trust-proxy" : "x",
       "squel" : "x",
       "pg" : "x",
-      "connect" : "x",
       "connect-mongo" : "x"
     }
 }

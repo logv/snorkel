@@ -39,6 +39,10 @@ var lessc_helper = {
         console.log("  -v, --version            Print version number and exit.");
         console.log("  -x, --compress           Compress output by removing some whitespaces.");
         console.log("  --clean-css              Compress output using clean-css");
+        console.log("  --clean-option=opt:val   Pass an option to clean css, using CLI arguments from ");
+        console.log("                           https://github.com/GoalSmashers/clean-css e.g.");
+        console.log("                           --clean-option=--selectors-merge-mode:ie8");
+        console.log("                           and to switch on advanced use --clean-option=--advanced");
         console.log("  --source-map[=FILENAME]  Outputs a v3 sourcemap to the filename (or output filename.map)");
         console.log("  --source-map-rootpath=X  adds this path onto the sourcemap filename and less file paths");
         console.log("  --source-map-basepath=X  Sets sourcemap base path, defaults to current working directory.");
@@ -75,4 +79,4 @@ var lessc_helper = {
 };
 
 // Exports helper functions
-for (var h in lessc_helper) { exports[h] = lessc_helper[h]; }
+for (var h in lessc_helper) { if (lessc_helper.hasOwnProperty(h)) { exports[h] = lessc_helper[h]; }}

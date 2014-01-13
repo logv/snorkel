@@ -12,8 +12,22 @@ var server = http.createServer(function server(req, res) {
 var primus = new Primus(server, { transformer: 'websockets', parser: 'JSON' });
 
 
+var a = primus.channel('a');
+
+
+a.on('connection', function (spark) {
+  console.log('connecting', spark.id);
+});
+
+a.on('disconnection', function (spark) {
+  console.log('disconnecting', spark.id);
+  a.forEach(function(conn){
+    conn.send('news','Spark ' + spark.id + ' disconnected');
+  });
+});
+
 // Listen for new connections
-primus.on('connection', function connection(spark) {
+/*primus.on('connection', function connection(spark) {
   console.log('new connection');
 
   spark.send('hello', 'world');
@@ -33,7 +47,7 @@ primus.on('connection', function connection(spark) {
   setInterval(function(){
     spark.room('news').send('news', '[NEWS] Breaking news!');
   }, 5000);
-});
+});*/
 
 // Start server listening
 server.listen(process.env.PORT || 8081, function(){
