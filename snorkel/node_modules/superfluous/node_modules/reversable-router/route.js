@@ -1,0 +1,314 @@
+var XRegExp = require('xregexp').XRegExp;
+
+exports = module.exports = Route;
+
+function Route(path, options) {
+  this.options = {
+    recursiveWildcard:true,
+    caseSensitive:    false,
+    wildcardInPairs:  false
+  }
+  this.setOptions(options);
+  this.path = path;
+  this.regex = null;
+}
+
+/**
+ * Set route options
+ * @param options
+ */
+Route.prototype.setOptions = function (options) {
+  for (var prop in options) {
+    this.options[prop] = options[prop];
+  }
+}
+/**
+ * Creates a regular expression from the provided `path` to match the URL against
+ * @return XRegExp
+ * @todo add parameter-specific regexes like :id => [\d]+, clean the regex items like `\.` so `\` => `\\`
+ * @todo if a Regex object passed => extract pattern
+ */
+Route.prototype.compile = function () {
+  var path = this.path;
+  // force all inner `masked` parameters to be required
+  path = path.replace(/\/\*\*/g, '/*');
+
+  // store the cleaned path to be used for URL generation
+  this.cleanedPath = path;
+
+  // make bracketed groups in url path a optional regex group
+  path = path.replace(/\)/g, ')?');
+
+  //the last `masked` parameter is optional
+  if (path.slice(-2) == '/*') {
+    path = path.slice(0, -2) + "/**";
+  }
+
+  //escape full stops
+  path = path.replace(/\./g, '\\.');
+
+  // change wildcards , the `*` (calling them `masked` parameters) to masked0, masked1...
+  var maskedWildcardName = '';
+  var hasMaskedWildcard = false;
+  var masked = [];
+  var i = 0;
+
+  path = XRegExp.replace(path, XRegExp('/\\*\\*?', 'g'), function (match) {
+    var splatName = 'splat' + i;
+    i++;
+    masked.push(splatName);
+    // last `splat` is optional and allows having `/` inside of it
+    if (match == '/**') {
+      hasMaskedWildcard = true;
+      maskedWildcardName = splatName;
+      return '(/(?<' + splatName + '>.*))?';
+    }
+    // any other `masked` parameters are required and don't allow `/` inside of them
+    return '/(?<' + splatName + '>[^/]+)';
+  });
+
+  //the last `masked` parameter is optional
+  if (path.slice(-1) == '/') {
+    path = path.substr(0, -1);
+  }
+
+  this.hasMaskedWildcard = hasMaskedWildcard;
+  this.masked = masked;
+  this.maskedWildcardName = maskedWildcardName;
+
+
+  // change & count named parameters ( `:params`)
+  var params = [];
+  path = XRegExp.replace(path, XRegExp(':[\\p{L}0-9_]+', 'g'), function (match) {
+    match = match.replace(':', '');
+    if (params.indexOf(match) > -1) return ':' + match;
+    params.push(match);
+    return '(?<' + match + '>[^/]+)';
+  });
+  this.params = params;
+
+
+  // Check if there is optional parts in the path
+  var optionalParams = [];
+  var bracketGroups = [];
+  var self = this;
+
+  // Performance: only check if there's a bracket character in the path
+  if (self.cleanedPath.indexOf('(') > -1) {
+    var unclosed = [];
+    for (var i = 0; i <= self.cleanedPath.length - 1; i++) {
+      var currentChar = self.cleanedPath[i];
+      if (currentChar == '(') {
+        bracketGroups.push({
+          start: i,
+          end:   null,
+          params:[]
+        });
+        unclosed.push(bracketGroups.length - 1);
+        continue;
+      }
+      if (currentChar == ')') {
+        bracketGroups[unclosed.pop()].end = i;
+      }
+    }
+    // Order by opening bracket position, descending
+    bracketGroups.sort(function (a, b) {
+      return a.start > b.start ? -1 : 1;
+    })
+    // Check for parameters in the optional parts, i.e. optional parameters
+    params.forEach(function (paramName) {
+      var index = self.cleanedPath.indexOf(':' + paramName);
+      bracketGroups.every(function (group) {
+        if (group.start < index && group.end > index && optionalParams.indexOf(paramName) == -1) {
+          optionalParams.push(paramName);
+          group.params.push(paramName);
+          return false;
+        }
+        return true;
+      })
+    })
+  }
+  this.optionalParams = optionalParams;
+  this.optionalParts = bracketGroups;
+
+  // Store compiled regex
+  this.regex = XRegExp('^' + path + '$', this.options.caseSensitive ? 'i' : undefined);
+  return this.regex;
+}
+
+
+/**
+ * Check if URL matches the route and if it does extract parameters
+ * @param url
+ * @return {*}
+ */
+Route.prototype.match = function (url) {
+  //make sure the last `/` is trimmed off the url, otherwise last splash can falsely be empty string, i.e. ''
+  if (url.slice(-1) == '/') {
+    url = url.substr(0, -1);
+  }
+  var path = this.path;
+
+  // Matches url?
+  // Performance: If there isn't any regex characters `*:()` then simply check for equality
+  if (path.indexOf('*') == -1 && path.indexOf(':') == -1 && path.indexOf('(') == -1 && path.indexOf(')') == -1 && path == url) {
+    return true;
+  }
+  var regex = this.regex ? this.regex : this.compile();
+  var matches = XRegExp.exec(url, regex);
+  if (matches == null) return false;
+
+  // Initialise the return value (found parameters)
+  var self = this;
+  var RequestParams = {_masked:[]};
+
+  // All named parameters
+  self.params.forEach(function (param) {
+    if (matches[param] == undefined) return;
+    RequestParams[param] = matches[param];
+  });
+
+  // All masked/unnamed parameters
+  var masked = self.masked;
+  masked.every(function (maskedName) {
+    if (matches[maskedName] == undefined) return true;
+    if (maskedName != self.maskedWildcardName) {
+      RequestParams._masked.push(matches[maskedName]);
+      return true;
+    }
+    // there is a anything-goes wildcard in the end of the url path, handle it:
+    if (self.options.recursiveWildcard) {
+      var maskedWildcardData = matches[maskedName].split('/');
+      // If we have `.../id/23` then:
+      // 1) parse is as 0=>id, 1=>23
+      if (!self.options.wildcardInPairs) {
+        RequestParams._masked = RequestParams._masked.concat(maskedWildcardData);
+        return false;
+      }
+      // 2) parse is as id => 23
+      var i = 0;
+      while (maskedWildcardData[i + 1] != undefined) {
+        if (i % 2 != 0) {
+          i++;
+          continue;
+        }
+        RequestParams[maskedWildcardData[i]] = maskedWildcardData[i + 1];
+        i++;
+      }
+    } else {
+      RequestParams._masked.push(matches[maskedName]);
+    }
+    return false;
+  });
+
+  return RequestParams;
+}
+
+
+/**
+ * Builds a URL using provided parameters
+ *
+ * @param {array} userParams The parameters, example: {id:4, _masked:[2, 1, 2]}
+ * @return {String}
+ */
+Route.prototype.generate = function (userParams) {
+  // Initialise return value
+  var self = this;
+  if (!this.regex) this.compile();
+  var url = this.cleanedPath;
+  var foundParameters = [];
+  var knownNamedParameters = this.params;
+  userParams = userParams == undefined ? {_masked:[]} : userParams;
+  userParams._masked = userParams._masked == undefined ? [] : userParams._masked;
+  // Check what parameters were provided by the user
+  knownNamedParameters.forEach(function (name) {
+    if (userParams[name] == undefined) return;
+    foundParameters.push(name);
+  })
+
+  // Has the user provided all parameters?
+  if (foundParameters.length != knownNamedParameters.length) {
+    // Don't match this route if there can't be any optional parameters
+    if (this.optionalParams.length == 0) throw new Error('not all url parameters are provided');
+    // Remove optional parts with missing parameters inside
+    url = this.removePartsWithMissingParams(url, userParams);
+  }
+  if (this.optionalParams.length) {
+    url = url.replace(/[\(\)]/g, '');
+  }
+
+  // Replace named parameters
+  foundParameters.forEach(function (name) {
+    url = url.replace(':' + name, userParams[name]);
+  })
+
+  // Replace masked/unnamed parameters, account for masked parameters that could have been removed in the optional parts
+  var maskCount = url.match(/\*/g);
+  var requiredMaskedNum = maskCount == null ? 0 : maskCount.length;
+  requiredMaskedNum = this.hasMaskedWildcard ? requiredMaskedNum - 1 : requiredMaskedNum;
+  var usedMasked = 0;
+
+  // Handle masked parameters
+  userParams._masked.forEach(function (value, i) {
+    // fill in required masked parameters
+    if (usedMasked < requiredMaskedNum) {
+      url = url.replace('*', value);
+      usedMasked++;
+      return true;
+    }
+    if (url.indexOf('*') == -1) throw new Error('too much `_masked` values provided. if you think this is not the problem check if you forgot to pass a named parameter you wanted');
+    // if wildcard parameters are enabled and are not parsed in pairs join the remaining of userParams._masked
+    if (self.hasMaskedWildcard && !self.options.wildcardInPairs) {
+      url = url.replace('*', userParams._masked.splice(i).join('/'));
+    }
+    return false;
+  });
+  if (userParams._masked.length < requiredMaskedNum) throw new Error('not enough `_masked` values provided');
+  delete userParams._masked;
+
+  // Handle optional masked parameters
+  if (this.hasMaskedWildcard && url.indexOf('*') > -1) {
+    // Make sure we replace the last `*` with something (even if it is an empty string)
+    var lastMaskReplacement = '';
+    // Handle masked wildcard parameters parsed in pairs
+    if (this.options.wildcardInPairs) {
+      for (var name in userParams) {
+        var value = userParams[name];
+        if (foundParameters.indexOf(name) > -1) continue;
+        lastMaskReplacement += name + '/' + value + '/';
+      }
+    }
+    url = url.replace('*', lastMaskReplacement);
+  }
+
+  return url;
+}
+
+
+Route.prototype.removePartsWithMissingParams = function (url, userParams) {
+  var groupsToRemove = [];
+  this.optionalParts.forEach(function (part) {
+    part.params.every(function (optionalParam) {
+      if (userParams[optionalParam] == undefined) {
+        groupsToRemove.push(part);
+        return false;
+      }
+      return true;
+    });
+  });
+  var subtractPairs = [];
+  groupsToRemove.forEach(function (group) {
+    var from = group.start, to = group.end, accountedForRemoval = false;
+    subtractPairs.forEach(function (subtract, i) {
+      if (from < subtract.start && to > subtract.end) {
+        to = to - (subtract.end + 1 - subtract.start);
+        subtractPairs[i] = {start:from, end:to};
+        accountedForRemoval = true;
+      }
+    });
+    url = url.substr(0, from) + url.substr(to + 1);
+    if (!accountedForRemoval) subtractPairs.push({start:group.start, end:group.end});
+  });
+  return url;
+}
+
