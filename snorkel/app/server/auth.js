@@ -118,7 +118,9 @@ module.exports = {
       function(username, password, done) {
         // creates a user, with an incrementing ID from RAM
         var passhash = USERS[username] || "lkj";
-        if (htpasswd.validate(passhash, password)) {
+        if (htpasswd.validate && htpasswd.validate(passhash, password)) {
+          done(null, new_user(username)); 
+        } else if (htpasswd(passhash, password)) {
           done(null, new_user(username));
         } else {
           done("just kidding, not just any credentials will wrok. try again");
