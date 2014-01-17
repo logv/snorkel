@@ -333,6 +333,10 @@ module.exports = {
       // gotta show a little dealie for old queries
     });
 
+    $(window.document).on("click", function() {
+      SF.trigger("page:clicked");
+    });
+
 
     var _history_modal;
 
