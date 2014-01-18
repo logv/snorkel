@@ -4,11 +4,11 @@
     "version": "0.0.9",
     "private": true,
     "dependencies": {
-      "superfluous" : "0.0.30",
+      "connect" : "x",
+      "superfluous" : "0.0.32",
       "hashids" : "x",
       "amqp" : "x",
       "htpasswd" : "x",
-      "connect" : "2.x",
       "json-stable-stringify" : "x",
       "passport-google" : "x",
       "trust-proxy" : "x",
