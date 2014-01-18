@@ -1,11 +1,17 @@
 "use strict";
 
+var config = require_core("server/config");
+
 function gracefulShutdown(io, cb) {
   var socket = require_core("server/socket");
   var sockets = socket.get_open_sockets();
-  _.each(sockets, function(socket) {
-    socket.emit("__refresh", { auth: parseInt(Math.random() * 120098, 10)});
-  });
+
+  // if we are in development mode
+  if (!config.RELEASE) {
+    _.each(sockets, function(socket) {
+      socket.emit("__refresh", { auth: parseInt(Math.random() * 120098, 10)});
+    });
+  }
 
   cb();
 }

@@ -67,14 +67,16 @@ module.exports = {
         // if the cookie isn't holding the session, let's use our real persistence store
         try {
           used_store.load(sid, function(err, sess) {
-            sess.reload(function() {
-              if (sess) {
-                handshake_data.headers.sid = sid;
-                handshake_data.headers.session = sess;
-              }
+            if (sess) {
+              sess.reload(function() {
+                if (sess) {
+                  handshake_data.headers.sid = sid;
+                  handshake_data.headers.session = sess;
+                }
 
-              cb(err, true);
-            });
+                cb(err, true);
+              });
+            }
           });
         } catch(e) {
           console.log(e);

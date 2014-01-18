@@ -28,7 +28,15 @@ table.table tbody td {
 
 
 /* Chosen selector height input */
-[data-cmp="multiselect"] .chzn-container-multi .chzn-choices .search-field input { height: 25px; }
+[data-cmp="multiselect"] .chzn-container-multi .chzn-choices 
+  @media @computer {
+    width: 140px;
+  }
+
+  .search-field input { 
+    height: 25px; 
+  }
+}
 
 
 /* In general, tap shouldn't do anything */
