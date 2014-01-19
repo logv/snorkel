@@ -3,8 +3,8 @@
 var auth = require_app("server/auth");
 var perf = require_app("server/perf");
 var config = require_core("server/config");
-var express = require('express');
-var context = require_core("server/context");
+var express = require("express");
+var main = require_core("server/main");
 
 module.exports = {
   setup_app: function(app) {
@@ -21,7 +21,7 @@ module.exports = {
     var package_json = require_core("../package.json");
     var app_name = package_json.name;
     var url = config.backend && config.backend.db_url;
-    var connect = require("connect");
+    var connect = main.connect;
     var MongoStore = require('connect-mongo')(connect);
     var store = new MongoStore({url: url, db: app_name, auto_reconnect: true } );
     require_core("server/store").set(store);
