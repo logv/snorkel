@@ -4,5 +4,6 @@ module.exports = {
   require_https: false,
   separate_services: false,
   no_api_auth: true,
+  use_cls: true,
   default_max_dataset_size: 1024 * 1024 * 100
 };

@@ -217,7 +217,11 @@ module.exports = {
       });
     })();
 
-    page.render({ content: render_async.toString(), header: header_str });
+    page.render({ 
+      content: render_async.toString(), 
+      header: header_str, 
+      socket: true, 
+      component: true});
     bridge.flush_data();
 
 

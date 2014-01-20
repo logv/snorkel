@@ -2,6 +2,7 @@
 
 var _datasets = {};
 
+require("core/client/component");
 var helpers = require("app/client/views/helpers");
 
 module.exports = {
