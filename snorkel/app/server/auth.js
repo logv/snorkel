@@ -58,12 +58,13 @@ module.exports = {
     });
 
     if (config.google_auth && config.google_auth.enabled) {
-      var GoogleStrategy = require('passport-google').Strategy;
+      var GoogleStrategy = require('passport-google-oauth').OAuth2Strategy;
 
       // Redirect the user to Google for authentication.  When complete, Google
       // will redirect the user back to the application at
       //     /auth/google/return
-      app.get('/auth/google', passport.authenticate('google'));
+      app.get('/auth/google', passport.authenticate('google', {
+        scope: ['email' ]}));
 
       // Google will redirect the user to this URL after authentication.  Finish
       // the process by verifying the assertion.  If valid, the user will be
@@ -85,11 +86,13 @@ module.exports = {
       }
 
       passport.use(new GoogleStrategy({
-          returnURL: realm + '/auth/google/return',
-          realm: realm
+          callbackURL: realm + '/auth/google/return',
+          realm: realm,
+          clientID: config.google_auth.client_id,
+          clientSecret: config.google_auth.client_secret,
         },
-        function(identifier, profile, done) {
-          var email = profile.emails[0].value.toLowerCase();
+        function(accessToken, refreshToken, profile, done) {
+          var email = profile._json.emails[0].value.toLowerCase();
           var tokens = email.split("@");
           var domain = tokens.pop();
           var user = email;

@@ -33,7 +33,12 @@ module.exports = {
     //  'you@your_google_domain.com': true,
     //  'your_friend@her_google_domain.com' : true
     // }
-    authorized_users: false
+    authorized_users: false,
+
+    // Generate these per project in http://console.developers.console.com -> credentials
+    // and add the URL: http://snorkel.server/auth/google/return to the allowed callback URL
+    client_secret: null,
+    client_id: null
   },
   behind_proxy: false,
   rss_feed: {
