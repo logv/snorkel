@@ -184,11 +184,12 @@ module.exports = {
       return colCmp.toString();
     }
 
-    function render_table_header(add_cast) {
+    function render_table_header(int_col) {
       var header = $("<tr>");
       var headers = [ "name", "display name", "description", "hidden", "formatter" ];
-      if (add_cast) {
+      if (int_col) {
         headers.push("groupable");
+        headers.push("time col");
       }
 
       _.map(headers, function(col) {

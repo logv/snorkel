@@ -12,7 +12,8 @@ var perf = module.exports = {
 
     _.extend(options, {
       integer: {
-        t_start: start
+        t_start_big: start,
+        t_start: start / 1000
       }
     });
 

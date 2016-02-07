@@ -53,6 +53,10 @@ module.exports = {
             col_meta.final_type = col_meta.type_str;
           }
 
+          if (col_meta.type_str === "integer" && col_meta.time_col) {
+            config.metadata.time_col = name;
+          }
+
         });
 
         var col_types = _.groupBy(cols, function(col_meta) {

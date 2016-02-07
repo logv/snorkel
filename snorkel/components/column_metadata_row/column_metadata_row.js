@@ -48,6 +48,17 @@ module.exports = {
     });
 
     $C("xeditable", {}, function() {
+      that.$el.find("td .editable[data-name='time_col']").editable({
+        source: [
+          {value: 'true', text: 'true'},
+          {value: 'false', text: 'false'}
+        ],
+        mode: 'popup',
+        type: 'select'
+      });
+    });
+
+    $C("xeditable", {}, function() {
       that.$el.find("td .editable[data-name='groupable']").editable({
         source: [
           {value: 'true', text: 'true'},

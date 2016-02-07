@@ -26,6 +26,9 @@ module.exports = {
     var store = new MongoStore({url: url, db: app_name, auto_reconnect: true } );
     require_core("server/store").set(store);
   },
+  setup_context: function(ctx) {
+    ctx.use_fullscreen = true
+  },
   after_ready: function() {
     if (!config.separate_services) {
       require_app("controllers/data/server").setup_collector();

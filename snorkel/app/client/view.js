@@ -158,6 +158,7 @@ SF.on("query:no_samples", function(data) {
 
 var graphs = {};
 function create_graph(Grapher, data, throbber) {
+
   var graphEl = $("<div>");
   var graph = new Grapher({
     el: graphEl,

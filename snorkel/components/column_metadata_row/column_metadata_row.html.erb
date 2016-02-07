@@ -1,4 +1,5 @@
 <%= set_default("groupable", "") %>
+<%= set_default("time_col", "") %>
 <td> <%= name %> </td>
 <td data-name="display_name" class="editable editable-click auto"> <%= display_name %> </td>
 <td><span data-name="description" class="editable editable-click" data-type="textarea" data-pk="1"> <%= description %> </span></td>
@@ -7,4 +8,7 @@
 
 <% if (type_str === "integer") { %>
   <td><span data-name="groupable" class="editable editable-click" data-type="select"> <%= groupable %> </span></td>
+<% } %>
+<% if (type_str === "integer") { %>
+  <td><span data-name="time_col" class="editable editable-click" data-type="select"> <%= time_col %> </span></td>
 <% } %>

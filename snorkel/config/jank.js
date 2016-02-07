@@ -1,6 +1,9 @@
 module.exports = {
   sockets: false,
   hostname: 'snorkel.superfluous.io',
+  backend: {
+    driver: "pcs"
+  },
   google_auth: {
     enabled: true
   },
