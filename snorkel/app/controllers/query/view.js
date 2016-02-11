@@ -178,7 +178,7 @@ function get_time_inputs() {
   var opts = ["", "-1 hour", "-3 hours", "-6 hours", "-1 day", "-1 week", "-2 weeks"];
   var compare_time = $C("selector", {
     name: "compare",
-    selected: "-1 week",
+    selected: "",
     options: dict(opts)
   });
 
@@ -205,7 +205,7 @@ function get_max_results_row() {
 
 // expressed in seconds
 var time_bucket_opts = {
-  "auto" : "",
+  "auto" : 0,
   "1 min" : 60,
   "5 min" : 300,
   "10 min" : 600,
@@ -407,7 +407,7 @@ module.exports = {
   },
 
   get_controls: function() {
-    var view = context("req").query.view || "overview";
+    var view = context("req").query.view || "table";
     // this is how i do data dependencies, :P
     return page.async(function(flush_data) {
       metadata.get(context("query_table"), function(config) {

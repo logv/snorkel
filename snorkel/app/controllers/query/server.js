@@ -81,7 +81,7 @@ function marshall_query(form_data) {
   var query_data = {};
 
   query_data.dims = array_of(form_data, 'group_by', ["browser"]);
-  query_data.view = value_of(form_data, 'view', 'overview');
+  query_data.view = value_of(form_data, 'view', 'table');
   query_data.baseview = value_of(form_data, 'baseview', query_data.view);
   query_data.time_field = value_of(form_data, 'time_field', 'time');
 
@@ -91,7 +91,7 @@ function marshall_query(form_data) {
   }
 
   if (query_data.view === 'overview') {
-    limit = 500;
+    limit = 100;
   }
 
   query_data.limit = value_of(form_data, 'max_results', limit);
@@ -104,7 +104,7 @@ function marshall_query(form_data) {
   query_data.sort_by = value_of(form_data, 'sort_by', "count");
   query_data.stacking = value_of(form_data, 'stacking', 'normal');
 
-  var start_str_ms = value_of(form_data, 'start', '-1 hour');
+  var start_str_ms = value_of(form_data, 'start', '-1 week');
   var end_str_ms = value_of(form_data, 'end', 'now');
   var now = Date.now();
 
@@ -213,11 +213,12 @@ function marshall_query(form_data) {
       }
 
       // ^((?!query).)*$
-      // do some preproductions :-)
       // TODO: move operation preprocessing to lower in the stack?
-      if (op === "$regexv") {
-        val = "^((?!" + val + ").)*$";
-        op = "$regex";
+      if (config.backend.driver !== "pcs")  {
+        if (op === "$regexv") {
+          val = "^((?!" + val + ").)*$";
+          op = "$regex";
+        }
       }
 
       // there is no real support for $eq in mongo, instead using $all. even though

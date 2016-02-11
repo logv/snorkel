@@ -35,7 +35,7 @@ module.exports = {
     // }
     authorized_users: false,
 
-    // Generate these per project in http://console.developers.console.com -> credentials
+    // Generate these per project in http://console.developers.google.com -> credentials
     // and add the URL: http://snorkel.server/auth/google/return to the allowed callback URL
     client_secret: null,
     client_id: null

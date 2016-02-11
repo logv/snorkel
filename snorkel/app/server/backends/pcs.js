@@ -9,9 +9,8 @@ var backend = require_app("server/backend");
 var path = require("path")
 var cwd = process.cwd()
 
-var DIGEST_PATH = path.join(cwd, "./bin/digest");
-var INGEST_PATH = path.join(cwd, "./bin/ingest");
-var QUERY_PATH = path.join(cwd, "./bin/query");
+var BIN_PATH = path.join(cwd, "./bin/sybil ");
+
 var DB_DIR = "./"
 // TODO:
 // implement weighting columns
@@ -24,9 +23,9 @@ function get_cmd(bin, arg_string) {
 }
 
 function run_query_cmd(arg_string, cb) {
-  var cmd = get_cmd(QUERY_PATH, arg_string)
-  cb = context.wrap(cb)
-  console.log("RUNNING COMMAND", cmd)
+  var cmd = get_cmd(BIN_PATH, " query " + arg_string);
+  cb = context.wrap(cb);
+  console.log("RUNNING COMMAND", cmd);
   child_process.exec(cmd, {
     cwd: DB_DIR,
     maxBuffer: 100000*1024
@@ -259,9 +258,9 @@ function add_str_filters(query_spec) {
       return
     }
     var column = tokens.slice(1).join('.');
-    var op = "eq"; // hardcoded
+    var op = "re"; // hardcoded
     if (f.conditions[0].op != "$regex") {
-      op = "neq"
+      op = "nre"
     }
 
     var value = f.conditions[0].value; //hardcoded for now
@@ -383,7 +382,7 @@ function queue_digest_records(table_name) {
 
 var digest_records = _.throttle(function () {
   _.each(DIGESTIONS, function(val, table_name) {
-    child_process.exec(DIGEST_PATH + " -table " + table_name, {
+    child_process.exec(BIN_PATH + " digest -table " + table_name, {
       cwd: DB_DIR,
     }, function(err, stdout, stderr) {
       console.log(stderr); 
@@ -444,7 +443,7 @@ var PCSDriver = _.extend(driver.Base, {
   add_samples: function(dataset, subset, samples, cb) {
     console.log("ADDING SAMPLES", dataset, subset, samples);
     var table_name = dataset + "." + subset;
-    var cmd = get_cmd(INGEST_PATH, "-table " + table_name);
+    var cmd = get_cmd(BIN_PATH, "ingest -table " + table_name);
     cb = context.wrap(cb);
     console.log("RUNNING COMMAND", cmd);
     queue_digest_records(table_name);

@@ -586,7 +586,7 @@ module.exports = {
   set_dom_from_query: function(query_str) {
     var query = $.deparam(query_str);
     var view = query.view;
-    this.update_view(view || "overview");
+    this.update_view(view || "table");
 
     var formEl = this.$page.find("#query_sidebar form");
     formEl.deserialize(query_str);
