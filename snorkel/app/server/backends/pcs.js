@@ -100,8 +100,16 @@ function add_dims_and_cols(query_spec) {
   }
 
   if (query_spec.opts.dims.length) {
-    var group_by = query_spec.opts.dims.join(",");
-    cmd_args += " -group " + group_by + " ";
+    var dims = _.filter(query_spec.opts.dims, function(d) {
+      return d.trim() !== "";
+    });
+
+    if (dims.length > 0) {
+      var group_by = dims.join(",");
+      if (group_by.trim() !== "") {
+        cmd_args += " -group " + group_by + " ";
+      }
+    }
   }
   if (query_spec.opts.cols.length) {
     var int_by = query_spec.opts.cols.join(",");
@@ -127,7 +135,7 @@ function get_args_for_spec(query_spec) {
     return cmd_args;
   }
   
-  cmd_args += " -laq ";
+  cmd_args += " ";
   cmd_args += add_dims_and_cols(query_spec);
   cmd_args += add_str_filters(query_spec);
   cmd_args += add_int_and_time_filters(query_spec);

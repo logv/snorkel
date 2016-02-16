@@ -80,7 +80,10 @@ var TimeView = BaseView.extend({
     if (this.compare_data) {
       _.each(this.compare_data, function(series) {
         _.each(series.data, function(pt) {
-          pt.x = pt.x - query.parsed.compare_delta;
+          if (query.parsed.compare_delta) {
+            pt.x = pt.x - query.parsed.compare_delta;
+
+          }
         });
         series.dashStyle = "LongDash";
       });
