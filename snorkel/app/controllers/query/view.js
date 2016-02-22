@@ -291,13 +291,20 @@ function get_group_by_row(group_columns) {
 
 function get_aggregate_row() {
   // AGGREGATE INPUTS
+  var options = {
+    "$avg" : "Average",
+    "$sum" : "Sum",
+    "$count" : "Count"
+  }
+
+  var extra_metrics = backend.extra_metrics();
+  if (extra_metrics) {
+    _.extend(options, extra_metrics);
+  }
+
   var agg_selector = $C("selector", {
     name: "agg",
-    options: {
-      "$avg" : "Average",
-      "$sum" : "Sum",
-      "$count" : "Count"
-    }
+    options: options
   });
   var aggregate_row = add_control("agg", "Metric", agg_selector.toString(), { space: true });
   return $(aggregate_row);

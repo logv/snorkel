@@ -45,7 +45,9 @@ function run_query_cmd(arg_string, cb) {
 
 }
 
-function marshall_time_rows(time_buckets, cols, dims) {
+function marshall_time_rows(query_spec, time_buckets) {
+  var cols = query_spec.opts.cols;
+  var dims = query_spec.opts.dims;
   var ret = [];
   _.each(time_buckets, function(rows, time_bucket) {
     _.each(rows, function(r) {
@@ -56,7 +58,7 @@ function marshall_time_rows(time_buckets, cols, dims) {
       });
 
       _.each(cols, function(c) {
-        row[c] = parseFloat(r[c], 10);
+        row[c] = extract_val(query_spec, r, c);
       });
 
       row._id.time_bucket = parseInt(time_bucket, 10);
@@ -72,7 +74,45 @@ function marshall_time_rows(time_buckets, cols, dims) {
 
 }
 
-function marshall_table_rows(rows, cols, dims) {
+function extract_val(query_spec, r, c) {
+  var agg = query_spec.opts.agg;
+  var percentile;
+  var sum;
+  var count;
+
+  if (agg === "$sum") {
+    sum = true;
+  } else if (agg === "$count") {
+    count = true;
+  }
+  if (agg.indexOf("$p") === 0) {
+    percentile = parseInt(agg.substr(2), 10);
+    if (_.isNaN(percentile)) {
+      percentile = null;
+    }
+  }
+  if (percentile) {
+    if (r[c]) {
+      return parseFloat(r[c].percentiles[percentile], 10);
+    } else {
+      return  "NA";
+    }
+  } else if (sum) {
+    return r.Count * parseFloat(r[c], 10);
+  } else if (count) {
+    return  r.Count;
+  } else {
+    return parseFloat(r[c], 10);
+
+  }
+
+}
+
+function marshall_table_rows(query_spec, rows) {
+  var cols = query_spec.opts.cols;
+  var dims = query_spec.opts.dims;
+
+
   var ret = [];
   _.each(rows, function(r) {
     var row = {};
@@ -82,9 +122,8 @@ function marshall_table_rows(rows, cols, dims) {
     });
 
     _.each(cols, function(c) {
-      row[c] = parseFloat(r[c], 10);
+      row[c] = extract_val(query_spec, r, c);
     });
-
     row.count = r.Count;
 
     ret.push(row);
@@ -115,6 +154,10 @@ function add_dims_and_cols(query_spec) {
     var int_by = query_spec.opts.cols.join(",");
     cmd_args += " -int " + int_by + " ";
 
+    if (query_spec.opts.agg && query_spec.opts.agg.indexOf("$p") === 0) {
+      cmd_args += " -op hist ";
+    }
+
   }
 
   return cmd_args;
@@ -143,7 +186,9 @@ function get_args_for_spec(query_spec) {
   return cmd_args;
 }
 
-function marshall_dist_rows(rows, cols, dims) {
+function marshall_dist_rows(query_spec, rows) {
+  var cols = query_spec.opts.cols;
+  var dims = query_spec.opts.dims;
   var ret = [];
   _.each(rows, function(r) {
     var row = {};
@@ -153,11 +198,13 @@ function marshall_dist_rows(rows, cols, dims) {
     });
 
     var col = cols[0];
-    _.each(r[col], function(p) {
+    _.each(r[col].buckets, function(count, bucket) {
       var copy = _.clone(row);
       copy._id = _.clone(row._id);
-      copy._id[col] = p;
-      copy.count = parseFloat(r.Count) / parseFloat(r[col].length);
+      var val = parseInt(bucket, 10);
+      copy._id[col] = val;
+      copy[col] = val;
+      copy.count = count;
 
       ret.push(copy);
     });
@@ -175,7 +222,7 @@ function run_hist_query(table, query_spec, cb) {
   console.log("RUNNING DIST QUERY");
 
   run_query_cmd(cmd_args + " -table " + table, function(err, results) {
-    var marshalled = marshall_dist_rows(results, query_spec.opts.cols, query_spec.opts.dims);
+    var marshalled = marshall_dist_rows(query_spec, results);
     cb(null, marshalled)
   })
 }
@@ -190,9 +237,9 @@ function run_time_query(table, query_spec, cb) {
   run_query_cmd(cmd_args + " -table " + table, function(err, results) {
     if (err) {
       return cb("Error parsing JSON");
-    } 
+    }
 
-    var marshalled = marshall_time_rows(results, query_spec.opts.cols, query_spec.opts.dims);
+    var marshalled = marshall_time_rows(query_spec, results);
     cb(null, marshalled);
 
   })
@@ -205,7 +252,7 @@ function run_table_query(table, query_spec, cb) {
   cmd_args += get_args_for_spec(query_spec)
 
   run_query_cmd(cmd_args + " -table " + table, function(err, results) {
-    var marshalled = marshall_table_rows(results, query_spec.opts.cols, query_spec.opts.dims);
+    var marshalled = marshall_table_rows(query_spec, results);
     cb(null, marshalled)
 
   })
@@ -222,7 +269,7 @@ function add_int_and_time_filters(query_spec) {
 
   if (query_spec.opts.start_ms) {
     filters.push(tf + ":gt:" + query_spec.opts.start_ms / 1000);
-  } 
+  }
 
   if (query_spec.opts.end_ms) {
     filters.push(tf + ":lt:" + query_spec.opts.end_ms / 1000);
@@ -240,7 +287,7 @@ function add_int_and_time_filters(query_spec) {
   });
 
 
-  var args = ""; 
+  var args = "";
 
   if (tf) {
     args = "-time-col " + tf + " ";
@@ -393,7 +440,7 @@ var digest_records = _.throttle(function () {
     child_process.exec(BIN_PATH + " digest -table " + table_name, {
       cwd: DB_DIR,
     }, function(err, stdout, stderr) {
-      console.log(stderr); 
+      console.log(stderr);
     });
   });
 
@@ -447,6 +494,17 @@ var PCSDriver = _.extend(driver.Base, {
   get_columns: get_cached_columns,
   clear_cache: function(table, cb) {},
   drop_dataset: function(table, cb) {},
+  extra_metrics: function() {
+
+    return {
+      "$p5" : "P5",
+      "$p25" : "P25",
+      "$p50" : "P50",
+      "$p75" : "P75",
+      "$p90" : "P90",
+      "$p95" : "P95"
+    };
+  },
   default_table: "snorkel_test_data",
   add_samples: function(dataset, subset, samples, cb) {
     console.log("ADDING SAMPLES", dataset, subset, samples);

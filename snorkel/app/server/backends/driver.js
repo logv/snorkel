@@ -95,6 +95,9 @@ var driver = {
   add_samples: function(dataset, subset, samples, cb) {
     not_implemented("add_samples");
   },
+  supports_percentiles: function() {
+    not_implemented("supported_metrics");
+  },
   validate: validate,
   predict_column_types: predict_column_types
 };
