@@ -42,11 +42,15 @@ function countToSize(count) {
     }
 
     if (count === 0) { return '0'; }
-    if (!count) {
+    if (!count || _.isNaN(count)) {
       return 'n/a';
     }
 
     var i = parseInt(Math.floor(Math.log(count) / Math.log(1000)), 10);
+
+    if (_.isNaN(i)) {
+      return 'n/a';
+    }
 
     if (i >= sizes.length) {
       return count;
@@ -54,7 +58,11 @@ function countToSize(count) {
       return parseInt(count * 1000, 10) / 1000;
     }
 
-    return Math.round(count / Math.pow(1000, i) * 100, 2) / 100 + '' + sizes[i];
+    if (i < sizes.length - 1) {
+      return Math.round(count / Math.pow(1000, i) * 100, 2) / 100 + '' + sizes[i];
+    }
+
+    return Math.round(count / Math.pow(1000, i) * 100, 2) / 100 ;
 }
 
 // from comments in http://codeaid.net/javascript/convert-size-in-bytes-to-human-readable-format-(javascript)
