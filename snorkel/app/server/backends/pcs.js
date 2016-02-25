@@ -406,12 +406,13 @@ function get_columns(table, cb) {
   console.log("GETTING COLUMNS", table)
   run_query_cmd("-info -json -table " + table, function(err, info) {
     var cols = []
+    var PREFIX_RE = /^(integer_|string_|set_)/;
     _.each(info.columns.ints, function(col) {
-      cols.push({name: col, type_str: 'integer'});
+      cols.push({name: col, type_str: 'integer', display_name: col.replace(PREFIX_RE, '')});
     });
 
     _.each(info.columns.strs, function(col) {
-      cols.push({name: col, type_str: 'string'});
+      cols.push({name: col, type_str: 'string', display_name: col.replace(PREFIX_RE, '')});
     });
 
     _cached_columns[table] = {
