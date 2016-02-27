@@ -37,10 +37,24 @@ module.exports = {
       });
 
 
+      $C("modal", {}).marshall();
       template.add_stylesheet("dashboards");
-      page.render({ content: template_str, header: header_str});
+      page.render({ content: template_str, header: header_str, component: true, socket: true });
 
   }),
 
-  socket: function() {}
+  socket: function(socket) {
+    socket.on("new_dashboard", function(dashboard, fn) {
+      var dashboard_controller = require_app("controllers/dashboard/server");
+      dashboard_controller.new_dashboard(socket, dashboard, function(err) {
+        if (err) {
+          fn("NOK");
+        } else {
+          fn("OK");
+        }
+      });
+    });
+
+  
+  }
 };

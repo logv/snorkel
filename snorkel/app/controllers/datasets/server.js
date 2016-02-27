@@ -135,13 +135,10 @@ module.exports = {
   index: auth.require_user(function() {
     var header_str = template.render("helpers/header.html.erb");
     var searchahead = $C("textinput", { name: "search" });
-    var dashboards_controller = require_app("controllers/dashboards/server");
 
-    var render_dashboards = page.async(dashboards_controller.render_dashboards);
     var template_str = template.render("controllers/datasets.html.erb", {
       render_searchahead: searchahead.toString,
-      render_datasets: render_datasets,
-      render_dashboards: render_dashboards
+      render_datasets: render_datasets
     });
 
 
@@ -238,17 +235,6 @@ module.exports = {
         socket.emit("set_metadata", "NOK");
       }
 
-    });
-
-    socket.on("new_dashboard", function(dashboard, fn) {
-      var dashboard_controller = require_app("controllers/dashboard/server");
-      dashboard_controller.new_dashboard(socket, dashboard, function(err) {
-        if (err) {
-          fn("NOK");
-        } else {
-          fn("OK");
-        }
-      });
     });
 
     socket.on("clear_cache", function(dataset) {

@@ -149,7 +149,10 @@ var time_opts = [
   "-1 week",
   "-2 weeks",
   "-3 weeks",
-  "-4 weeks"
+  "-1 month",
+  "-2 months",
+  "-3 months",
+  "-6 months"
 ];
 
 function dict(arr) {

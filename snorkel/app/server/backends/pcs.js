@@ -265,7 +265,21 @@ function add_int_and_time_filters(query_spec) {
 
   var filters = []
 
-  var tf = query_spec.meta.metadata.time_col || "time";
+
+  var df = "integer_time";
+
+  try {
+    var col_types = query_spec.meta.metadata.col_types;
+    if (col_types.integer.time) {
+      df = "time";
+    } else if (col_types.integer.integer_time) {
+      df = "integer_time";
+    }
+  } catch(e) {
+    console.log("Couldn't guess at TIME COL", e)
+  }
+
+  var tf = query_spec.meta.metadata.time_col || df;
 
   if (query_spec.opts.start_ms) {
     filters.push(tf + ":gt:" + query_spec.opts.start_ms / 1000);

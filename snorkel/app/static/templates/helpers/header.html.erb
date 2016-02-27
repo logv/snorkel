@@ -4,7 +4,8 @@
 
 <div class="navbar navbar-fixed-top">
   <div class="navbar-inner">
-    <a class="brand" href="/datasets" style="padding-right: 0px"><b>snorkel</b> </a>
+    <a class="brand" href="<%= url_for("datasets.index") %>" style="padding-right: 0px"><b>snorkel</b> </a>
+
     <img
       class="pull-left"
       style="width: 32px; height: 32px; margin-top: 5px;"
@@ -18,6 +19,10 @@
     <% } %>
 
     <% if (show_user_status) { %>
+      <div class="lfloat" style="margin-top: 1.2em">
+        <a href="<%= url_for("dashboards.index") %>" style="padding-left: 10px; color: white">Dashboards</a>
+      </div>
+
       <ul class="nav pull-right mrl">
       <% if (username) { %>
           <!-- TODO: Replace this with an actual component? -->

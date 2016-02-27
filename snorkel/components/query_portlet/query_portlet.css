@@ -18,6 +18,10 @@
   display: none;
 }
 
+.query_portlet {
+  overflow: hidden;
+}
+
 &.fullscreen {
   z-index: 10000;
 
