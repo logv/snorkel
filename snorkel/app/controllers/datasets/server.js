@@ -245,7 +245,7 @@ module.exports = {
 
     socket.on("drop", function(dataset) {
       // Validate this is an easily droppable dataset
-      var user = socket.manager.__user;
+      var user = socket.session.__user;
       if (dataset_is_editable(dataset, user)) {
         console.log("DROPPING ", dataset);
 

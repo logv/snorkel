@@ -26,12 +26,19 @@ function guess_value_type(value) {
   }
 }
 
+// from stackoverflow: http://stackoverflow.com/questions/11456850/split-a-string-by-commas-but-ignore-commas-within-double-quotes-using-javascript
+function split_line(line) {
+  var arr = line.match(/(".*?"|[^",\s]+)(?=\s*,|\s*$)/g);
+
+  return _.toArray(arr)
+}
+
 function read_csv(username, name, data, options, cb) {
   if (_.isString(data)) {
     data = data.split("\n");
   }
 
-  var headers = _.map(data.shift().split(","), function(h) {
+  var headers = _.map(split_line(data.shift()), function(h) {
     return h.replace(/^\s*/, "").replace(/\s*$/, "");
   });
 
@@ -53,7 +60,7 @@ function read_csv(username, name, data, options, cb) {
   }
 
   _.each(data, function(row) {
-    var row_data = _.map(row.split(","), function(h) {
+    var row_data = _.map(split_line(row), function(h) {
       return h.replace(/^\s*/, "").replace(/\s*$/, "");
     });
     var row_obj = {};

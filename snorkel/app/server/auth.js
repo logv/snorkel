@@ -123,10 +123,10 @@ module.exports = {
         var passhash = USERS[username] || "lkj";
         if (htpasswd.validate && htpasswd.validate(passhash, password)) {
           done(null, new_user(username)); 
-        } else if (htpasswd(passhash, password)) {
+        } else if (_.isFunction(htpasswd) && htpasswd(passhash, password)) {
           done(null, new_user(username));
         } else {
-          done("just kidding, not just any credentials will wrok. try again");
+          done("Invalid Username / PW combo");
         }
     }));
 
