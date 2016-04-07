@@ -24,12 +24,21 @@ var db_options = {
 var package_json = require_core("../package.json");
 var context = require_core("server/context");
 var config = require_core("server/config");
-var mongodb = require("mongodb"),
-    port = mongodb.Connection.DEFAULT_PORT;
+
+var Engine, separator;
+var use_mongo = config.backend.driver === "mongo";
+
+if (use_mongo) {
+  Engine = require("mongodb");
+  separator = "/";
+} else {
+  Engine = require("tingodb")();
+  separator = ".";
+}
 
 var EventEmitter = require("events").EventEmitter;
 
-var separator = "/";
+
 function collection_builder(db_name, before_create) {
   var db_url = config.backend && config.backend.db_url;
   var _db;
@@ -49,11 +58,17 @@ function collection_builder(db_name, before_create) {
       server: server_options,
       db: db_options
     };
-    mongodb.connect(db_url, options, onOpened);
+    Engine.connect(db_url, options, onOpened);
   } else {
-    var mongoserver = new mongodb.Server(host, port, server_options);
-    var db_connector = new mongodb.Db(db_name, mongoserver, db_options);
-    db_connector.open(onOpened);
+    if (!use_mongo) {
+      var db_connector = new Engine.Db("./tdb/", {});
+      db_connector.open(onOpened);
+    } else {
+      var port = Engine.Connection.DEFAULT_PORT;
+      var mongoserver = new Engine.Server(host, port, server_options);
+      var db_connector = new Engine.Db(db_name, mongoserver, db_options);
+      db_connector.open(onOpened);
+    }
   }
 
   return {

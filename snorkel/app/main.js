@@ -53,5 +53,8 @@ module.exports = {
   },
   setup_db: function(app) {
     require_app("server/db").install(app);
+    if (config.backend.driver == "mongo") {
+      require_app("server/backends/mongo").install();
+    }
   }
 };

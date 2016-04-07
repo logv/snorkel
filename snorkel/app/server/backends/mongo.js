@@ -7,16 +7,116 @@ var backend = require_app("server/backend");
 var driver = require_app("server/backends/driver");
 var DATASET_PREFIX = "datasets/";
 
-var snorkle_db = require_app("server/db")
-  .db("snorkel", function(db, db_name) {
+var config = require_core('server/config');
+var host = "localhost";
+var server_options = {
+  auto_reconnect: true
+};
+
+var db_options = {
+  journal: 1
+};
+
+var EventEmitter = require("events").EventEmitter;
+
+var separator = "/";
+function collection_builder(db_name, before_create) {
+  var db_url = config.backend && config.backend.db_url;
+  var _db;
+  var _created = {};
+  var arbiter = new EventEmitter();
+
+  function onOpened(err, db) {
+    // TODO: report errors somewhere?
+    if (err) { return ; }
+    _db = db;
+    arbiter.emit("db_open", db);
+  }
+
+  if (db_url) {
+    var options = {
+      uri_decode_auth: true,
+      server: server_options,
+      db: db_options
+    };
+    mongo.connect(db_url, options, onOpened);
+  } else {
+    var port = mongo.Connection.DEFAULT_PORT;
+    var mongoserver = new mongo.Server(host, port, server_options);
+    var db_connector = new mongo.Db(db_name, mongoserver, db_options);
+    _db = db_connector;
+  }
+
+  return {
+    /**
+     * This function returns a collection from the mongo DB, making sure that
+     * the DB is created before using it.
+     *
+     * @method get
+     * @param {String} db_name* A namespaced name for the DB
+     * @param {Function} cb Function to run when the DB is returned.
+     */
+    get: function() {
+      var cb;
+      var args = _.toArray(arguments);
+      var last = args.pop();
+
+      if (_.isFunction(last)) {
+        cb = last;
+      } else {
+        args.push(last);
+      }
+
+      var db_name = args.join(separator);
+
+      if (!_db && !cb) {
+        console.trace();
+        throw("Trying to access DB before its been initialized");
+      } else if (!_db) {
+        return arbiter.once("db_open", function(db) {
+          if (!_created[db_name] && before_create) {
+            before_create(_db, db_name);
+          }
+          _created[db_name] = true;
+
+          var collection = db.collection(db_name);
+          cb(collection);
+        });
+      }
+
+
+      if (!_created[db_name] && before_create) {
+        before_create(_db, db_name);
+      }
+
+      var collection = _db.collection(db_name);
+      _created[db_name] = true;
+      if (cb) {
+        cb(collection);
+      }
+
+      return collection;
+    },
+
+    /**
+     * Returns the raw database connection
+     *
+     * @method raw
+     * @return {Object} db Mongo DB Connection
+     */
+    raw: function() {
+      return _db;
+    }
+  };
+}
+
+var snorkle_db = collection_builder("snorkel", function(db, db_name) {
     db.createCollection(db_name,
       {
         capped: true,
         size: config.default_max_dataset_size
       }, function(err, data) { });
   });
-
-
 
 var _pending = {};
 var _cached_columns = {};
@@ -590,6 +690,13 @@ function clear_column_cache(table, cb) {
 
 var MongoDriver = _.extend(driver.Base, {
   run: run,
+  install: function() {
+    var config = require_core('server/config');
+    var package_json = require_core("../package.json");
+
+    var SF_db = collection_builder(config.db_name || package_json.name);
+
+  },
   get_stats: get_stats,
   get_tables: get_tables,
   get_columns: get_cached_columns,

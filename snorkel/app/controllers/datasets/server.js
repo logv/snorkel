@@ -44,7 +44,7 @@ function render_datasets() {
     var datasets;
     var metadatas;
 
-    var after = _.after(3, function() {
+    var after = _.after(2, function() {
       var table_options = {};
       var datasetsEl = $("<div />");
 
@@ -99,16 +99,6 @@ function render_datasets() {
 
       flush_data(datasetsEl.toString());
     });
-
-    collection.aggregate([
-      { $match: conditions },
-      { $project: { "dataset": "$parsed.table" }},
-      { $group: { _id: { "dataset" : "$dataset" }, count: { "$sum": 1 }}},
-      { $sort: { count: -1 }}
-    ], context.wrap(function(err, arr) {
-      if (!err) { query_data = arr; }
-      after();
-    }));
 
     backend.get_tables(function(tables) {
       datasets = tables;
