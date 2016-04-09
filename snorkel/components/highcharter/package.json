@@ -1,6 +1,6 @@
 {
   "main" : "highcharter",
-  "helpers": [ "vendor/highcharts3" ],
+  "helpers": [ "vendor/highcharts4" ],
   "style": "highcharter.css",
   "styles": [],
   "no_redefine" : true,
