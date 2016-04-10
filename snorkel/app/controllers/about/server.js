@@ -27,10 +27,6 @@ module.exports = {
         title: "Time Series"
       },
       {
-        src: "images/screens/919669_10201137390940549_427039138_o.jpg",
-        title: "Dashboards"
-      },
-      {
         src: "images/screens/882570_10200883042702002_321476546_o.jpg",
         title: "Tables"
       },
