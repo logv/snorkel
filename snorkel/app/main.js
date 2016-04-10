@@ -27,7 +27,8 @@ module.exports = {
     require_core("server/store").set(store);
   },
   setup_context: function(ctx) {
-    ctx.use_fullscreen = true
+    ctx.use_fullscreen = true;
+    ctx.title = "snorkel";
   },
   after_ready: function() {
     if (!config.separate_services) {
