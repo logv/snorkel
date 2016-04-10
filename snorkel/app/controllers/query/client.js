@@ -470,7 +470,6 @@ module.exports = {
     var that = this;
     var query_str = window.location.search.substring(1);
     SF.do_when(this.fields, 'query:fields', function() {
-      that.run_query(query_str, true);
       that.set_dom_from_query(query_str);
     });
 
