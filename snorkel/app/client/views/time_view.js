@@ -59,7 +59,9 @@ var TimeView = BaseView.extend({
           compare: is_compare
         };
 
-        series[field_label].data.push(pt);
+        if (pt.y !== null && !_.isNaN(pt.y)) {
+          series[field_label].data.push(pt);
+        }
       });
     });
 
