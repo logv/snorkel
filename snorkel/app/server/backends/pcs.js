@@ -75,16 +75,21 @@ function marshall_time_rows(query_spec, time_buckets) {
 }
 
 function extract_val(query_spec, r, c) {
+
   var agg = query_spec.opts.agg;
   var percentile;
   var sum;
   var count;
+  var distinct;
 
   if (agg === "$sum") {
     sum = true;
   } else if (agg === "$count") {
     count = true;
+  } else if (agg === "$distinct") {
+    distinct = true;
   }
+
   if (agg.indexOf("$p") === 0) {
     percentile = parseInt(agg.substr(2), 10);
     if (_.isNaN(percentile)) {
@@ -101,6 +106,8 @@ function extract_val(query_spec, r, c) {
     return r.Count * parseFloat(r[c], 10);
   } else if (count) {
     return  r.Count;
+  } else if (distinct) {
+    return r.Distinct || r.distinct;
   } else {
     return parseFloat(r[c], 10);
 
@@ -125,6 +132,11 @@ function marshall_table_rows(query_spec, rows) {
       row[c] = extract_val(query_spec, r, c);
     });
     row.count = r.Count;
+    row.distinct = r.Distinct || r.distinct;
+
+    if (query_spec.opts.agg === "$distinct") {
+      row.count = row.distinct;
+    }
 
     ret.push(row);
   });
@@ -159,6 +171,11 @@ function add_dims_and_cols(query_spec) {
     }
 
   }
+
+  if (query_spec.opts.agg && query_spec.opts.agg === "$distinct") {
+    cmd_args += "-op distinct";
+  }
+
 
   return cmd_args;
 }
@@ -517,7 +534,8 @@ var PCSDriver = _.extend(driver.Base, {
       "$p50" : "P50",
       "$p75" : "P75",
       "$p90" : "P90",
-      "$p95" : "P95"
+      "$p95" : "P95",
+      "$distinct" : "Distinct"
     };
   },
   default_table: "snorkel_test_data",

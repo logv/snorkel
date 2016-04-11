@@ -13,7 +13,7 @@
     <% _.each(slides, function(s, index) { %>
         <div class="slide" style="display: none;" data-id="<%= s.title %>">
             <img src="<%= s.src %>" > </img>
-            <div class="caption"> </div>
+            <div class="caption"> <%= s.caption || "" %></div>
         </div>
       <% }); %>
   </div>

@@ -22,7 +22,7 @@ var TimeView = BaseView.extend({
       _.each(result, function(value, field) {
         if (field === "_id") { return; }
 
-        if (data.parsed.agg === "$count") {
+        if (data.parsed.agg === "$count" || data.parsed.agg === "$distinct") {
           if (field !== "count") { return; }
         } else {
           if (field === "count") { return; }

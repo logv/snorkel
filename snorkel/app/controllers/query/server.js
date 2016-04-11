@@ -166,7 +166,7 @@ function marshall_query(form_data) {
     if (query_data.field_two) {
       use_fields.push(query_data.field_two);
     }
-  } else {
+  } else if (agg !== "$distinct") {
     console.log("Warning: no fields found for query");
     use_fields = [ ];
     agg = "$count";

@@ -44,6 +44,11 @@ var TableView = BaseView.extend({
     var group_by = _.clone(this.data.parsed.dims);
     var cols = _.clone(this.data.parsed.cols);
 
+    if (this.data.parsed.agg == "$distinct") {
+      group_by = [];
+      cols = [];
+    }
+
     // TODO: something
     cols.unshift("count"); // modifies cols column
 
