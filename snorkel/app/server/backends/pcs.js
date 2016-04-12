@@ -51,6 +51,10 @@ function marshall_time_rows(query_spec, time_buckets) {
   var ret = [];
   _.each(time_buckets, function(rows, time_bucket) {
     _.each(rows, function(r) {
+      if (!r) {
+        return;
+      }
+
       var row = {};
       row._id = {};
       _.each(dims, function(d) {
@@ -97,7 +101,7 @@ function extract_val(query_spec, r, c) {
     }
   }
   if (percentile) {
-    if (r[c]) {
+    if (r[c] && r[c].percentiles) {
       return parseFloat(r[c].percentiles[percentile], 10);
     } else {
       return  "NA";
@@ -170,10 +174,16 @@ function add_dims_and_cols(query_spec) {
       cmd_args += " -op hist ";
     }
 
+    if (query_spec.opts.hist_bucket) {
+      cmd_args += " -int-bucket " + query_spec.opts.hist_bucket + " ";
+
+    }
+
+
   }
 
   if (query_spec.opts.agg && query_spec.opts.agg === "$distinct") {
-    cmd_args += "-op distinct";
+    cmd_args += "-op distinct ";
   }
 
 
