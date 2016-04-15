@@ -473,27 +473,17 @@ function post_bounce() {
   res.end();
 }
 
-function get_download() {
+function get_query(cb) {
+
   if (controller.require_https()) { return; }
   var client_id = context("req").query.client_id || context("req").query.c;
   var hashid = context("req").query.hashid || context("req").query.h;
   var conditions = { };
   var now = parseInt(Date.now() / 1000, 10);
   var query_id = "api/" + now;
-  var req = context("req");
-  var res = context("res");
-
-
 
   function use_saved_query() {
-    load_saved_query(conditions, function(query) {
-      if (query) {
-        var results = JSON.stringify(query.results);
-        res.setHeader('Content-Length', results.length);
-        res.write(results, 'binary');
-        res.end();
-      }
-    });
+    load_saved_query(conditions, cb);
   }
 
   if (hashid) {
@@ -515,14 +505,72 @@ function get_download() {
     });
 
     var query_data = marshall_query(query_form_data);
-    handle_new_query(query_id, query_data, null, function(results) {
-      results = JSON.stringify(results);
+    handle_new_query(query_id, query_data, null, cb);
+  }
+
+}
+
+function get_grafana() {
+  var res = context("res");
+  get_query(function(data) {
+    var query = data.query;
+    if (query) {
+      var ret = []
+      var series = [];
+
+      var cols = query.parsed.cols;
+      if (!cols || !cols.length) {
+        cols = [ "count" ];
+      }
+
+      _.each(query.results, function(result) {
+        var groupby = "";
+        if (query.parsed.agg !== "$distinct") {
+          _.each(result._id, function(value, key) {
+            if (key === "time_bucket") {
+              return;
+            }
+
+            groupby += value;
+          });
+        }
+
+        _.each(cols, function(col) {
+          var key = groupby+"."+col;
+          var datapoints = series[key];
+          if (!datapoints) {
+            datapoints = {
+              datapoints: [],
+              target: key
+            };
+            series[key] = datapoints;
+          }
+
+          // Grafana uses MS timestamps
+          datapoints.datapoints.push([result[col], result._id.time_bucket * 1000]);
+        });
+
+      });
+
+      var results = JSON.stringify(_.values(series));
       res.setHeader('Content-Length', results.length);
       res.write(results, 'binary');
       res.end();
-    });
-  }
+    }
+  });
 
+}
+
+function get_download() {
+  get_query(function(err, query) {
+    if (query) {
+      var results = JSON.stringify(query.results);
+      var res = context("res");
+      res.setHeader('Content-Length', results.length);
+      res.write(results, 'binary');
+      res.end();
+    }
+  });
 }
 
 
@@ -812,6 +860,7 @@ module.exports = {
     "/saved": "saved",
     "/user" : "user",
     "/dataset" : "dataset",
+    "/grafana" : "grafana",
     "/download" : "download"
   },
   post_routes: {
@@ -922,7 +971,16 @@ module.exports = {
     });
   },
   index: auth.require_user(get_index),
-  download: function() {
+  grafana: function(ctx) {
+    if (!config.no_api_auth) {
+      auth.require_user(get_grafana)();
+    } else {
+      get_grafana();
+
+    }
+
+  },
+  download: function(ctx) {
     if (!config.no_api_auth) {
       auth.require_user(get_download)();
     } else {

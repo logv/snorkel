@@ -17,6 +17,7 @@ questions about the *now*.
     npm install
 
     # helper for restarting the server when js files change
+    # (for production, i recommend using pm2 with a memory limit on processes)
     npm install -g nodemon
 
     # edit your config
@@ -85,3 +86,6 @@ open http://localhost:3000 in your browser and get started :-)
   4. `heroku config:add GPLUS\_DOMAIN=yourcompanydomain.com` (or change heroku.js to configure auth)
 1. push everything under the snorkel directory (in particular the Procfile) to your heroku git repo. If you have git subtree, use: `git subtree push --prefix snorkel heroku master`
 
+## Dashboarding / Grafana Support
+
+  The repo [grafana snorkel datasource](https://github.com/logV/grafana-snorkel-datasource) has a plugin for grafana to query snorkel. While this plugin is in early stages, grafana is quite amazing.
