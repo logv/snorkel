@@ -741,14 +741,13 @@ function save_query(socket, query, name, description) {
   });
 }
 
-function refresh_query(form_data, __id, socket, cb) {
+function refresh_query_from_socket(form_data, __id, socket) {
   var collection = db.get("query", "results");
   // save results to db
   if (!form_data || !form_data.hashid) {
     return;
   }
   var user_id = socket.session.__user.id || parseInt(Math.random() * 10000, 10);
-  var user_name = socket.session.__user.username;
 
   queries.get_saved_query({ hashid: form_data.hashid}, function(err, saved_query) {
     if (!saved_query) {
@@ -867,7 +866,7 @@ module.exports = {
     "/bounce" : "bounce"
   },
 
-  refresh: refresh_query,
+  refresh: refresh_query_from_socket,
   save: save_query,
   socket: function(socket) {
     var __id = 1;
@@ -930,7 +929,7 @@ module.exports = {
     });
 
     socket.on("refresh_query", function(form_data) {
-      refresh_query(form_data, __id, socket);
+      refresh_query_from_socket(form_data, __id, socket);
     });
 
     socket.on("update_portlet", function(portlet) {

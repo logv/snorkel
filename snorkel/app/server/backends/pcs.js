@@ -487,7 +487,7 @@ var digest_records = _.throttle(function () {
   });
 
   DIGESTIONS = {};
-}, 30000, { leading: false });
+}, 60 * 5 * 1000 /* 5 minute digestions */, { leading: false });
 
 var PCSDriver = _.extend(driver.Base, {
   run: function(table, query_spec, unweight, cb) {

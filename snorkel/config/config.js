@@ -22,7 +22,8 @@ module.exports = {
   backend: {
     driver: "mongo"
   },
-  db_name: "jank",
+  // this is table name to use for storing old queries and dataset metadata
+  db_name: "jank", // CHANGE ME! (to something like snorkel_config)
   hostname: "localhost",
   no_api_auth: false, // require user authentication to use API endpoint
   google_auth: {

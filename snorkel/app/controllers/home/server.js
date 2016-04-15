@@ -12,6 +12,8 @@ function index() {
   context("controller", "home");
   context("title", "welcoem");
 
+  template.add_stylesheet("home.css");
+
 
   
   if (context('req').isAuthenticated()) { 

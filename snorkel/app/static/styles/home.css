@@ -1,0 +1,5 @@
+[class*="span"] {
+  @media @mobile {
+    width: 100% !important;
+  }
+}
