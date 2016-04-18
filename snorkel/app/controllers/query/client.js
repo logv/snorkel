@@ -555,6 +555,7 @@ module.exports = {
     var json_filters = JSON.stringify(filter_data);
     form_str += "&filters=" + json_filters;
 
+    form_data.push({name: "baseview", value: views.QUERIES[view] || grapher.baseview });
     form_data.push({name: "filters", value: json_filters});
 
     return {

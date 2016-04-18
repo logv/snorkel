@@ -14,6 +14,8 @@ var VIEW_INPUTS = {
 };
 var GRAPHERS = {};
 
+var QUERIES = {};
+
 function get_container(query) {
   var emptyEl = $("<div />");
   if (!query) {
@@ -36,6 +38,8 @@ SF.on("view:add", function(view, details, view_class) {
 
   VIEW_INPUTS[view] = details;
   GRAPHERS[view] = view_class;
+
+  QUERIES[view] = details.baseview;
 });
 
 // Requiring these here has this side effect of adding them to the list of
@@ -50,6 +54,7 @@ var ScatterView = require("app/client/views/scatter_view");
 var AreaView = require("app/client/views/area_view");
 var BarView = require("app/client/views/bar_view");
 var DrillView = require("app/client/views/drill_view");
+var LagView = require("app/client/views/lag_view");
 var ResultsStore = require("app/client/results_store");
 
 function get_control(name) {
@@ -71,6 +76,20 @@ function get_control_row(name) {
 
 function handle_update_view(view) {
   var input_schema = VIEW_INPUTS[view];
+
+  var custom_controls = input_schema.custom_controls;
+  var customControlsEl = $("#query_sidebar .view_custom_controls");
+  if (custom_controls) {
+    customControlsEl.empty();
+
+    var controlEls = custom_controls();
+    customControlsEl.append(controlEls);
+    customControlsEl.stop(true).slideDown();
+
+  } else {
+    customControlsEl.stop(true).slideUp();
+  }
+
 
   get_control('view').find("select").val(view);
 
@@ -213,7 +232,7 @@ function show_saved_query_details(id, data, force) {
   var options = {created: created, query: data };
 
   if (!_widget) {
-    options.title = data.title; 
+    options.title = data.title;
     options.description = data.description;
   }
 
@@ -270,12 +289,13 @@ module.exports = {
   insert_error: insert_error,
   redraw: redraw_graph,
   GRAPHS: GRAPHERS,
+  QUERIES: QUERIES,
   set_control: update_control,
   get_control: get_control_value,
   set_default_container: function(container) {
-    _container = container; 
+    _container = container;
   },
-  set_container: function(container, query) { 
+  set_container: function(container, query) {
     if (!query) { return; }
 
     var server_id = ResultsStore.to_server(query.clientid) || ResultsStore.to_server(query.parsed.id);

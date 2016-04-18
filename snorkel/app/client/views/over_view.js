@@ -6,9 +6,7 @@ var presenter = require("app/client/views/presenter");
 var filter_helper = require("app/controllers/query/filters");
 
 var OverView = BaseView.extend({
-
-  events: {
-  },
+  baseview: helpers.VIEWS.SAMPLES,
   prepare: function(data) {
     // Samples are broken up into raw samples of
     // integer, string, set types

@@ -7,6 +7,7 @@ var presenter = require("app/client/views/presenter");
 
 var row_key = helpers.row_key;
 var BarView = BaseView.extend({
+  baseview: helpers.VIEWS.TABLE,
   finalize: function() {
     var that = this;
     var group_by = _.clone(this.data.parsed.dims);

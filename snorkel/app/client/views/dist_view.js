@@ -74,7 +74,7 @@ function calc_cdf(sorted_hist_arr, total, w_total) {
 
 
 var DistView = BaseView.extend({
-
+  baseview: helpers.VIEWS.HIST,
   prepare: function(data) {
     console.log("PREP:", data);
     var series = [];

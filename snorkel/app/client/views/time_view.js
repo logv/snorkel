@@ -7,6 +7,7 @@ var presenter = require("app/client/views/presenter");
 
 var BaseView = require("app/client/views/base_view");
 var TimeView = BaseView.extend({
+  baseview: helpers.VIEWS.TIME,
   prepare: function(data) {
 
     var dataset = this.table;

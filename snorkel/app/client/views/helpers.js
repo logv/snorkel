@@ -435,6 +435,13 @@ _.extend(module.exports, INPUTS);
 module.exports.inputs = INPUTS;
 
 _.extend(module.exports, {
+  VIEWS: {
+    TIME: "time",
+    TABLE: "table",
+    HIST: "dist",
+    DIST: "dist",
+    SAMPLES: "samples"
+  },
   STD_INPUTS: INPUTS.TIME_INPUTS
     .concat(INPUTS.GROUP_BY)
     .concat(INPUTS.MULTI_AGG)

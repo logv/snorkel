@@ -28,6 +28,7 @@ function get_filter_for_cell(table, el) {
 }
 
 var TableView = BaseView.extend({
+  baseview: helpers.VIEWS.TABLE,
   events: {
     "click td" : "handle_cell_clicked",
     "click .popover a.option" : "handle_popover_filter_clicked",

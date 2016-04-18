@@ -4,7 +4,7 @@ var DistView = require("app/client/views/dist_view");
 var helpers = require("app/client/views/helpers");
 
 var MultiDistView = DistView.extend({
-
+  baseview: helpers.VIEWS.HIST,
   prepare: function(data) {
     var col = data.parsed.col || data.parsed.cols[0];
     var series = [];
@@ -346,6 +346,7 @@ var MultiDistView = DistView.extend({
 
 var excludes = helpers.inputs.MULTI_AGG;
 SF.trigger("view:add", "multidist",  {
+    baseview: helpers.VIEWS.HIST,
     include: _.difference(helpers.STD_INPUTS
       .concat(helpers.inputs.SINGLE_AGG)
       .concat(helpers.inputs.GROUP_BY)

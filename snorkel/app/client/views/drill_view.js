@@ -4,6 +4,7 @@ var helpers = require("app/client/views/helpers");
 var presenter = require("app/client/views/presenter");
 var BaseView = require("app/client/views/base_view");
 var DrillView = BaseView.extend({
+  baseview: helpers.VIEWS.TABLE,
   render: function() {
 
     var tabEl = this.$el;
@@ -348,16 +349,9 @@ var DrillView = BaseView.extend({
 
 
     return ret;
-  },
-  supplement_inputs: function(inputs) {
-    inputs.push({
-      name: "baseview",
-      value: "table"
-    });
   }
 });
 
-var excludes = _.clone(helpers.STD_EXCLUDES);
 SF.trigger("view:add", "drill", {
   include: helpers.STD_INPUTS
     .concat(helpers.inputs.COMPARE),

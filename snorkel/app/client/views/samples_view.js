@@ -6,7 +6,7 @@ var presenter = require("app/client/views/presenter");
 var filter_helper = require("app/controllers/query/filters");
 
 var SamplesView = BaseView.extend({
-
+  baseview: helpers.VIEWS.SAMPLES, 
   events: {
     "click td" : "handle_cell_clicked",
     "click .popover a.option" : "handle_popover_filter_clicked",

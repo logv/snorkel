@@ -5,6 +5,7 @@ var presenter = require("app/client/views/presenter");
 var SamplesView = require("app/client/views/samples_view");
 
 var ScatterView = SamplesView.extend({
+  baseview: helpers.VIEWS.SAMPLES,
   prepare: function(data) {
     return data;
   },

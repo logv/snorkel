@@ -67,7 +67,7 @@ function add_control(control_name, control_label, component, options) {
     help_link = $C("helpover", { title: help_str.title, content: help_str.content }).toString();
   }
 
-  var html = template.partial("query/control_row.html.erb", {
+  var cmp = $C("query_control_row", {
     name: control_name,
     label: control_label,
     component: component.toString(),
@@ -76,8 +76,7 @@ function add_control(control_name, control_label, component, options) {
   });
 
 
-
-  return $(html);
+  return cmp.$el;
 }
 
 function get_view_selector_row() {
@@ -93,8 +92,10 @@ function get_view_selector_row() {
       "area" : "Stacked Area",
       "multidist" : "Grouped Dist.",
       "scatter" : "Scatter Plot",
+      "overview" : "Overview",
+      " " : "--",
+      "lag" : "Lag Plot",
       "drill" : "Drilldown",
-      "overview" : "Overview"
     },
     delegate: {
       "change": "view_changed"
@@ -335,6 +336,10 @@ function get_fieldset_row(agg_columns) {
   return add_control("fieldset", "Fields", field_selector.toString());
 }
 
+function get_view_custom_inputs() {
+  return $("<div class='ptl view_custom_controls' />");
+}
+
 function get_controls(columns) {
   var control_box = $("<div>");
 
@@ -373,6 +378,7 @@ function get_controls(columns) {
   control_box.append(get_field_row(agg_columns, "field_two", "Field (2)"));
   control_box.append(get_fieldset_row(agg_columns));
   control_box.append(get_stacking_row());
+  control_box.append(get_view_custom_inputs());
 
   return control_box.toString();
 }

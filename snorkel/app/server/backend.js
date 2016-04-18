@@ -101,15 +101,10 @@ function query_builder(query) {
 }
 
 var QUERIES = {
-  bar: query_builder("table"),
   dist: query_builder("hist"),
-  multidist: query_builder("hist"),
   table: query_builder("table"),
   samples: query_builder("samples"),
-  scatter: query_builder("samples"),
-  overview: query_builder("samples"),
-  time: query_builder("time"),
-  area: query_builder("time")
+  time: query_builder("time")
 };
 
 function prep_pipeline(params, meta) {
