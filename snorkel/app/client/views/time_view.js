@@ -15,7 +15,7 @@ var TimeView = BaseView.extend({
     var is_compare = this.compare_query === data;
 
     // For each column, need to record a series
-    var group_by = data.parsed.dims;
+    var group_by = data.parsed.dims || [];
     group_by.sort();
     _.each(data.results, function(result) {
       var label = "";
