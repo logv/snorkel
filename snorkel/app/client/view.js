@@ -44,6 +44,9 @@ SF.on("view:add", function(view, details, view_class) {
 
 // Requiring these here has this side effect of adding them to the list of
 // views we can use.
+// TODO: make this an automated process that is done server side and shuttled
+// over to the client, so it can be dynamic
+
 var TimeView = require("app/client/views/time_view");
 var TableView = require("app/client/views/table_view");
 var DistView = require("app/client/views/dist_view");
@@ -55,6 +58,8 @@ var AreaView = require("app/client/views/area_view");
 var BarView = require("app/client/views/bar_view");
 var DrillView = require("app/client/views/drill_view");
 var LagView = require("app/client/views/lag_view");
+var AutoCorrView = require("app/client/views/autocorr_view");
+
 var ResultsStore = require("app/client/results_store");
 
 function get_control(name) {

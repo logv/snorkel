@@ -94,6 +94,7 @@ function get_view_selector_row() {
       "scatter" : "Scatter Plot",
       "overview" : "Overview",
       " " : "--",
+      "autocorr" : "Auto Correlation",
       "lag" : "Lag Plot",
       "drill" : "Drilldown",
     },
