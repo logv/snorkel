@@ -14,8 +14,6 @@ module.exports = {
     app.use(passport.session());
     app.use(express.bodyParser());
 
-    // Install our console.log slogger
-    require_app("controllers/slog/server").install();
   },
   insteadof_store: function() {
     var package_json = require_core("../package.json");
