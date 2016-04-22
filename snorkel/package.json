@@ -14,7 +14,7 @@
       "squel" : "x",
       "pg" : "x",
       "tingodb" : "x",
-      "connect-mongo" : "x"
+      "connect-level" : "x"
     }
 }
 

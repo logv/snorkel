@@ -19,9 +19,10 @@ module.exports = {
     var package_json = require_core("../package.json");
     var app_name = package_json.name;
     var url = config.backend && config.backend.db_url;
-    var connect = main.connect;
-    var MongoStore = require('connect-mongo')(connect);
-    var store = new MongoStore({url: url, db: app_name, auto_reconnect: true } );
+    var connect  = main.connect;
+    var LevelStore = require('connect-level')(connect);
+
+    var store = new LevelStore();
     require_core("server/store").set(store);
   },
   setup_context: function(ctx) {

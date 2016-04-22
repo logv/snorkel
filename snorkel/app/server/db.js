@@ -47,7 +47,11 @@ function collection_builder(db_name, before_create) {
 
   function onOpened(err, db) {
     // TODO: report errors somewhere?
-    if (err) { return ; }
+    if (err) {
+
+      console.log("ERROR OPENING DB", err);
+      return ;
+    }
     _db = db;
     arbiter.emit("db_open", db);
   }
@@ -95,6 +99,10 @@ function collection_builder(db_name, before_create) {
 
       if (!_db && !cb) {
         console.trace();
+        if (use_mongo) {
+          console.log("Check that your mongo DB is started!");
+        }
+
         throw("Trying to access DB before its been initialized");
       } else if (!_db) {
         return arbiter.once("db_open", function(db) {
