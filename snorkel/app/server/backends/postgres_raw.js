@@ -658,7 +658,7 @@ function get_cached_columns(table, cb) {
 
   if (_pending[table]) {
     _pending[table].push(cb);
-    return
+    return;
   }
 
   _pending[table] = [cb];

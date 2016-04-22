@@ -473,7 +473,7 @@ function post_bounce() {
   res.end();
 }
 
-function get_query(cb) {
+function get_query(cb, no_saved_queries) {
 
   if (controller.require_https()) { return; }
   var client_id = context("req").query.client_id || context("req").query.c;
@@ -486,10 +486,10 @@ function get_query(cb) {
     load_saved_query(conditions, cb);
   }
 
-  if (hashid) {
+  if (hashid && !no_saved_queries) {
     conditions.hashid = hashid;
     use_saved_query();
-  } else if (client_id) {
+  } else if (client_id && !no_saved_queries) {
     conditions.clientid = client_id;
     use_saved_query();
   } else { // running a new query
@@ -562,7 +562,7 @@ function get_grafana() {
       res.write(results, 'binary');
       res.end();
     }
-  });
+  }, true /* no saved queries */);
 
 }
 
