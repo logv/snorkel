@@ -516,7 +516,7 @@ function get_grafana() {
     var query = data.query;
     if (query) {
       var ret = []
-      var series = [];
+      var series = {};
 
       var cols = query.parsed.cols;
       if (!cols || !cols.length) {
@@ -551,6 +551,11 @@ function get_grafana() {
         });
 
       });
+
+      _.each(series, function(serie) {
+        serie.datapoints = _.sortBy(serie.datapoints, function(r) { return r[1]; });
+      });
+
 
       var results = JSON.stringify(_.values(series));
       res.setHeader('Content-Length', results.length);
