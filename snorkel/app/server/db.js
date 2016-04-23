@@ -65,7 +65,10 @@ function collection_builder(db_name, before_create) {
     Engine.connect(db_url, options, onOpened);
   } else {
     if (!use_mongo) {
-      var db_connector = new Engine.Db("./tdb/", {});
+      var fs = require("fs");
+      var TDB_DIR = "./tdb/";
+      try { fs.mkdirSync(TDB_DIR); } catch(e) { }
+      db_connector = new Engine.Db(TDB_DIR, {});
       db_connector.open(onOpened);
     } else {
       var port = Engine.Connection.DEFAULT_PORT;

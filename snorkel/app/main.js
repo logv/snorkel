@@ -16,13 +16,11 @@ module.exports = {
 
   },
   insteadof_store: function() {
-    var package_json = require_core("../package.json");
-    var app_name = package_json.name;
-    var url = config.backend && config.backend.db_url;
     var connect  = main.connect;
-    var LevelStore = require('connect-level')(connect);
+    var session_store_module = config.session_store || "connect-sqlite3";
+    var SessionStore = require(session_store_module)(connect);
 
-    var store = new LevelStore();
+    var store = new SessionStore();
     require_core("server/store").set(store);
   },
   setup_context: function(ctx) {

@@ -14,7 +14,7 @@
       "squel" : "x",
       "pg" : "x",
       "tingodb" : "x",
-      "connect-level" : "x"
+      "connect-sqlite3" : "x"
     }
 }
 

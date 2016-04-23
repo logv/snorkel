@@ -22,6 +22,9 @@ module.exports = {
   backend: {
     driver: "mongo"
   },
+  // you should have libsqlite3-dev installed for the npm install of connect-sqlite3 to work
+  // or you can swap it with connect-level
+  session_store: "connect-sqlite3",
   // this is table name to use for storing old queries and dataset metadata
   db_name: "jank", // CHANGE ME! (to something like snorkel_config)
   hostname: "localhost",
