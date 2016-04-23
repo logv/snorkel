@@ -53,7 +53,7 @@ module.exports = {
             col_meta.final_type = col_meta.type_str;
           }
 
-          if (col_meta.type_str === "integer" && col_meta.time_col) {
+          if (col_meta.type_str === "integer" && col_meta.time_col && !config.metadata.time_col) {
             config.metadata.time_col = name;
           }
 
@@ -69,6 +69,19 @@ module.exports = {
         });
 
         config.metadata.col_types = col_types;
+
+        var default_time_col;
+        _.each(["time", "integer_time", "createdAt", "timestamp", "updatedAt"], function(ts) {
+          if (config.metadata.columns[ts] && !default_time_col) {
+            default_time_col = ts;
+          }
+        });
+
+        if (!config.metadata.time_col) {
+          config.metadata.time_col = default_time_col;
+        }
+
+
 
 
         cb(config);

@@ -176,7 +176,6 @@ module.exports = {
       var headers = [ "name", "display name", "description", "hidden", "formatter" ];
       if (int_col) {
         headers.push("groupable");
-        headers.push("time col");
       }
 
       _.map(headers, function(col) {
@@ -189,6 +188,15 @@ module.exports = {
     var render_async = page.async(function(flush) {
       metadata.get(table, function(meta) {
         _metadata = meta.metadata;
+        var opts = {};
+        _.each(_metadata.col_types.integer, function(c) { opts[c.name] = c.display_name || c.name; });
+
+        var timeColEl = $C("selector", {
+          name: "time_col",
+          options: opts,
+          selected: _metadata.time_col
+        });
+
         var rss_feed = _metadata.rss_feed;
         var template_str = template.partial("datasets/edit.html.erb", {
           name: table,
@@ -197,7 +205,8 @@ module.exports = {
           description: _metadata.description,
           col_types: _metadata.col_types,
           render_column: render_column,
-          render_table_header: render_table_header
+          render_table_header: render_table_header,
+          time_col: timeColEl.toString()
         });
 
         bridge.controller("datasets", "initialize_editor");
