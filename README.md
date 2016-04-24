@@ -11,9 +11,9 @@ in adjusting failed queries.
 documents
 ---------
 
-[read the quick start](http://github.com/logv/snorkel/blob/master/docs/QUICK_START.md)
+[read the quick start](https://github.com/logV/snorkel/wiki/QuickStart)
 
-[heroku support](http://github.com/logv/snorkel/blob/master/docs/HEROKU.md) (thanks @rameshvk)
+[heroku support](https://github.com/logV/snorkel/wiki/Heroku) (thanks @rameshvk)
 
 [grafana snorkel datasource](https://github.com/logV/grafana-snorkel-datasource) is a plugin for grafana (3.0) to query snorkel. While this plugin is in early stages, grafana is quite amazing.
 
