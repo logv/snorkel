@@ -512,7 +512,7 @@ function get_query(cb, no_saved_queries) {
 
 function get_grafana() {
   var res = context("res");
-  get_query(function(data) {
+  get_query(function(data, meta) {
     var query = data.query;
     if (query) {
       var ret = []
@@ -522,6 +522,8 @@ function get_grafana() {
       if (!cols || !cols.length) {
         cols = [ "count" ];
       }
+
+      var formatters = { };
 
       _.each(query.results, function(result) {
         var groupby = "";
@@ -546,6 +548,25 @@ function get_grafana() {
             series[key] = datapoints;
           }
 
+          var metadata = meta.metadata;
+          var formatter_js = metadata.columns[col] && metadata.columns[col].formatter;
+          if (formatter_js && !formatters[col]) {
+            var args = [ "value", col, formatter_js ];
+            var func = Function.apply(null, args);
+            formatters[col] = function(value) {
+              var val = func.apply(null, [value, value]);
+              return val;
+            };
+
+          }
+
+          if (formatters[col]) {
+            try {
+              result[col] = formatters[col](result[col]);
+            } catch(e) {
+            }
+
+          }
           // Grafana uses MS timestamps
           datapoints.datapoints.push([result[col], result._id.time_bucket * 1000]);
         });
@@ -697,7 +718,7 @@ function handle_new_query_with_meta(meta, query_id, query_data, socket, done) {
     sample
       .flush();
 
-    done(results);
+    done(results, meta);
   });
 }
 

@@ -32,6 +32,12 @@ var TimeView = BaseView.extend({
           }
         }
 
+        var formatter = presenter.get_field_number_formatter(dataset, field);
+        if (formatter) {
+          value = formatter(value, value);
+        }
+
+
 
         var dims = _.map(group_by, function(g) {
           return result._id[g];
