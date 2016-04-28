@@ -978,7 +978,7 @@ module.exports = {
       handle_new_query(query_id, query_data, socket, function(results) {
         var collection = db.get("query", "results");
         // save results to db
-        collection.insert({
+        var query_data = {
           input: form_data,
           created: +Date.now(),
           updated: +Date.now(),
@@ -987,11 +987,27 @@ module.exports = {
           hashid: hashed_id,
           clientid: query_id,
           userid: user_id,
-          username: user_name
-        }, function(err, item) {
-          if (err) { console.log("Error saving query results:", err); }
-          socket.emit("query_id", { client_id: query_id, server_id: hashed_id});
-        });
+          username: user_name };
+
+        var orig_data = query_data;
+
+        // Can't keep periods inside the query when saving into mongodb, for some reason.
+        // this is gonna make it much harder to pull these records out and use them again
+        try {
+          query_data = JSON.stringify(query_data, null, 2);
+          query_data = JSON.parse(query_data.replace(/\./g, "_"));
+        } catch(e) {
+          query_data = orig_data;
+        }
+
+        try {
+          collection.insert(query_data, function(err, item) {
+            if (err) { console.log("Error saving query results:", err); }
+            socket.emit("query_id", { client_id: query_id, server_id: hashed_id});
+          });
+        } catch(e) {
+          console.log("COULDNT SAVE RESULT DATA INTO METADATA STORE", e);
+        }
       });
     });
   },

@@ -10,23 +10,26 @@ function validate() {
   console.log("Validating backend driver");
 }
 
+// This is meant for predicting data from samples of the form { integer: { }, string: {}, set: {} }
 function predict_column_types(data) {
   var schema = {};
   var values = {};
   _.each(data, function(sample) {
     _.each(sample, function(fields, field_type) {
-      _.each(fields, function(value, field) {
-        if (!schema[field]) {
-          schema[field] = {};
-          values[field] = {};
-        }
-        if (!schema[field][field_type]) {
-          schema[field][field_type] = 0;
-          values[field][field_type] = [];
-        }
-        schema[field][field_type] += 1;
-        values[field][field_type].push(value);
-      });
+      if (_.isObject(fields)) {
+        _.each(fields, function(value, field) {
+          if (!schema[field]) {
+            schema[field] = {};
+            values[field] = {};
+          }
+          if (!schema[field][field_type]) {
+            schema[field][field_type] = 0;
+            values[field][field_type] = [];
+          }
+          schema[field][field_type] += 1;
+          values[field][field_type].push(value);
+        });
+      }
     });
   });
 

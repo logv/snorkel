@@ -46,7 +46,7 @@ function set_fields(fields) {
       return;
     }
 
-    typed_fields[field.type_str + "." + field.name] = field.display_name || field.name;
+    typed_fields[field.name] = field.display_name || field.name;
     field_types[field.name] = field.type_str;
   });
 }
