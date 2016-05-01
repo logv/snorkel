@@ -24,13 +24,24 @@ function get_saved() {
 function get_saved_queries(conditions, options, cb) {
   var visited = {};
   var collection = db.get("query", "results");
+
+  // Need to ensure indeces on any parts of this table that we are querying
+  collection.ensureIndex("parsed.table");
+  collection.ensureIndex("updated");
+  collection.ensureIndex("username");
+  collection.ensureIndex("saved");
+
   cb = context.wrap(cb);
+  options.limit = options.limit || 30;
+  var start = +Date.now()
   collection.find(conditions, options, function(err, cur) {
-    cur.sort({ updated: -1 });
     cur.limit(options.limit || 30);
+    cur.sort({ updated: -1 });
     var ret;
 
     cur.toArray(function(err, arr) {
+      var end = +Date.now();
+      console.log("SAVED QUERY FINDING TOOK", end - start);
       if (!options.no_dedupe) {
         _.each(arr, function(query) {
           if (visited[query.hashid]) {
@@ -106,7 +117,7 @@ function get_past_results(hashid, cb) {
     hashid: hashid
   };
 
-  get_saved_queries(conditions, { limit: 100000, no_dedupe: true }, function(arr) {
+  get_saved_queries(conditions, { limit: 100, no_dedupe: true }, function(arr) {
     var ret = _.map(arr, function(r) { return {
       updated: r.updated,
       _id: r._id
