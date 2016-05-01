@@ -1,63 +1,93 @@
 <%= render_partial("about/fork_me.html.erb") %>
-
-<div class="container-fluid">
-  <div class="span12 row-fluid">
-    <h1> use <b><a href="/datasets">snorkel</a> </b>
-    and stop data <b>mishaps</b>
+<div id= "page-top">
+  <div class="container">
+    <div class="row-fluid">
+      <div class="span12 clearfix centered">
+        <img src="/images/no-diving.png"> </img>
+        <img src="/images/yes-snorkeling.png"> </img>
+      </div>
+    </div>
+    <h1>
+      <span>use <b><a href="/datasets">snorkel</a> </b>
+        and stop data <b>mishaps</b></span>
     </h1>
-
   </div>
+</div>
 
-  <div class="row-fluid">
-    <div class="clearfix">
-      <div class="pull-left" style="margin: auto; text-align: center">
-          <img src="/images/no-diving.png"> </img>
-          <img src="/images/yes-snorkeling.png"> </img>
+<div class = "container-wrapper">
+  <div class="container-fluid">
+    <!--
+    <div class="row-fluid">
+      <div class="span12">
+        <h1 class="centered"> use <b><a href="/datasets">snorkel</a> </b>
+        and stop data <b>mishaps</b>
+        </h1>
       </div>
     </div>
 
-    <div class="clearfix mbl mtl">
-      <a style="zoom: 2" class="btn btn-success" href="<%= url_for('about.index') %>">take the tour</a>
-    </div>
-    <div class="span4">
-      <h2>Overview</h2>
-      <div>
-          <p>
-            <b>snorkel</b> is a time based data analysis UI that is
-            <b>complementary</b> to your monitoring software. After you spot an
-            anomaly in a time series graph, snorkel helps you create, refine
-            and compare queries on your data that explain <b>why</b> your
-            graphs are changing.  </p> 
+    <div class="row-fluid">
+      <div class="span12 clearfix">
+        <div style="margin: auto; text-align: center">
+            <img src="/images/no-diving.png"> </img>
+            <img src="/images/yes-snorkeling.png"> </img>
+        </div>
       </div>
-      <h2>Example Uses</h2>
-      <ul>
-        <li>monitor push and deployment health</li>
-        <li>track and diagnose client errors</li>
-        <li>diagnose performance regressions</li>
-        <li>locate optimization opportunities</li>
-        <li>analyze performance experiments</li>
-      </ul>
     </div>
+    -->
+    
+    <div class="row-fluid" >
+      <div class="span12">
+        <h2>Overview</h2>
+        <div>
+            <p>
+              <b>snorkel</b> is a time based data analysis UI that is
+              <b>complementary</b> to your monitoring software. After you spot an
+              anomaly in a time series graph, snorkel helps you create, refine
+              and compare queries on your data that explain <b>why</b> your
+              graphs are changing.  </p> 
+        </div>
+      </div>
+    </div>
+    <div class="row-fluid">
+      <div class="span12 centered clearfix mbl mtl" style="padding:20px">
+        <a style="zoom: 2" class="btn btn-success" href="<%= url_for('about.index') %>">take the tour</a>
 
-    <div class="span1"></div>
-    <div class="span4">
-      <h2>Features</h2>
-      <ul>
-        <li>Realtime drilldowns</li>
-        <li>Powerful comparison queries</li>
-        <li><a href="http://github.com/logv/snorkel/wiki/Backends">Supports mongo or postgres</a></li>
-        <li><a href="http://github.com/logv/grafana-snorkel-datasource" target="_blank">
-          Dashboarding with Grafana</a></li>
-        <li><s>100%</s>85% uncommented Node.JS</li>
-        <li>(mostly) Mobile friendly UI</li>
-      </ul>
-      <h2>Drawbacks</h2>
-      <ul>
-        <li>No JOIN operations</li>
-        <li>Snorkel won't fix the problems it finds</li>
-      </ul>
+      </div>
+    </div>
+    <div class="row-fluid">
+      <div class="span4">
+        <h2>Example Uses</h2>
+        <ul>
+          <li>monitor push and deployment health</li>
+          <li>track and diagnose client errors</li>
+          <li>diagnose performance regressions</li>
+          <li>locate optimization opportunities</li>
+          <li>analyze performance experiments</li>
+        </ul>
+      </div>
+    
+      
+      <div class="span4">
+        <h2>Features</h2>
+        <ul>
+          <li>Realtime drilldowns</li>
+          <li>Powerful comparison queries</li>
+          <li><a href="http://github.com/logv/snorkel/wiki/Backends">Supports mongo or postgres</a></li>
+          <li><a href="http://github.com/logv/grafana-snorkel-datasource" target="_blank">
+            Dashboarding with Grafana</a></li>
+          <li><s>100%</s>85% uncommented Node.JS</li>
+          <li>(mostly) Mobile friendly UI</li>
+        </ul>
+      </div>
+      <div class="span4">
+        <h2>Drawbacks</h2>
+        <ul>
+          <li>No JOIN operations</li>
+          <li>Snorkel won't fix the problems it finds</li>
+        </ul>
+      </div>
+
     </div>
 
   </div>
-
 </div>

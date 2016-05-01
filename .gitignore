@@ -8,3 +8,4 @@ snorkel/config/certs/
 snorkel/config/local/
 snorkel/config/users.htpasswd
 output
+.DS_Store

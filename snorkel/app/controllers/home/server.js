@@ -15,13 +15,14 @@ function index() {
   template.add_stylesheet("home.css");
 
 
-  
+  var header_str = template.render("helpers/header.html.erb", { show_user_status: false });
+
   if (context('req').isAuthenticated()) { 
     context('res').redirect('/datasets');
   } else {
     var template_str = template.render("controllers/home.html.erb", {});
 
-    page.render({ content: template_str });
+    page.render({ content: template_str, header: header_str });
   }
 }
 
