@@ -8,7 +8,7 @@
 
   </div>
 
-  <div class="span12 row-fluid">
+  <div class="row-fluid">
     <div class="clearfix">
       <div class="pull-left" style="margin: auto; text-align: center">
           <img src="/images/no-diving.png"> </img>
@@ -17,40 +17,35 @@
     </div>
 
     <div class="clearfix mbl mtl">
-      <h1><a href="<%= url_for('about.index') %>">take the tour</a></h1>
+      <a style="zoom: 2" class="btn btn-success" href="<%= url_for('about.index') %>">take the tour</a>
     </div>
     <div class="span4">
+      <h2>Overview</h2>
       <div>
-      <h2>Highlevel</h2>
-        <p>
-          <b>snorkel</b> answers questions about the <b>here</b> and
-          <b>now</b>.  You can think of snorkel like an <a
-          href="http://en.wikipedia.org/wiki/Online_analytical_processing">OLAP</a>
-          with amnesia. Snorkel stores <b>raw samples</b> in <b>datasets</b>
-          and dynamically slices and aggregates them in real time. As the
-          samples age, they can be set to <b>automatically expire</b>, keeping
-          query times snappy.
-        </p>
-
-      <h2>When do I sample data?</h2>
-        <p>
-          Typically, datasets tend to hold a few weeks worth of information. If
-          you find that your samples are not sticking around for long enough,
-          you should consider <b>sampling</b> the data down and adding a
-          <b>weight</b> or <b>sample_rate</b> field that represents that
-          sample's weight. Snorkel does the right thing and
-          will account for the sample rate when doing its aggregations.
-        </p>
+          <p>
+            <b>snorkel</b> is a time based data analysis UI that is
+            <b>complementary</b> to your monitoring software. After you spot an
+            anomaly in a time series graph, snorkel helps you create, refine
+            and compare queries on your data that explain <b>why</b> your
+            graphs are changing.  </p> 
       </div>
+      <h2>Example Uses</h2>
+      <ul>
+        <li>monitor push and deployment health</li>
+        <li>track and diagnose client errors</li>
+        <li>diagnose performance regressions</li>
+        <li>locate optimization opportunities</li>
+        <li>analyze performance experiments</li>
+      </ul>
     </div>
 
     <div class="span1"></div>
     <div class="span4">
       <h2>Features</h2>
       <ul>
-        <li>Analyze hundreds of megabytes of data</li>
         <li>Realtime drilldowns</li>
         <li>Powerful comparison queries</li>
+        <li><a href="http://github.com/logv/snorkel/wiki/Backends">Supports mongo or postgres</a></li>
         <li><a href="http://github.com/logv/grafana-snorkel-datasource" target="_blank">
           Dashboarding with Grafana</a></li>
         <li><s>100%</s>85% uncommented Node.JS</li>
@@ -58,7 +53,6 @@
       </ul>
       <h2>Drawbacks</h2>
       <ul>
-        <li>Limited retention time</li>
         <li>No JOIN operations</li>
         <li>Snorkel won't fix the problems it finds</li>
       </ul>
