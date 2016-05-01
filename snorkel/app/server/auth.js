@@ -76,7 +76,7 @@ module.exports = {
       app.get('/login/success', function(req, res) {
         var next = req.session.redirect_to || '/';
         req.session.redirect_to = null;
-        return res.redirect(next +'?user=' + req.user.id);
+        return res.redirect(next);
       });
       var realm = "http://" + config.hostname;
       if (!config.behind_proxy) {

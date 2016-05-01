@@ -13,7 +13,7 @@ documents
 
 [read the quick start](https://github.com/logV/snorkel/wiki/QuickStart)
 
-[heroku support](https://github.com/logV/snorkel/wiki/Heroku) (thanks @rameshvk)
+[usage guide](https://github.com/logV/snorkel/wiki/Guide)
 
 [grafana snorkel datasource](https://github.com/logV/grafana-snorkel-datasource) is a plugin for grafana (3.0) to query snorkel. While this plugin is in early stages, grafana is quite amazing.
 

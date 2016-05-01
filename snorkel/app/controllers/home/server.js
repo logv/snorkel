@@ -10,12 +10,11 @@ function index() {
   // TODO: automate this, so its unecessary
   // override the name of this controller from "" => home
   context("controller", "home");
-  context("title", "welcoem");
 
   template.add_stylesheet("home.css");
 
 
-  var header_str = template.render("helpers/header.html.erb", { show_user_status: false });
+  var header_str = template.render("helpers/header.html.erb", { show_user_status: true });
 
   if (context('req').isAuthenticated()) { 
     context('res').redirect('/datasets');
