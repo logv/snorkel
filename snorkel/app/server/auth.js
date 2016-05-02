@@ -144,7 +144,7 @@ module.exports = {
       function(req, res, next) {
         var next = req.session.redirect_to || '/';
         req.session.redirect_to = null;
-        return res.redirect(next +'?user=' + req.user.id);
+        return res.redirect(next);
       });
 
     io.authorize(function(req, cb) {
