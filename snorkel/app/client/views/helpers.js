@@ -193,7 +193,7 @@ module.exports = {
     var filter_type = wrapper.attr("data-type");
     var value = wrapper.attr("data-value");
 
-    var filter = [filter_type + "." + name, op, value];
+    var filter = [name, op, value];
 
     return filter;
 
