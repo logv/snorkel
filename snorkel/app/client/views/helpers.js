@@ -210,7 +210,7 @@ module.exports = {
       value = el.html();
     }
 
-    return [field_type + "." + field_name, op, value];
+    return [field_name, op, value];
   },
 
   // # }}}
