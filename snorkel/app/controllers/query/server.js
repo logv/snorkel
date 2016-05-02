@@ -299,7 +299,11 @@ function load_saved_query(conditions, cb) {
       var obj = arr.pop();
       if (!obj) {
         return cb(null);
+      }
 
+      try {
+        obj = JSON.parse(JSON.stringify(obj).replace(/#DOT#/g, "."));
+      } catch(e) {
       }
 
       var input_view = _.find(obj.input, function(r) {
@@ -995,7 +999,7 @@ module.exports = {
         // this is gonna make it much harder to pull these records out and use them again
         try {
           query_data = JSON.stringify(query_data, null, 2);
-          query_data = JSON.parse(query_data.replace(/\./g, "_"));
+          query_data = JSON.parse(query_data.replace(/\./g, "#DOT#"));
         } catch(e) {
           query_data = orig_data;
         }

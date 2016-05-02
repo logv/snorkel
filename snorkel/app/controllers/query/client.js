@@ -497,7 +497,7 @@ module.exports = {
       // TODO: do better than just reloading the URL.
       // something more ajaxy, with Backbone's Router
       //
-      if (this.table && table != this.table) {
+      if (table && this.table && table != this.table) {
         var uri = new miuri(window.location.pathname);
         uri.query({ 'table' : table});
         window.location = uri;

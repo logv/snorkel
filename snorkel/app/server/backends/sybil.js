@@ -10,6 +10,7 @@ var path = require("path")
 var cwd = process.cwd()
 
 var BIN_PATH = path.join(cwd, "./bin/sybil ");
+var DATASET_SEPARATOR = "@"
 
 var DB_DIR = "./"
 // TODO:
@@ -317,11 +318,11 @@ function add_int_and_time_filters(query_spec) {
   }
 
   _.each(query_spec.opts.filters, function(f) {
-    var tokens = f.column.split('.');
-    if (tokens[0] !== "integer") {
-      return
+    var column = f.column;
+    if (!query_spec.col_config[column] || 
+        query_spec.col_config[column].final_type !== "integer") {
+      return;
     }
-    var column = tokens.slice(1).join('.');
     var value = f.conditions[0].value; //hardcoded for now
 
     filters.push(column + ':' + f.conditions[0].op.replace("$", "") + ':' + value);
@@ -349,11 +350,12 @@ function add_str_filters(query_spec) {
   var filters = []
 
   _.each(query_spec.opts.filters, function(f) {
-    var tokens = f.column.split('.');
-    if (tokens[0] !== "string") {
-      return
+    var column = f.column;
+    if (!query_spec.col_config[column] || 
+        query_spec.col_config[column].final_type !== "string") {
+      return;
     }
-    var column = tokens.slice(1).join('.');
+
     var op = "re"; // hardcoded
     if (f.conditions[0].op != "$regex") {
       op = "nre"
@@ -551,7 +553,7 @@ var PCSDriver = _.extend(driver.Base, {
   default_table: "snorkel_test_data",
   add_samples: function(dataset, subset, samples, cb) {
     console.log("ADDING SAMPLES", dataset, subset, samples);
-    var table_name = dataset + "." + subset;
+    var table_name = dataset + DATASET_SEPARATOR + subset;
     var cmd = get_cmd(BIN_PATH, "ingest -table " + table_name);
     cb = context.wrap(cb);
     console.log("RUNNING COMMAND", cmd);
