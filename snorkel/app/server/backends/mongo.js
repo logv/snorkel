@@ -145,7 +145,7 @@ function round_column(col, out_col, bin_size) {
 //     { "$lt" : 1200 }
 //  ]
 // }
-function add_filters(filters) {
+function add_filters(filters, meta) {
   var pipeline = [];
 
   _.each(filters, function(filter) {
@@ -155,6 +155,11 @@ function add_filters(filters) {
     if (!col) {
       // TODO: error here
       console.log("Missing column for filter: ", filter);
+    }
+
+    if (meta) {
+      var col_type = meta.columns[col].type_str;
+      col = col_type + "." + col;
     }
 
     transform.$match[col] = {};
@@ -505,7 +510,7 @@ function query_to_pipeline(query) {
   }
 
   var timeline = add_time_range(time_field, start_s, end_s);
-  var filters = add_filters(params.filters);
+  var filters = add_filters(params.filters, meta.metadata);
   var limit = [];
 
   if (params.limit) {

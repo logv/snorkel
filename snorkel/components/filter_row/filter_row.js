@@ -14,14 +14,20 @@ function update_operators(selector, new_op) {
   var added_ops = null;
   var types = ["integer", "set", "string"];
   var shown = [];
+  var options = this.options;
+
+  
+  var field_types = options && options.types || {};
+  console.log("FIELD TYPES ARE");
+
   _.each(ops, function(op) {
     var $op = $(op);
     $op.attr("disabled", true);
     $op.attr("selected", false);
 
     _.each(types, function(type) {
-      if (val.indexOf(type) !== -1 &&
-          $op.attr("data-type") === type) {
+      var field_is_type = val.indexOf(type) !== -1 || field_types[val] === type;
+      if (field_is_type && $op.attr("data-type") === type) {
         $op.attr("disabled", false);
 
         shown.push(op);
@@ -36,10 +42,14 @@ function update_operators(selector, new_op) {
     console.log("No operators supported for", val);
   }
 
-  // Select the first op :-)
-  $(op).find("option:not(:disabled)")
-    .first()
-    .attr("selected", true);
+  _.delay(function() {
+    // Select the first op :-)
+    var firstEl = $(op).find("option:not(:disabled)")
+      .first()
+      .attr("selected", true);
+    console.log("FIRST EL", firstEl);
+
+  });
 }
 
 module.exports = {
@@ -47,7 +57,8 @@ module.exports = {
   className: "",
   defaults: {
   },
-  client: function() {
+  client: function(options) {
+    this.options.types = this.options.types || options.types;
     this.$el.find(".filter_field").trigger("change", { target: this.$el.find(".filter_field") });
     if (this.options.op) {
       this.$el.find(".filter_op").val(this.options.op);

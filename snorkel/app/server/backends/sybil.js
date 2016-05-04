@@ -350,7 +350,11 @@ function add_str_filters(query_spec) {
   var filters = []
 
   _.each(query_spec.opts.filters, function(f) {
+    
     var column = f.column;
+    column = column.replace(/^string\./, "");
+    column = column.replace(/^integer\./, "");
+    column = column.replace(/^set\./, "");
     if (!query_spec.col_config[column] || 
         query_spec.col_config[column].final_type !== "string") {
       return;

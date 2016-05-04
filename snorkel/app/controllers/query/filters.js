@@ -81,7 +81,7 @@ function add_filter(filter, compare, force) {
   }
   var filters = _filter_els;
 
-  $C("filter_row", { fields: typed_fields, op: op, selected: val, field: field }, function(cmp) {
+  $C("filter_row", { fields: typed_fields, op: op, selected: val, field: field, types: field_types }, function(cmp) {
     filters.push(cmp.$el);
     cmp.set_field(field);
     cmp.set_value(val);

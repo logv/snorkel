@@ -299,12 +299,11 @@ var query_defs = {
 };
 
 function add_query_filters(query_spec, stmt) {
-
+  var meta = query_spec.meta.metadata;
   if (query_spec.params.filters) {
     _.each(query_spec.params.filters, function(filter) {
-      var split_col = filter.column.split(".");
-      var type = split_col[0];
-      var col = split_col[1];
+      var col = filter.column;
+      var type = meta.columns[col].type_str;
 
       _.each(filter.conditions, function(condition) {
         if (query_defs[condition.op]) {

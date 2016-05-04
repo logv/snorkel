@@ -389,15 +389,17 @@ module.exports = {
         var columns = config.metadata.columns;
 
         var typed_fields = {};
+        var field_types = {};
         _.each(columns, function(field) {
           if (BLACKLIST[field.name] || BLACKLIST[field.final_type] || field.hidden === 'true') {
             return;
           }
 
-          typed_fields[field.type_str + "." + field.name] = field.display_name || field.name;
+          typed_fields[field.name] = field.display_name || field.name;
+          field_types[field.name] = field.type_str;
         });
 
-        var filter_row = $C("filter_row", { fields: typed_fields });
+        var filter_row = $C("filter_row", { fields: typed_fields, client_options: { types: field_types }});
         var compare_filter_row = $C("filter_row", { fields: typed_fields });
 
         var filter_box = $("<div class='filter_group query_filters'>");
