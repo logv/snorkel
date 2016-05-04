@@ -333,6 +333,13 @@ function get_index() {
 
   bridge.controller("query", "set_table", table);
 
+  var editEl = $("<a>Settings</a>")
+    .addClass("dataset_settings")
+    .attr('href', '/datasets/edit?table=' +  table)
+    .attr('target', '_blank');
+
+  var sidebar_edit_link = editEl.toString();
+
   function render_query_content() {
 
     return page.async(function(flush) {
@@ -424,12 +431,6 @@ function get_index() {
       };
     }
 
-    var editEl = $("<a>Dataset Settings</a>")
-      .attr('href', '/datasets/edit?table=' +  table)
-      .attr('target', '_blank');
-
-    var edit_link = editEl.toString();
-
     var render_dashboards = page.async(function(flush) {
       dashboard_controller.get_dashboards(null, function(dashes) {
         bridge.controller("query", "set_dashboards", dashes);
@@ -441,17 +442,29 @@ function get_index() {
       render_controls: wrap_str(controls),
       render_filters: wrap_str(filters),
       render_stats: wrap_str(stats),
-      render_edit_link: wrap_str(edit_link),
+      render_edit_link: wrap_str(sidebar_edit_link),
       render_go_button: render_button_bar,
       render_aux_button: render_button_bar,
       render_dashboards: render_dashboards
     });
   }
 
+  var edit_header_link = $("<div class='mtm mbl mll lfloat' />");
+  editEl = $("<a style='color: white'>Settings</a>")
+    .addClass("dataset_settings")
+    .attr('href', '/datasets/edit?table=' +  table)
+    .attr('target', '_blank');
+
+  var edit_link = editEl.toString();
+  edit_header_link.append(edit_link);
   var header_str = template.render("helpers/header.html.erb", {
     tabs: function() {
+      var view_selector = $("<div class='lfloat' />")
+        .append(view.table_selector()());
+
       return $("<div>")
-        .html(view.table_selector()())
+        .html(view_selector)
+        .append(edit_header_link)
         .html();
     }
   });
