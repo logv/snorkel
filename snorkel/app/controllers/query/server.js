@@ -24,7 +24,6 @@ var metadata = require_app("server/metadata");
 var Sample = require_app("server/sample");
 var view = require_app("controllers/query/view");
 var queries = require_app("server/queries");
-var dashboard_controller = require_app("controllers/dashboard/server");
 
 var strtotime = require_vendor("strtotime");
 
@@ -431,21 +430,13 @@ function get_index() {
       };
     }
 
-    var render_dashboards = page.async(function(flush) {
-      dashboard_controller.get_dashboards(null, function(dashes) {
-        bridge.controller("query", "set_dashboards", dashes);
-      });
-      flush("");
-    });
-
     return template.partial("query/sidebar.html.erb", {
       render_controls: wrap_str(controls),
       render_filters: wrap_str(filters),
       render_stats: wrap_str(stats),
       render_edit_link: wrap_str(sidebar_edit_link),
       render_go_button: render_button_bar,
-      render_aux_button: render_button_bar,
-      render_dashboards: render_dashboards
+      render_aux_button: render_button_bar
     });
   }
 
@@ -605,7 +596,7 @@ function get_grafana() {
 }
 
 function get_download() {
-  get_query(function(err, query) {
+  get_query(function(query) {
     if (query) {
       var results = JSON.stringify(query.results);
       var res = context("res");
@@ -973,11 +964,6 @@ module.exports = {
 
     socket.on("refresh_query", function(form_data) {
       refresh_query_from_socket(form_data, __id, socket);
-    });
-
-    socket.on("update_portlet", function(portlet) {
-      console.log("Updating portlet", portlet);
-      dashboard_controller.update_portlet(socket, portlet);
     });
 
     socket.on("load_rss", load_rss);

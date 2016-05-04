@@ -830,14 +830,6 @@ module.exports = {
     window.open(url, '_blank');
   },
 
-  dashboard_query: function() {
-    $C("query_portlet_modal", {
-      show_dashboard: true,
-      dashboards: this.dashboards,
-      query_id: _query_id
-    }, function() { });
-  },
-
   save_query: function() {
     var query_id = _query_id;
     // TODO: get current query details
