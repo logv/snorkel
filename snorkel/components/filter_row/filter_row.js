@@ -18,8 +18,6 @@ function update_operators(selector, new_op) {
 
   
   var field_types = options && options.types || {};
-  console.log("FIELD TYPES ARE");
-
   _.each(ops, function(op) {
     var $op = $(op);
     $op.attr("disabled", true);
@@ -47,7 +45,6 @@ function update_operators(selector, new_op) {
     var firstEl = $(op).find("option:not(:disabled)")
       .first()
       .attr("selected", true);
-    console.log("FIRST EL", firstEl);
 
   });
 }
