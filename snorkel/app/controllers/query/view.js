@@ -87,13 +87,14 @@ function get_view_selector_row() {
       "time" : "Time Series",
       "dist" : "Distribution",
       "samples" : "Samples",
+      "session" : "Timeline",
       "overview" : "Overview",
       "" : "--",
       "bar"  : "Bar Chart",
       "area" : "Stacked Area",
-      "multidist" : "Grouped Dist.",
       "scatter" : "Scatter Plot",
-      "drill" : "Drilldown"
+      "multidist" : "Grouped Dist.",
+      "drill" : "Drilldown",
     },
     delegate: {
       "change": "view_changed"

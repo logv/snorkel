@@ -6,6 +6,7 @@ module.exports = {
   set_fields: function(table, fields) {
     if (!this.metadata) { this.metadata = {}; }
     if (!this.formatters) { this.formatters = {}; }
+    if (!this.inner_formatters) { this.inner_formatters = {}; }
 
     this.metadata[table] = fields;
   },
@@ -41,18 +42,14 @@ module.exports = {
   },
 
   get_field_number_formatter: function(dataset, col) {
-
     var self = this;
     var formatter = function(val) {
-      var inner_formatter = self.get_field_formatter(dataset, col);
+      var inner_formatter = self.inner_formatters[dataset][col];
 
-      var ret = inner_formatter(val);
-
-      try {
-        return $(ret).attr("data-transform") || ret;
-      } catch(e) {
-        return ret;
-      }
+      if (inner_formatter) {
+        return inner_formatter(val);
+      } 
+      return val;
     };
 
     return formatter;
@@ -62,6 +59,7 @@ module.exports = {
   get_field_formatter: function(dataset, col) {
     if (!this.formatters[dataset])  {
       this.formatters[dataset] = {};
+      this.inner_formatters[dataset] = {};
     }
 
     if (!this.formatters[dataset][col]) {
@@ -71,7 +69,12 @@ module.exports = {
 
         if (col_type === "integer" &&
             (typeof(val) === "string" || typeof(val) === "number")) {
-          return helpers.count_format(val);
+          var formatted_value = helpers.count_format(val);
+
+          return $("<div >")
+            .attr("data-value", val)
+            .addClass("value_cell")
+            .append(formatted_value);
         }
 
         return val;
@@ -82,6 +85,10 @@ module.exports = {
         if (formatter_js) {
           var args = [ "value", col, formatter_js ];
           var func = Function.apply(null, args);
+          this.inner_formatters[dataset][col] = function(value) {
+            return func.apply(null, [value, value]);
+          }
+
           this.formatters[dataset][col] = function(value) {
             var val = func.apply(null, [value, value]);
             return $("<div >")

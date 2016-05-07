@@ -198,13 +198,9 @@ function handle_query_saved(query_details) {
 
   $C("modal", {
     title: "Success!",
-    body: "yuor query has been saved. look in your query history for it. <br />" +
+    body: "Your query has been saved. Look in your query history for it. <br />" +
           "<small>(Click on your username to see recent &amp; saved queries)</small>"
   });
-}
-
-function handle_portlet_update(data) {
-  SF.socket().emit("update_portlet", data);
 }
 
 function insert_query_tiles(container, queries, in_order) {
@@ -583,8 +579,13 @@ module.exports = {
     component.load("multiselect", done);
   },
 
+  get_current_query: function() {
+    return this.query_params || {};
+  },
+
   set_dom_from_query: function(query_str) {
     var query = $.deparam(query_str);
+    this.query_params = query;
     var view = query.view;
     this.update_view(view || "table");
 

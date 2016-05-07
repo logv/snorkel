@@ -59,19 +59,8 @@ module.exports = {
 
         });
 
-        var col_types = _.groupBy(cols, function(col_meta) {
-          if (col_meta.type_str === "integer" && col_meta.groupable === "true") {
-            col_meta.final_type = "string";
-          } else {
-            col_meta.final_type = col_meta.type_str;
-          }
-          return col_meta.final_type;
-        });
-
-        config.metadata.col_types = col_types;
-
         var default_time_col;
-        _.each(["time", "integer_time", "createdAt", "timestamp", "updatedAt"], function(ts) {
+        _.each(["time", "integer_time", "integer.time", "createdAt", "timestamp", "updatedAt"], function(ts) {
           if (config.metadata.columns[ts] && !default_time_col) {
             default_time_col = ts;
           }
@@ -81,7 +70,23 @@ module.exports = {
           config.metadata.time_col = default_time_col;
         }
 
+        _.each(cols, function(col_meta) {
+          if (col_meta.name === config.metadata.time_col) {
+            col_meta.time_col = true;
+          }
+        });
 
+        var col_types = _.groupBy(cols, function(col_meta) {
+          if (col_meta.type_str === "integer" && col_meta.groupable === "true") {
+            col_meta.final_type = "string";
+          } else {
+            col_meta.final_type = col_meta.type_str;
+          }
+
+          return col_meta.final_type;
+        });
+
+        config.metadata.col_types = col_types;
 
 
         cb(config);

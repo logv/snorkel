@@ -53,6 +53,7 @@ var DistView = require("app/client/views/dist_view");
 var MultiDistView = require("app/client/views/multi_dist_view");
 var OverView = require("app/client/views/over_view");
 var SamplesView = require("app/client/views/samples_view");
+var SessionView = require("app/client/views/session_view");
 var ScatterView = require("app/client/views/scatter_view");
 var AreaView = require("app/client/views/area_view");
 var BarView = require("app/client/views/bar_view");
@@ -81,13 +82,14 @@ function get_control_row(name) {
 
 function handle_update_view(view) {
   var input_schema = VIEW_INPUTS[view];
+  var fields = SF.controller().get_fields(this.table);
 
   var custom_controls = input_schema.custom_controls;
   var customControlsEl = $("#query_sidebar .view_custom_controls");
   if (custom_controls) {
     customControlsEl.empty();
 
-    var controlEls = custom_controls();
+    var controlEls = custom_controls(fields);
     customControlsEl.append(controlEls);
     customControlsEl.stop(true).slideDown();
 

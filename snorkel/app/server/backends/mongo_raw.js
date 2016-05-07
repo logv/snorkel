@@ -494,7 +494,7 @@ function query_to_pipeline(query) {
   var time_field = "integer.time";
 
   var pipeline = get_query_pipeline(query);
-  if (params.cast_cols && !backend.SAMPLE_VIEWS[params.view]) {
+  if (params.cast_cols && query.view !== "samples") {
     pipeline = cast_columns(time_field, params.cast_cols, params.cols, params.weight_col, params.dims).concat(pipeline);
   }
 
@@ -514,9 +514,9 @@ function query_to_pipeline(query) {
   var limit = [];
 
   if (params.limit) {
-    if (params.view !== "time" &&
-        params.view !== "area" &&
-        params.views !== "distribution") {
+    if (query.view !== "time" &&
+        query.view !== "area" &&
+        query.view !== "distribution") {
       limit.push({$limit: params.limit || 100});
     }
 
@@ -709,7 +709,6 @@ function get_cached_columns(table, cb) {
     }
   }
 
-  console.log("Updating cached column results for table", table);
   get_columns(table, cb);
 }
 

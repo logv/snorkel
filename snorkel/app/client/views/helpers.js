@@ -414,7 +414,7 @@ var INPUTS = {
     "max_results"
   ],
 
-  GROUP_BY: [ "group_by", "agg" ],
+  GROUP_BY: [ "group_by"],
 
   MULTI_AGG: [ "fieldset", "agg" ],
   SINGLE_AGG: [ "field", "agg" ],

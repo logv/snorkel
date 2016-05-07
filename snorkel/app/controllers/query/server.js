@@ -108,6 +108,7 @@ function marshall_query(form_data) {
   var now = Date.now();
 
   query_data.field_two = value_of(form_data, 'field_two');
+  query_data.event_field = value_of(form_data, 'event_field');
 
   // Now we should round the start and end to the time bucket
   query_data.start_ms = fuzzy_time(start_str_ms, now);

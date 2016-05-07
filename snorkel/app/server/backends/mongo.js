@@ -494,7 +494,7 @@ function query_to_pipeline(query) {
   var time_field = opts.time_field || 'time';
 
   var pipeline = get_query_pipeline(query);
-  if (params.cast_cols && !backend.SAMPLE_VIEWS[params.view]) {
+  if (params.cast_cols && query.view !== "samples") {
     pipeline = cast_columns(time_field, params.cast_cols, params.cols, params.weight_col, params.dims).concat(pipeline);
   }
 
