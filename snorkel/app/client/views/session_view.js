@@ -34,6 +34,7 @@ var SessionView = BaseView.extend({
       plotted_vals.push({
         x: value,
         name: color,
+        result: result,
         y: 2,
         marker: {
           radius: 10,
@@ -93,6 +94,16 @@ var SessionView = BaseView.extend({
         series: {
           tooltip: {
             enabled: false
+          },
+          point: {
+            events: {
+              click: function() {
+                var details = "<pre class='sample_details'>" + JSON.stringify(this.result, null, 2) + "</pre>";
+                $C("modal", {title: "Sample details", body: details}, function(modal) {
+                  modal.show();
+                });
+              }
+            }
           },
           marker: {
             enabled: true,

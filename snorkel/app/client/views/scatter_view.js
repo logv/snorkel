@@ -87,7 +87,7 @@ var ScatterView = SamplesView.extend({
           point: {
             events: {
               click: function() {
-                var details = "<pre>" + JSON.stringify(this.result, null, 2) + "</pre>";
+                var details = "<pre class='sample_details'>" + JSON.stringify(this.result, null, 2) + "</pre>";
                 $C("modal", {title: "Sample details", body: details}, function(modal) {
                   modal.show();
                 });

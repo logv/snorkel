@@ -104,3 +104,11 @@ button.close {
 .ui-sortable-placeholder { border: 1px dotted black; visibility: visible !important; height: 50px !important; min-width: 200px; }
 .ui-sortable-placeholder * { visibility: hidden; }
 
+pre {
+  color: #000;
+  font-weight: bold;
+  background-color: #fdfdfd;
+  font-size: 1.2em;
+  font-family: monospace;
+  border: 0px;
+}

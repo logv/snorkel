@@ -12,6 +12,7 @@ module.exports = {
        plotOptions: {
         series: {
           animation: false,
+          turboThreshold: 2000,
           marker: { enabled: false }
           }
         },
