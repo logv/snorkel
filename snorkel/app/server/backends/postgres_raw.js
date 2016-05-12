@@ -9,7 +9,9 @@ var squel = require("squel");
 var context = require_core("server/context");
 var backend = require_app("server/backend");
 var driver = require_app("server/backends/driver");
-var conString = "postgres://postgres:1234@localhost/postgres";
+var config = require_core('server/config');
+
+var conString = config.backend.conn_string || "postgres://postgres:1234@localhost/postgres";
 
 var PREFIX = "_";
 
@@ -670,7 +672,6 @@ function get_cached_columns(table, cb) {
     };
 
     _.each(_pending[table], function(cb) {
-      console.log("EMITTING UPDATED RESULTS");
       cb(results);
     });
     delete _pending[table];
