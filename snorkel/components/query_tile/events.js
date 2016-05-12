@@ -7,7 +7,7 @@ module.exports = {
   },
 
   handle_title_click: function() {
-    SF.controller().trigger("query_tile_clicked", this.options.query);
+    SF.controller().trigger("query_id_clicked", this.options.query);
   },
   handle_delete_click: function(e) {
     var $el = this.$el;

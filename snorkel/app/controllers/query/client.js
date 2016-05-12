@@ -208,10 +208,9 @@ function insert_query_tiles(container, queries, in_order) {
     var view_data = views.VIEWS[data.parsed.view];
 
     ResultsStore.identify({ client_id: data.clientid, server_id: data.hashid });
+    ResultsStore.set_timestamp(data.results.query.id, data.updated || data.created);
+
     if (data.results) {
-
-      ResultsStore.set_timestamp(data.results.query.id, data.updated || data.created);
-
       if (data.results.query) {
         ResultsStore.add_results_data(data.results.query);
       }
@@ -361,7 +360,10 @@ module.exports = {
 
     SF.controller().on("query_id_clicked", function(short_query) {
       SF.socket().emit("load_query_data", { hashid: short_query.hashid, updated: short_query.updated }, function(query) {
-        _history_modal.hide();
+        if (_history_modal) {
+          _history_modal.hide();
+        }
+
         SF.controller().trigger("query_tile_clicked", query);
       });
     });

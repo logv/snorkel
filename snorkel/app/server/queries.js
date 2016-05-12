@@ -34,14 +34,16 @@ function get_saved_queries(conditions, options, cb) {
   cb = context.wrap(cb);
   options.limit = options.limit || 30;
   var start = +Date.now()
-  collection.find(conditions, options, function(err, cur) {
+  var projection = {};
+  projection["results.results"] = 0;
+  collection.find(conditions, projection, function(err, cur) {
     cur.limit(options.limit || 30);
     cur.sort({ updated: -1 });
     var ret;
 
     cur.toArray(function(err, arr) {
       var end = +Date.now();
-      console.log("SAVED QUERY FINDING TOOK", end - start);
+      console.log("SAVED QUERY FINDING TOOK", end - start, "RESULTS", arr.length);
       if (!options.no_dedupe) {
         _.each(arr, function(query) {
           if (visited[query.hashid]) {
