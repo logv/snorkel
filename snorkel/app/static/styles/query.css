@@ -25,8 +25,9 @@ html, body {
   height: 40px;
   line-height: 40px;
   font-weight: bold;
-  padding-top: 8px;
+  padding-top: 4px;
   z-index: 1020; /* Stay above the query queue sidebar, damnit */
+  padding-bottom: 6px;
 
   .graph_quick_links a {
     width: 8%;
@@ -163,7 +164,8 @@ html, body {
   .helpover {
     display: inline-block;
     color: #dadada;
-    float: right;
+    position: absolute;
+    margin-left: 10px;
     cursor: pointer;
     padding-top: 5px;
     height: 28px;
@@ -188,6 +190,13 @@ html, body {
     }
     .go_button {
       float: right;
+    }
+
+    .go_button_wrapper {
+      .go_button {
+        border-radius: 3px;
+        padding: 5px 9px;
+      }
     }
 
     .aux_buttons {
@@ -299,10 +308,6 @@ html, body {
     }
 
     .go_button {
-      padding-left: 10px;
-      padding-right: 10px;
-      padding-bottom: 8px;
-      padding-top: 8px;
       float: right;
     }
   }
@@ -321,9 +326,7 @@ html, body {
   .save_button,
   .download_button,
   .share_button {
-    padding: 8px;
   }
-
 
   .form-horizontal select { margin-top: 5px; }
 

@@ -500,8 +500,6 @@ var DistView = BaseView.extend({
         return table;
       }
 
-      outerEl.append($("<h2>Percentiles</h2>"));
-      outerEl.append(render_stats_overview([5, 25, 50, 75, 95]));
       outerEl.append($("<h2>Moments</h2>"));
 
       var headers = ["count", "average", "trimean"];
@@ -547,6 +545,8 @@ var DistView = BaseView.extend({
       table.attr("class",  "table");
       outerEl.append(table);
 
+      outerEl.append($("<h2>Percentiles</h2>"));
+      outerEl.append(render_stats_overview([5, 25, 50, 75, 95]));
       outerEl.append($("<h2>Outliers</h2>"));
       outerEl.append(render_stats_overview([95, 96, 97, 98, 99]));
 

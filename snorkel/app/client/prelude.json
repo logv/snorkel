@@ -11,7 +11,8 @@
     "app/static/vendor/hex-rgb.src.js"
   ],
   "styles" : [
-    "app/static/styles/bootstrap/bootstrap.override.css",
+    "app/static/styles/bootstrap/bootstrap.flatly.css",
+    "app/static/styles/bootstrap/bootstrap.glyphs.css",
     "app/static/styles/bootstrap/responsive.css",
     "app/static/styles/bootstrap/overrides.css",
     "app/static/styles/box.css",
