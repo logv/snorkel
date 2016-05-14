@@ -44,11 +44,13 @@ module.exports = {
   get_field_number_formatter: function(dataset, col) {
     var self = this;
     var formatter = function(val) {
-      var inner_formatter = self.inner_formatters[dataset][col];
+      if (self.inner_formatters[dataset]) {
+        var inner_formatter = self.inner_formatters[dataset][col];
 
-      if (inner_formatter) {
-        return inner_formatter(val);
-      } 
+        if (inner_formatter) {
+          return inner_formatter(val);
+        }
+      }
       return val;
     };
 
