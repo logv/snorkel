@@ -496,13 +496,13 @@ var DistView = BaseView.extend({
         var table = helpers.build_table(dataset, headers, [row]);
 
         // only class attr.
-        table.attr("class",  "table");
+        table.attr("class",  "table percentile_table");
         return table;
       }
 
       outerEl.append($("<h2>Moments</h2>"));
 
-      var headers = ["count", "average", "trimean"];
+      var headers = ["count", "average", "trimean", "", ""];
       var row = [];
 
       function trimean(data) {
@@ -542,7 +542,7 @@ var DistView = BaseView.extend({
       var table = helpers.build_table(dataset, headers, [row]);
 
       // only class attr.
-      table.attr("class",  "table");
+      table.attr("class",  "table moment_table");
       outerEl.append(table);
 
       outerEl.append($("<h2>Percentiles</h2>"));

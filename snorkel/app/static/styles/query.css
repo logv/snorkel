@@ -467,3 +467,11 @@ a {
 .btn.logout {
   color: #0077fc;
 }
+
+.moment_table,
+.percentile_table,
+.stats_table {
+  td {
+    width: 20%;
+  }
+}
