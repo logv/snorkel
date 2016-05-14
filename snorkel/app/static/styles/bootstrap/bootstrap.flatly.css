@@ -3295,6 +3295,9 @@ button.close {
 
 .btn-mini {
   padding: 1px 8px;
+
+  padding-top: 5px;
+  padding-bottom: 5px;
   font-size: 11.25px;
   -webkit-border-radius: 1px;
      -moz-border-radius: 1px;
@@ -3586,7 +3589,7 @@ input[type="submit"].btn.btn-mini {
 
 .btn-link[disabled]:hover,
 .btn-link[disabled]:focus {
-  color: #7b8a8b;
+  color: #007fff;
   text-decoration: none;
 }
 
@@ -6353,6 +6356,8 @@ div.subnav .nav > .active > a:hover {
 
 .btn-mini {
   padding: 1px 8px;
+  padding-top: 5px;
+  padding-bottom: 5px;
 }
 
 .table tbody tr.success > td,

@@ -292,7 +292,8 @@
   -webkit-box-shadow: 0 0 5px rgba(0,0,0,.3);
   -moz-box-shadow   : 0 0 5px rgba(0,0,0,.3);
   box-shadow        : 0 0 5px rgba(0,0,0,.3);
-  border: 1px solid #5897fb;
+  border: 1px solid #7DADD9;
+  border: 1px solid -webkit-focus-ring-color;
 }
 .chzn-container-active .chzn-single-with-drop {
   border: 1px solid #aaa;
@@ -317,7 +318,8 @@
   -webkit-box-shadow: 0 0 5px rgba(0,0,0,.3);
   -moz-box-shadow   : 0 0 5px rgba(0,0,0,.3);
   box-shadow        : 0 0 5px rgba(0,0,0,.3);
-  border: 1px solid #5897fb;
+  border: 1px solid #7DADD9;
+  border: 1px solid -webkit-focus-ring-color;
 }
 .chzn-container-active .chzn-choices .search-field input {
   color: #111 !important;

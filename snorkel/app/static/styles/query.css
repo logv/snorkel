@@ -29,6 +29,10 @@ html, body {
   z-index: 1020; /* Stay above the query queue sidebar, damnit */
   padding-bottom: 6px;
 
+  .btn {
+    color: #4b3a4b;
+  }
+
   .graph_quick_links a {
     width: 8%;
   }
@@ -459,3 +463,7 @@ a {
   cursor: pointer;
 }
 
+
+.btn.logout {
+  color: #0077fc;
+}
