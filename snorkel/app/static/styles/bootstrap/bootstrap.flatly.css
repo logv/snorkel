@@ -5396,6 +5396,8 @@ input[type="submit"].btn.btn-mini {
 
 .popover-content {
   padding: 9px 14px;
+  color: #000;
+  background-color: #fdfdfd;
 }
 
 .popover .arrow,

@@ -208,7 +208,7 @@ function insert_query_tiles(container, queries, in_order) {
     var view_data = views.VIEWS[data.parsed.view];
 
     ResultsStore.identify({ client_id: data.clientid, server_id: data.hashid });
-    ResultsStore.set_timestamp(data.results.query.id, data.updated || data.created);
+    ResultsStore.set_timestamp(data.hashid, data.updated || data.created);
 
     if (data.results) {
       if (data.results.query) {

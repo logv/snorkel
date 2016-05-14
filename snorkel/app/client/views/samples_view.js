@@ -52,7 +52,7 @@ var SamplesView = BaseView.extend({
 
     var all_cols = string_cols.concat(integer_cols).concat(set_cols);
     _.each(all_cols, function(col) {
-      headers.push(presenter.get_field_name(dataset, col));
+      headers.push(col);
     });
 
     var rows = [];
