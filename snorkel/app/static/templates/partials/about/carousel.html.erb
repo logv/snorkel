@@ -1,20 +1,16 @@
-<div class="row-fluid">
-  <div class="span2">
+<div id="CakeCarousel" class="carousel slide">
+  <!-- Carousel items -->
+  <div class="carousel-inner">
     <% _.each(slides, function(s, index) { %>
-      <div>
-          <a class="slide_link" data-target="<%= s.title %>">
-            <%= s.title %>
-          </a>
-      </div>
-    <% }); %>
-  </div>
-
-  <div class="clearfix slides span8">
-    <% _.each(slides, function(s, index) { %>
-        <div class="slide" style="display: none;" data-id="<%= s.title %>">
-            <img src="<%= s.src %>" > </img>
-            <div class="caption"> <%= s.caption || "" %></div>
+        <div class="item <%= index == 0 ? "active" : "" %>" data-id="<%=  s.title  %>" style='height: 100%'>
+            <h1 class='mbl' style='text-align: center'><%= s.title %></h1>
+            <hr />
+            <img class='mtl' src="<%= s.src %>" > </img>
+            <div class="caption"><%= s.caption || "" %></div>
         </div>
       <% }); %>
   </div>
+  <!-- Carousel nav -->
+  <a class="carousel-control left" href="#CakeCarousel" data-slide="prev">&lsaquo;</a>
+  <a class="carousel-control right" href="#CakeCarousel" data-slide="next">&rsaquo;</a>
 </div>

@@ -8,5 +8,11 @@
 }
 
 .slide {
-  border: 3px solid #ddd;
+  height: 500px;
+  text-align: center;
+
+  img {
+    display: block;
+    margin: auto;
+  }
 }
