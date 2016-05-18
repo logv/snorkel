@@ -52,8 +52,8 @@ var DrillView = BaseView.extend({
       curAvgEl.html(col + ": "  + formatter(self.data[col].avg));
       if (self.compare_data) {
         curAvgEl.html(col + ": " +
-          formatter(self.data[col].avg) + " -> " +
-          formatter(self.compare_data[col].avg));
+          formatter(self.data[col].avg).html() + " -> " +
+          formatter(self.compare_data[col].avg).html());
       }
 
       avgEl.append(curAvgEl);
