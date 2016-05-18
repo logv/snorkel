@@ -574,7 +574,8 @@ var PCSDriver = _.extend(driver.Base, {
     cb();
 
 
-  }
+  },
+  SEPARATOR: DATASET_SEPARATOR
 });
 
 module.exports = PCSDriver;

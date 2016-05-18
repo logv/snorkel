@@ -164,6 +164,7 @@ module.exports = {
   add_sample: function(dataset, subset, sample, cb) {
     driver.add_samples(dataset, subset, [sample], cb);
   },
-  SAMPLE_VIEWS: SAMPLE_VIEWS
+  SAMPLE_VIEWS: SAMPLE_VIEWS,
+  SEPARATOR: driver.SEPARATOR || "/"
 };
 

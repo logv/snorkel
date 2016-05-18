@@ -208,7 +208,7 @@ module.exports = {
 
       }
 
-      var dataset = username + "/csv/" + csv_name;
+      var dataset = username + backend.SEPARATOR + "csv" + backend.SEPARATOR + csv_name;
       context("res").redirect("/query?table=" + dataset);
     });
 

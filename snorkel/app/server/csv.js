@@ -168,7 +168,7 @@ function read_csv(username, name, data, options, cb) {
 
   rows = transform_rows(rows, cols, col_types);
 
-  backend.add_samples(username + "/csv", name, rows, function(insert_err) { 
+  backend.add_samples(username + backend.SEPARATOR + "csv", name, rows, function(insert_err) { 
     if (cb) {
       cb(insert_err || err, rows);
     }
