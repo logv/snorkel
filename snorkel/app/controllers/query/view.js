@@ -116,6 +116,8 @@ function get_table_selector() {
           if (config) {
             table_options[table.table_name] = config.metadata.display_name || table.table_name;
           }
+
+          table_options[table.table_name] = table_options[table.table_name].replace(backend.SEPARATOR, "/");
         });
 
         var cmp = $C("selector", {

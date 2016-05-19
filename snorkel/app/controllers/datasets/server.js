@@ -79,9 +79,23 @@ function render_datasets() {
 
         }
 
+        var dataset_tokens = metadata_.name.split(backend.SEPARATOR);
+        var superset = "";
+        var display_name = metadata_.display_name;
+        if (dataset_tokens.length > 1) {
+          superset = dataset_tokens.shift();
+          if (display_name) {
+            display_name = display_name.replace(superset + backend.SEPARATOR, "");
+          } else {
+            display_name = metadata_.name.replace(superset + backend.SEPARATOR, "");
+          }
+          superset += "/";
+        }
+
         var cmp = $C("dataset_tile", {
           name: metadata_.name,
-          display_name: metadata_.display_name,
+          superset: superset,
+          display_name: display_name,
           description: metadata_.description,
           editable: editable,
           queries: query_counts[table.table_name],
