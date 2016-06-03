@@ -24,7 +24,7 @@ function get_cmd(bin, arg_string) {
 }
 
 function run_query_cmd(arg_string, cb) {
-  var cmd = get_cmd(BIN_PATH, " query " + arg_string);
+  var cmd = get_cmd(BIN_PATH, " query -read-log " + arg_string);
   cb = context.wrap(cb);
   console.log("RUNNING COMMAND", cmd);
   child_process.exec(cmd, {
@@ -495,6 +495,37 @@ var digest_records = _.throttle(function () {
   DIGESTIONS = {};
 }, 60 * 5 * 1000 /* 5 minute digestions */, { leading: false });
 
+
+var QUEUES = {};
+
+var flush_queue = _.throttle(function() {
+  _.each(QUEUES, function(queue, table_name) {
+    var all = [];
+    _.each(queue, function(samples) {
+      all = all.concat(samples);
+    });
+    queue.length = 0;
+
+    if (!all.length) {
+      return;
+    }
+
+    console.log("QUEUE", table_name, all.length);
+
+    var cmd = get_cmd(BIN_PATH, "ingest -table " + table_name);
+    console.log("RUNNING COMMAND", cmd);
+    queue_digest_records(table_name);
+    var cp = child_process.exec(cmd, {
+      cwd: DB_DIR,
+    });
+
+    _.each(all, function(s) {
+      cp.stdin.write(JSON.stringify(s) + "\n");
+    });
+    cp.stdin.destroy();
+  });
+}, 3000);
+
 var PCSDriver = _.extend(driver.Base, {
   run: function(table, query_spec, unweight, cb) {
     console.log("RUNNING QUERY", table, query_spec);
@@ -556,23 +587,17 @@ var PCSDriver = _.extend(driver.Base, {
   },
   default_table: "snorkel_test_data",
   add_samples: function(dataset, subset, samples, cb) {
-    console.log("ADDING SAMPLES", dataset, subset, samples);
+    if (!samples || !samples.length) {
+      return;
+    }
+
     var table_name = dataset + DATASET_SEPARATOR + subset;
-    var cmd = get_cmd(BIN_PATH, "ingest -table " + table_name);
-    cb = context.wrap(cb);
-    console.log("RUNNING COMMAND", cmd);
-    queue_digest_records(table_name);
-    var cp = child_process.exec(cmd, {
-      cwd: DB_DIR,
-    });
-
-    _.each(samples, function(s) {
-      cp.stdin.write(JSON.stringify(s) + "\n");
-    });
-    cp.stdin.destroy();
-
+    var queue = QUEUES[table_name] || [];
+    QUEUES[table_name] = queue;
+    queue.push(samples);
     cb();
 
+    flush_queue();
 
   },
   SEPARATOR: DATASET_SEPARATOR
