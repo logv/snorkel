@@ -319,7 +319,7 @@ function add_int_and_time_filters(query_spec) {
 
   _.each(query_spec.opts.filters, function(f) {
     var column = f.column;
-    if (!query_spec.col_config[column] || 
+    if (!query_spec.col_config[column] ||
         query_spec.col_config[column].final_type !== "integer") {
       return;
     }
@@ -350,12 +350,12 @@ function add_str_filters(query_spec) {
   var filters = []
 
   _.each(query_spec.opts.filters, function(f) {
-    
+
     var column = f.column;
     column = column.replace(/^string\./, "");
     column = column.replace(/^integer\./, "");
     column = column.replace(/^set\./, "");
-    if (!query_spec.col_config[column] || 
+    if (!query_spec.col_config[column] ||
         query_spec.col_config[column].final_type !== "string") {
       return;
     }
@@ -385,6 +385,9 @@ function run_samples_query(table, query_spec, cb) {
   var args = "";
   args += get_args_for_spec(query_spec)
   var table_name = table.table_name || table;
+
+  var meta = query_spec.meta.metadata;
+  var col_info = meta.columns;
   run_query_cmd(args + " -samples -json -table " + table_name, function(err, samples) {
     var results = [];
 
@@ -394,16 +397,30 @@ function run_samples_query(table, query_spec, cb) {
         string: {}
       };
 
+      // TODO: use the column metadata to convert rows -> nest samples
       _.each(sample, function(v, k) {
-        try {
-          var res = parseInt(v, 10);
-          if (isNaN(res)) { throw "NaN"; }
+        if (col_info[k]) {
+          if (col_info[k].type_str === "integer") {
+            result.integer[k] = v;
+            return;
+          } else if (col_info[k].type_str === "string") {
+            result.string[k] = v;
+            return;
+          }
+        }
 
-          result.integer[k] = res;
-          return;
+        try {
+           var res = parseInt(v, 10);
+           if (isNaN(res)) { throw "NaN"; }
+
+           if (v == res.toString()) {
+             result.integer[k] = res;
+             return;
+           }
         } catch (e)  { }
 
         result.string[k] = v;
+
       });
 
       results.push(result);
