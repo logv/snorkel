@@ -68,7 +68,8 @@ function marshall_time_rows(query_spec, time_buckets) {
 
       row._id.time_bucket = parseInt(time_bucket, 10);
 
-      row.count = r.Count;
+      row.count = r.Samples;
+      row.weighted_count = r.Count;
 
       ret.push(row);
     });
@@ -136,8 +137,9 @@ function marshall_table_rows(query_spec, rows) {
     _.each(cols, function(c) {
       row[c] = extract_val(query_spec, r, c);
     });
-    row.count = r.Count;
+    row.count = r.Samples;
     row.distinct = r.Distinct || r.distinct;
+    row.weighted_count = r.Count;
 
     if (query_spec.opts.agg === "$distinct") {
       row.count = row.distinct;
@@ -200,6 +202,15 @@ function add_limit(query_spec) {
   return ""
 }
 
+function add_weight(query_spec) {
+
+  if (query_spec.opts.weight_col) {
+    return "-weight-col " + query_spec.opts.weight_col + " ";
+  }
+
+  return "";
+}
+
 function get_args_for_spec(query_spec) {
   var cmd_args = "";
   if (!query_spec || !query_spec.opts) {
@@ -211,6 +222,7 @@ function get_args_for_spec(query_spec) {
   cmd_args += add_str_filters(query_spec);
   cmd_args += add_int_and_time_filters(query_spec);
   cmd_args += add_limit(query_spec);
+  cmd_args += add_weight(query_spec);
   return cmd_args;
 }
 
