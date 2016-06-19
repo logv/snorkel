@@ -68,8 +68,8 @@ function marshall_time_rows(query_spec, time_buckets) {
 
       row._id.time_bucket = parseInt(time_bucket, 10);
 
-      row.count = r.Samples;
-      row.weighted_count = r.Count;
+      row.count = r.Samples || r.Count;
+      row.weighted_count = r.Count || r.Samples;
 
       ret.push(row);
     });
@@ -137,9 +137,9 @@ function marshall_table_rows(query_spec, rows) {
     _.each(cols, function(c) {
       row[c] = extract_val(query_spec, r, c);
     });
-    row.count = r.Samples;
+    row.count = r.Samples || r.Count;
     row.distinct = r.Distinct || r.distinct;
-    row.weighted_count = r.Count;
+    row.weighted_count = r.Count || r.Samples;
 
     if (query_spec.opts.agg === "$distinct") {
       row.count = row.distinct;
