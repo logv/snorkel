@@ -5,12 +5,29 @@ var context = require_core("server/context");
 
 var child_process = require("child_process");
 var backend = require_app("server/backend");
+var config = require_core("server/config");
 
 var path = require("path")
 var cwd = process.cwd()
 
-var BIN_PATH = path.join(cwd, "./bin/sybil ");
+var BIN_PATH = config.backend.bin_path || path.join(cwd, "./bin/sybil ");
 var DATASET_SEPARATOR = "@"
+
+function path_exists(path) {
+  var fs = require('fs');
+  try {
+      fs.statSync(path);
+      console.log("Using local sybil path,", path);
+      return true;
+  }
+  catch (e) {
+  }
+}
+
+if (!path_exists(BIN_PATH.trim())) {
+  console.log("Using global sybil path");
+  BIN_PATH = "sybil ";
+}
 
 var DB_DIR = "./"
 // TODO:
@@ -216,7 +233,7 @@ function get_args_for_spec(query_spec) {
   if (!query_spec || !query_spec.opts) {
     return cmd_args;
   }
-  
+
   cmd_args += " ";
   cmd_args += add_dims_and_cols(query_spec);
   cmd_args += add_str_filters(query_spec);
