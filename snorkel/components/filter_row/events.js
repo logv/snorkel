@@ -22,9 +22,10 @@ function removeFilterRow(filterButton) {
   }
 }
 
-function addFilterRow(filterButton) {
+function addFilterRow(filterButton, filter_row) {
   // TODO: is that really necessary?
   var table = $(filterButton).parents(".filter_group");
+  var options = filter_row.options;
 
   // To find out the ID of a given row, select its first parent with class
   // 'filter_row' and then find any element with a data-id on it?
@@ -41,7 +42,7 @@ function addFilterRow(filterButton) {
     fields[value] = label;
   });
 
-  $C("filter_row", { fields: fields }, function(cmp) {
+  $C("filter_row", { fields: fields, types: options.types }, function(cmp) {
     $(table).append(cmp.$el);
   });
 }
@@ -54,7 +55,7 @@ module.exports = {
   },
 
   handle_field_change: function(evt) {
-    var val = $(evt.target).val(); // i dunno what i'm doing here
+    var val = $(evt.target).val();
     var selector = $(evt.target);
     this.update_operators(selector, val);
   },
@@ -64,6 +65,6 @@ module.exports = {
   },
 
   handle_add_filter: function(evt) {
-    addFilterRow(evt.target);
+    addFilterRow(evt.target, this);
   }
 };

@@ -403,7 +403,7 @@ module.exports = {
         });
 
         var filter_row = $C("filter_row", { fields: typed_fields, client_options: { types: field_types }});
-        var compare_filter_row = $C("filter_row", { fields: typed_fields });
+        var compare_filter_row = $C("filter_row", { fields: typed_fields, client_options: { types: field_types} });
 
         var filter_box = $("<div class='filter_group query_filters'>");
         var compare_filter_box = $("<div class='filter_group compare_filters' data-filter-type='compare'>");
