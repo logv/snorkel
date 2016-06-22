@@ -1,0 +1,7 @@
+{
+  "main" : "cytocharter",
+  "helpers": ["vendor/cytoscape"],
+  "style": "cytocharter.css",
+  "styles": [],
+  "template": "cytocharter.html.erb"
+}

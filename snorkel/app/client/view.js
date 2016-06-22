@@ -58,6 +58,7 @@ var ScatterView = require("app/client/views/scatter_view");
 var AreaView = require("app/client/views/area_view");
 var BarView = require("app/client/views/bar_view");
 var DrillView = require("app/client/views/drill_view");
+var GraphView = require("app/client/views/graph_view");
 
 var ResultsStore = require("app/client/results_store");
 

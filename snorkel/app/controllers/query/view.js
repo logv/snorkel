@@ -94,6 +94,7 @@ function get_view_selector_row() {
       "area" : "Stacked Area",
       "scatter" : "Scatter Plot",
       "multidist" : "Grouped Dist.",
+      "graph" : "DiGraph",
       "drill" : "Drilldown",
     },
     delegate: {
@@ -338,7 +339,7 @@ function get_fieldset_row(agg_columns) {
 }
 
 function get_view_custom_inputs() {
-  return $("<div class='ptl view_custom_controls' />");
+  return $("<div class='ptl view_custom_controls clearfix' />");
 }
 
 function get_controls(columns) {
