@@ -12,7 +12,7 @@
       "passport-google" : "x",
       "trust-proxy" : "x",
       "squel" : "x",
-      "pg" : "x",
+      "pg" : "4.3.0",
       "tingodb" : "x",
       "connect-sqlite3" : "x"
     }
