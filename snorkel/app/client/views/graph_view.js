@@ -19,16 +19,18 @@ var GraphView = BaseView.extend({
     var self = this;
     var fields = SF.controller().get_fields(self.table);
 		var $el = self.$el;
-		$el.height("600px");
+		$el.height("100%");
+    var height = Math.max($(window).height(), 600);
+    $el.css("min-height", height + "px");
 
     var query_params = self.data.parsed;
-    var group_by = query_params.dims || [];
-    var dim_one = group_by[0];
-    var dim_two = group_by[1];
+    var dim_one = query_params.dim_one;
+    var dim_two = query_params.dim_two;
 
     var node_lookup = {};
 
-    function make_node(name) {
+    function make_node(name, group_by) {
+      name = group_by.join(":") + " " + name;
       var node = node_lookup[name];
       if (!node) {
         node = {
@@ -49,8 +51,18 @@ var GraphView = BaseView.extend({
     var max_weight = 0;
 
     _.each(self.data.results, function(res) {
-      var start = make_node(res._id[dim_one]);
-      var end = make_node(res._id[dim_two]);
+
+      var group_by = [];
+      _.each(res._id, function(v, k) {
+        if (k === dim_one || k === dim_two) {
+          return;
+        }
+
+        group_by.push(v);
+      });
+
+      var start = make_node(res._id[dim_one], group_by);
+      var end = make_node(res._id[dim_two], group_by);
 
       var count = res.count;
       start.data.weight = (start.data.weight || 0) + count;
@@ -117,7 +129,7 @@ var GraphView = BaseView.extend({
           edges: edges
         },
         layout: {
-          name: 'breadthfirst',
+          name: 'cose',
           padding: 10
         }
       });
@@ -155,11 +167,13 @@ function build_custom_controls(fields) {
 
 
   var query_params = SF.controller().get_current_query();
-  var group_by = query_params.group_by || [];
+  var dim_one = query_params.dim_one;
+  var dim_two = query_params.dim_two;
+
   $C("selector", {
-    name: "group_by",
+    name: "dim_one",
     options: options,
-    selected: group_by[0]
+    selected: dim_one,
   }, function(selector) {
     $C("query_control_row", {
       label: "Prev Node",
@@ -171,9 +185,9 @@ function build_custom_controls(fields) {
   });
 
   $C("selector", {
-    name: "group_by",
+    name: "dim_two",
     options: options,
-    selected: group_by[1]
+    selected: dim_two,
   }, function(selector) {
     $C("query_control_row", {
       label: "Node",
@@ -192,6 +206,7 @@ function build_custom_controls(fields) {
 SF.trigger("view:add", "graph",  {
   custom_controls: build_custom_controls,
   include: helpers.inputs.TIME_INPUTS
+    .concat(helpers.inputs.GROUP_BY)
     .concat(helpers.inputs.LIMIT),
   icon: "noun/pin.svg"
 }, GraphView);

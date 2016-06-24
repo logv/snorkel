@@ -107,6 +107,14 @@ function marshall_query(form_data) {
   var end_str_ms = value_of(form_data, 'end', 'now');
   var now = Date.now();
 
+  // For single dim group bys
+  query_data.dim_one = value_of(form_data, 'dim_one');
+  query_data.dim_two = value_of(form_data, 'dim_two');
+
+  if (query_data.dim_one) { query_data.dims.push(query_data.dim_one); }
+  if (query_data.dim_two) { query_data.dims.push(query_data.dim_two); }
+
+
   query_data.field_two = value_of(form_data, 'field_two');
   query_data.event_field = value_of(form_data, 'event_field');
 
