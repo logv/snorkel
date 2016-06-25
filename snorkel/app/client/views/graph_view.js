@@ -32,11 +32,13 @@ var GraphView = BaseView.extend({
     function make_node(name, group_by) {
       name = group_by.join(":") + " " + name;
       var node = node_lookup[name];
+      var id = _.uniqueId("node");
       if (!node) {
         node = {
           data: {
-            id: _.uniqueId("node"),
-            name: name
+            id: id,
+            name: name,
+            nodeColor: helpers.get_color(id)
           }
         };
         node_lookup[name] = node;
@@ -73,7 +75,8 @@ var GraphView = BaseView.extend({
       max_str = Math.max(count, max_str);
 
       edges.push({
-        data: { source: start.data.id, target: end.data.id, strength: count }
+        data: { source: start.data.id, target: end.data.id, strength: count,
+          fromColor: helpers.get_color(start.data.id), toColor: helpers.get_color(end.data.id) }
       });
 
 
@@ -99,16 +102,16 @@ var GraphView = BaseView.extend({
 							'text-outline-width': 2,
               'width': 'mapData(weight, 0, ' + max_weight + ', 40, 60)',
               'height': 'mapData(weight, 0, ' + max_weight + ', 40, 60)',
-							'backgrund-color': '#999',
-							'text-outline-color': '#999'
+							'background-color': 'data(nodeColor)',
+							'text-outline-color': 'data(nodeColor)'
 						})
 					.selector('edge')
 						.css({
 							'curve-style': 'bezier',
 							'target-arrow-shape': 'triangle',
-							'target-arrow-color': '#ccc',
               'width': 'mapData(strength, 0, ' + max_str + ', 2, 10)',
-							'line-color': '#ccc'
+              'line-color': 'data(fromColor)',
+              'target-arrow-color': 'data(fromColor)'
 						})
 					.selector(':selected')
 						.css({
