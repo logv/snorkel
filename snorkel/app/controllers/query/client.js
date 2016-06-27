@@ -204,6 +204,9 @@ function handle_query_saved(query_details) {
 }
 
 function insert_query_tiles(container, queries, in_order) {
+  var controller = SF.controller();
+  var table = controller.table;
+
   _.each(queries, function(data) {
     var view_data = views.VIEWS[data.parsed.view];
 
@@ -228,6 +231,10 @@ function insert_query_tiles(container, queries, in_order) {
     var icon = "noun/view.svg";
     if (view_data) {
       icon = view_data.icon || "noun/view.svg";
+    }
+
+    if (table !== data.parsed.table) {
+      return;
     }
 
     // Psas in the query from above for later re-usage
