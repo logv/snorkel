@@ -85,7 +85,10 @@ function add_filter(filter, compare, force) {
     filters.push(cmp.$el);
     cmp.set_field(field);
     cmp.set_value(val);
-    cmp.set_op(op);
+
+    // There are some annoying inter-dependencies going on with
+    // set_field/set_value above, so we push set_op into a delay
+    _.delay(function() { cmp.set_op(op); });
 
     if (compare) {
       cmp.$el.find(".filter_group")

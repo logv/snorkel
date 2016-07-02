@@ -57,8 +57,9 @@ module.exports = {
   client: function(options) {
     this.options.types = this.options.types || options.types;
     this.$el.find(".filter_field").trigger("change", { target: this.$el.find(".filter_field") });
+
     if (this.options.op) {
-      this.$el.find(".filter_op").val(this.options.op);
+      this.set_op(this.options.op);
     }
   },
   set_value: function(val) {

@@ -222,7 +222,7 @@ function marshall_query(form_data) {
 
       // ^((?!query).)*$
       // TODO: move operation preprocessing to lower in the stack?
-      if (config.backend.driver !== "pcs")  {
+      if (config.backend.driver !== "sybil")  {
         if (op === "$regexv") {
           val = "^((?!" + val + ").)*$";
           op = "$regex";

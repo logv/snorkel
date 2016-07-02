@@ -44,7 +44,7 @@ set_default("ops", OPS);
             _type = packed[1],
             _label = packed[2];
       %>
-        <option =<%= (_op === op) ? "selected" : "" %>
+        <option <%= (_op === op) ? "selected" : "" %>
           value="<%= _op %>" data-type="<%= _type %>">
             <%= _label %>
         </option>
