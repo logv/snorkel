@@ -121,9 +121,9 @@ var TimeView = BaseView.extend({
           var s = "";
           var now = this.x;
           var el = $("<div><b>" + Highcharts.dateFormat('%a %d %b %H:%M:%S', this.x) + "</b></div>");
-
           _.each(this.points, function(point) {
-            var ptDiv = $("<div>");
+            var ptDiv = $("<div class='clearfix'>");
+            ptDiv.css("min-width", "400px");
 
             var name = point.series.name;
             if (point.point.compare) {
@@ -139,7 +139,7 @@ var TimeView = BaseView.extend({
             }
 
             ptDiv.append(":");
-            var valDiv = $("<div class='pull-right mlm' />")
+            var valDiv = $("<div class='mlm rfloat' />")
                           .html(helpers.number_format(point.y));
             ptDiv.append(valDiv);
 
@@ -148,7 +148,10 @@ var TimeView = BaseView.extend({
 
             var samples = point.point.samples;
             if (samples) {
-              valDiv.append($("<div class='mlm pull-right' />").html("(" + samples + "samples)"));
+              var sampleDiv = $("<div class='mlm' />").html("(" + samples + "samples)");
+              sampleDiv.css("display", "inline-block");
+              valDiv.append(sampleDiv);
+
             }
           });
 
