@@ -43,24 +43,13 @@ function render_datasets() {
     var query_data;
     var datasets;
     var metadatas;
+    var found_data = {};
 
     var after = _.after(2, function() {
-      var table_options = {};
       var datasetsEl = $("<div />");
-
-      var query_counts = {};
-      _.each(query_data, function(result) {
-        query_counts[result._id.dataset] = result.count;
-      });
-
-      // Do a descending sort on query counts
-      datasets.sort(function(a, b) {
-        return (query_counts[b.table_name] || 0) - (query_counts[a.table_name] || 0);
-      });
 
       _.each(datasets, function(table) {
         if (table.table_name === "undefined") { return; }
-        var editable = dataset_is_editable(table.table_name, user);
         var metadata_ = {
           name: table.table_name,
           description: ''
@@ -70,35 +59,50 @@ function render_datasets() {
           var newdata = _.find(metadatas, function(m) {
             if (!m) { return; }
 
-            return m.table === table.table_name;
+            var this_name = m.table.table_name || m.table;
+            var table_name = table.table_name || table;
+
+            return table_name === this_name;
           });
 
           if (newdata) {
-            _.extend(metadata_, newdata.metadata);
+            _.extend(metadata_, _.clone(newdata.metadata));
           }
 
         }
 
-        var dataset_tokens = metadata_.name.split(backend.SEPARATOR);
-        var superset = "";
+        var table_name = metadata_.name.table_name || metadata_.name;
+        var dataset_tokens = table_name.split(backend.SEPARATOR);
+        var display_name = metadata_.display_name || dataset_tokens.join("/");
+        while (display_name.indexOf(backend.SEPARATOR) >= 0) {
+          display_name = display_name.replace(backend.SEPARATOR, "/");
+        }
+
+        found_data[table_name] = metadata_;
+        metadata_.display_name = display_name;
+
+      });
+
+
+
+
+
+      // Do a descending sort on query counts
+      var sorted_datasets = _.sortBy(datasets, function(dataset) {
+        return found_data[dataset.table_name || dataset.name].display_name;
+      });
+
+      _.each(sorted_datasets, function(table) {
+        var metadata_ = found_data[table.table_name];
+        var table_name = metadata_.name.table_name;
         var display_name = metadata_.display_name;
-        if (dataset_tokens.length > 1) {
-          superset = dataset_tokens.shift();
-          if (display_name) {
-            display_name = display_name.replace(superset + backend.SEPARATOR, "");
-          } else {
-            display_name = metadata_.name.replace(superset + backend.SEPARATOR, "");
-          }
-          superset += "/";
-        }
 
+        var editable = dataset_is_editable(table.table_name, user);
         var cmp = $C("dataset_tile", {
-          name: metadata_.name,
-          superset: superset,
+          name: table_name,
           display_name: display_name,
           description: metadata_.description,
           editable: editable,
-          queries: query_counts[table.table_name],
           client_options: {
             dataset: table.table_name
           },

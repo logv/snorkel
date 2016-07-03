@@ -19,9 +19,12 @@ module.exports = {
     cb = context.wrap(cb);
 
     var collection = db.get("dataset", "metadata");
-    collection.findOne({ table: table }, function(err, obj) {
+    var table_name = table.table_name || table;
+    collection.findOne({ table: table_name }, function(err, obj) {
       var config = _.clone(metadata_master);
       config.table = table;
+      config.metadata = _.clone(metadata_master.metadata);
+
       config.metadata.name = table;
       config.metadata.columns = {};
 
