@@ -111,9 +111,12 @@ function get_table_selector() {
         var table_options = {};
 
         _.each(tables, function(table) {
-          table_options[table.table_name] = table.table_name;
-
           var config = configs[table.table_name];
+          if (config.metadata.hide_dataset) {
+            return;
+          }
+
+          table_options[table.table_name] = table.table_name;
           if (config) {
             table_options[table.table_name] = config.metadata.display_name || table.table_name;
           }

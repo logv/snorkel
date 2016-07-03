@@ -44,6 +44,7 @@ module.exports = {
       display_name: get_value_from_xeditable('display_name'),
       rss_feed: get_value_from_xeditable('rss_feed'),
       time_col: $page.find(".dataset_config select[name='time_col']").val(),
+      hide_dataset: $page.find(".dataset_config select[name='hide_dataset']").val(),
       columns: {}
     };
 

@@ -96,10 +96,13 @@ function render_datasets() {
         var metadata_ = found_data[table.table_name];
         var table_name = metadata_.name.table_name;
         var display_name = metadata_.display_name;
+        if (metadata_.hide_dataset == "true" && !req.query.all) {
+          return;
+        }
 
         var editable = dataset_is_editable(table.table_name, user);
         var cmp = $C("dataset_tile", {
-          name: table_name,
+          name: table_name || table.table_name,
           display_name: display_name,
           description: metadata_.description,
           editable: editable,
@@ -215,6 +218,15 @@ module.exports = {
           selected: _metadata.time_col
         });
 
+        var hiddenEl = $C("selector", {
+          name: "hide_dataset",
+          options: {
+            false : "false",
+            true: "true"
+          },
+          selected: _metadata.hide_dataset
+        });
+
         var rss_feed = _metadata.rss_feed;
         var template_str = template.partial("datasets/edit.html.erb", {
           name: table,
@@ -224,7 +236,8 @@ module.exports = {
           col_types: _metadata.col_types,
           render_column: render_column,
           render_table_header: render_table_header,
-          time_col: timeColEl.toString()
+          time_col: timeColEl.toString(),
+          hidden_col: hiddenEl.toString()
         });
 
         bridge.controller("datasets", "initialize_editor");
@@ -232,10 +245,10 @@ module.exports = {
       });
     })();
 
-    page.render({ 
-      content: render_async.toString(), 
-      header: header_str, 
-      socket: true, 
+    page.render({
+      content: render_async.toString(),
+      header: header_str,
+      socket: true,
       component: true});
     bridge.flush_data();
 

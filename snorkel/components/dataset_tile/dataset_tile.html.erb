@@ -18,10 +18,10 @@
 
     <% if (editable) { %>
       <a class="icon delete" href="#"> <i class="icon-trash"></i> </a>
-      <a class="mth mrl" href="/datasets/edit?table=<%=name %>">
-            <span class="icon delete"> <i class="icon-edit"></i> </span>
-      </a>
     <% } %>
+    <a class="mtl mrl editlink" href="/datasets/edit?table=<%=name %>">
+          <span class="icon mtl"> <i class="icon-edit"></i> </span>
+    </a>
 
   </h3>
 
