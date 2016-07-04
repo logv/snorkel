@@ -36,16 +36,16 @@ module.exports = {
 
     $(".superset").each(function() {
       var $superset = $(this);
-      var title = $superset.find("h1").text().trim();
+      var supertitle = $superset.find("h1").text().trim();
 
-      if (val && re.test(title)) {
+      if (val && re.test(supertitle)) {
         $superset.find(".dataset_tile").fadeIn();
       } else {
 
         $superset.find(".dataset_tile").each(function() {
           var $el = $(this);
           var title = $el.find("h3 a").text().trim();
-          if (re.test(title)) {
+          if (re.test(supertitle + " " + title)) {
             $el.fadeIn();
           } else {
             $el.hide();
