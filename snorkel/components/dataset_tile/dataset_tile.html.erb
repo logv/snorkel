@@ -17,15 +17,15 @@
     <% } %>
 
     <% if (editable) { %>
+      <a class="mtl mrl editlink" href="/datasets/edit?table=<%=name %>">
+            <span class="icon mtl"> <i class="icon-edit"></i> </span>
+      </a>
       <a class="icon delete" href="#"> <i class="icon-trash"></i> </a>
     <% } %>
-    <a class="mtl mrl editlink" href="/datasets/edit?table=<%=name %>">
-          <span class="icon mtl"> <i class="icon-edit"></i> </span>
-    </a>
 
   </h3>
 
-  <div class="dataset_info span6">
+  <div class="dataset_info">
     <div>
       <p>
         <% if (description) { %>

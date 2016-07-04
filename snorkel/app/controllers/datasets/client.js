@@ -7,12 +7,70 @@ var helpers = require("app/client/views/helpers");
 
 module.exports = {
   events: {
+    "click .superset h1" : "handle_superset_click",
+    "click .hidden_datasets h1" : "handle_superset_click",
     "click .logout" : "handle_logout",
     "click .save" : "handle_save_metadata",
     "click .cancel" : "handle_discard_metadata",
     "click .clear_cache" : "handle_clear_metadata",
+    "keyup .dataset_finder" : "handle_select_datasets"
   },
   initialize: function() {
+    $(".dataset_finder").focus();
+  },
+
+  handle_select_datasets: function(e) {
+    var val = $(e.target).val();
+    var reg = val.split(" ").join(".*");
+    var re = new RegExp(reg);
+
+    if (e.keyCode === 13) {
+      // Find the first dataset and navigate to it!
+      var tile = $(".dataset_tile:visible").find("h3 a").first();
+      if ($(tile).attr('href')) {
+        window.location = $(tile).attr("href");
+      }
+
+      return;
+    }
+
+    $(".superset").each(function() {
+      var $superset = $(this);
+      var title = $superset.find("h1").text().trim();
+
+      if (val && re.test(title)) {
+        $superset.find(".dataset_tile").fadeIn();
+      } else {
+
+        $superset.find(".dataset_tile").each(function() {
+          var $el = $(this);
+          var title = $el.find("h3 a").text().trim();
+          if (re.test(title)) {
+            $el.fadeIn();
+          } else {
+            $el.hide();
+          }
+        });
+      }
+
+    });
+
+  },
+
+
+
+  handle_superset_click: function(e) {
+    var container = $(e.target).closest(".superset,.hidden_datasets");
+
+    var add = !container.hasClass("active");
+    $(".superset,.hidden_datasets")
+      .removeClass("active")
+      .find(".status").text(">");
+
+    if (add) {
+      container.addClass("active");
+      container.find(".status").text("v");
+    }
   },
 
   initialize_editor: function() {
@@ -43,7 +101,7 @@ module.exports = {
       description: get_value_from_xeditable('description'),
       display_name: get_value_from_xeditable('display_name'),
       rss_feed: get_value_from_xeditable('rss_feed'),
-      time_col: $page.find(".dataset_config select[name='time_col']").val(),
+      time_col:   $page.find(".dataset_config   select[name='time_col']").val(),
       hide_dataset: $page.find(".dataset_config select[name='hide_dataset']").val(),
       columns: {}
     };

@@ -47,6 +47,16 @@ function render_datasets() {
 
     var after = _.after(2, function() {
       var datasetsEl = $("<div />");
+      var hiddenEl = $("<div class='hidden_datasets noselect' />");
+      var parentEl = $("<div />");
+      parentEl.append(datasetsEl);
+
+      var headerEl = $("<h1 />");
+      headerEl.text("hidden/");
+      headerEl.prepend("<span class='status'>&gt;</span>");
+
+      parentEl.append(hiddenEl);
+      hiddenEl.append(headerEl);
 
       _.each(datasets, function(table) {
         if (table.table_name === "undefined") { return; }
@@ -92,18 +102,19 @@ function render_datasets() {
         return found_data[dataset.table_name || dataset.name].display_name;
       });
 
+      var parents = {};
+
       _.each(sorted_datasets, function(table) {
         var metadata_ = found_data[table.table_name];
         var table_name = metadata_.name.table_name;
         var display_name = metadata_.display_name;
-        if (metadata_.hide_dataset == "true" && !req.query.all) {
-          return;
-        }
+        var dataset_tokens = display_name.split("/");
+        var superset = dataset_tokens[0];
 
         var editable = dataset_is_editable(table.table_name, user);
         var cmp = $C("dataset_tile", {
           name: table_name || table.table_name,
-          display_name: display_name,
+          display_name: display_name.replace(superset + "/", ""),
           description: metadata_.description,
           editable: editable,
           client_options: {
@@ -115,10 +126,30 @@ function render_datasets() {
           }
         });
 
-        datasetsEl.append(cmp.toString());
+        if (metadata_.hide_dataset == "true") {
+          hiddenEl.append(cmp.toString());
+        } else {
+          var supersetEl = parents[superset];
+          if (!supersetEl) {
+            parents[superset] = $("<div class='superset clearfix noselect'>");
+            supersetEl = parents[superset];
+            supersetEl.attr("id", superset);
+
+            var headerEl = $("<h1 />");
+            headerEl.text(superset + "/");
+            headerEl.prepend("<span class='status' >&gt;</span>");
+
+            supersetEl.append(headerEl);
+            datasetsEl.append(supersetEl);
+
+          }
+
+          supersetEl.append(cmp.toString());
+        }
+
       });
 
-      flush_data(datasetsEl.toString());
+      flush_data(parentEl.toString());
     });
 
     backend.get_tables(function(tables) {

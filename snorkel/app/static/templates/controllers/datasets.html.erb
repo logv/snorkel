@@ -1,17 +1,23 @@
+<% set_default("upload_csv", true) %>
+
 <div class="container-fluid">
  
   <%= render_template("helpers/user_status.html.erb") %>
 
   <div class="clearfix">
-    <div class="datasets span6">
+    <div class="datasets">
       <div class="clearfix">
         <h1 class="lfloat">Datasets</h1>
-        <div class="rfloat mll mtl">
-          <%= render_partial("datasets/csv_dialog.html.erb") %>
-        </div>
+        <% if (upload_csv) { %>
+          <div class="rfloat mll mtl">
+            <%= render_partial("datasets/csv_dialog.html.erb") %>
+          </div>
+        <% } %>
+
+        <input class='input-block-level dataset_finder pbl' style='zoom: 1.25' />
       </div>
 
-      <div class="dataset_list">
+      <div class="dataset_list ptl">
         <%= render_datasets() %>
       </div>
     </div>
