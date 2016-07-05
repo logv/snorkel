@@ -112,7 +112,7 @@ function get_table_selector() {
 
         _.each(tables, function(table) {
           var config = configs[table.table_name];
-          if (config.metadata.hide_dataset) {
+          if (config.metadata.hide_dataset === 'true') {
             return;
           }
 
