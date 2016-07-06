@@ -7,7 +7,6 @@ module.exports = {
     $(this.el).addClass("tablesorter");
     $(this.el).tablesorter({
       textExtraction: function(node) { 
-        console.log("NODE IS", node);
         var value_cell = $(node).find(".value_cell");
         if (value_cell.length > 0) {
           return value_cell.data("value") || value_cell.html();
