@@ -76,7 +76,8 @@ function add_filter(filter, compare, force) {
   var op = filter.shift();
   var val = filter.shift();
 
-  if (!val && !force) {
+  var undef = _.isUndefined(val) || _.isNull(val);
+  if (undef && !force) {
     return;
   }
   var filters = _filter_els;
