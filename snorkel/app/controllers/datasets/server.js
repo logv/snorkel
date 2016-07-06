@@ -178,9 +178,12 @@ module.exports = {
     var header_str = template.render("helpers/header.html.erb");
     var searchahead = $C("textinput", { name: "search" });
 
+    var upload_csv = config.upload_csv;
+
     var template_str = template.render("controllers/datasets.html.erb", {
       render_searchahead: searchahead.toString,
-      render_datasets: render_datasets
+      render_datasets: render_datasets,
+      upload_csv: upload_csv
     });
 
 
