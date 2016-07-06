@@ -475,3 +475,9 @@ a {
     width: 20%;
   }
 }
+
+#report_bug {
+  position: fixed;
+  bottom: 5px;
+  right: 15px;
+}
