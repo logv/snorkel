@@ -28,13 +28,32 @@ var print_input_stats = _.throttle(function() {
       console.log("INSERT SUMMARY");
     }
 
+    var samples = [];
     _.each(tables, function(table) {
       // TODO: log these to snorkel DB, too
       console.log_no_ts(table,"\n  inserts:", _sample_insertions[table] || 0, "\terrors:", _sample_errors[table] || 0);
+
+      var now = new Date();
+      var sample = {
+        integer: {
+          inserts: _sample_insertions[table] || 0,
+          errors: _sample_errors[table] || 0,
+          time: (+now) / 1000
+        },
+        string: {
+          dataset: table,
+          dayofweek: now.getDay(),
+          hourofday: now.getHours()
+        }
+      };
+
+      samples.push(sample);
     });
 
-    _sample_insertions = {};  
+    _sample_insertions = {};
     _sample_errors = {};
+
+    backend.add_samples("snorkel", "ingest", samples, function(){});
   }, 500);
 }, 5000);
 
@@ -156,7 +175,7 @@ function setup_udp_socket() {
     try {
 
       if (parsed_data.annotation) {
-        add_annotation(parsed_data.annotation, function() { 
+        add_annotation(parsed_data.annotation, function() {
         });
       } else {
         backend.add_sample(parsed_data.dataset, parsed_data.subset, parsed_data.sample, function(err) {
