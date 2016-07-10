@@ -242,6 +242,12 @@ function get_time_bucket_row() {
   return add_control("time_bucket", "Time Slice", max_results_input.toString());
 }
 
+function get_time_normalize_row() {
+  var opts = { "" : "", "hour" : "hour", "min" : "minute" };
+  var max_results_input = $C("selector", { name: "time_divisor", options: opts });
+  return add_control("time_divisor", "Time Divisor", max_results_input.toString());
+}
+
 var hist_bucket_opts = [
   "auto",
   "10",
@@ -371,12 +377,12 @@ function get_controls(columns) {
   control_box.append(get_view_selector_row());
 
   control_box.append(get_time_inputs());
-  control_box.append(get_time_field_input(time_field_columns));
   control_box.append($("<div id='rollup' style='position: relative; top: -40px'>"));
   control_box.append(get_group_by_row(groupable_columns));
   control_box.append(get_sort_by_row(agg_columns));
   control_box.append(get_max_results_row());
   control_box.append(get_time_bucket_row());
+  control_box.append(get_time_normalize_row());
   control_box.append(get_hist_bucket_row());
   control_box.append(get_aggregate_row());
   control_box.append(get_field_row(agg_columns));

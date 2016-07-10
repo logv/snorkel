@@ -127,6 +127,7 @@ function marshall_query(form_data) {
   if (!time_bucket) {
     time_bucket = estimate_time_buckets(query_interval, 800);
   }
+  var time_divisor = value_of(form_data, 'time_divisor');
 
   if (time_bucket) {
     // Have to adjust the interval if there is a time bucket
@@ -156,6 +157,7 @@ function marshall_query(form_data) {
   // TODO: have views take more part in augmenting query data?
   query_data.hist_bucket = hist_bucket;
   query_data.time_bucket = time_bucket;
+  query_data.time_divisor = time_divisor;
 
   var aggs = [];
   var agg = value_of(form_data, 'agg', 'avg');

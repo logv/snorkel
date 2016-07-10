@@ -14,6 +14,13 @@ var TimeView = BaseView.extend({
     var series = {};
     var is_compare = this.compare_query === data;
 
+    var divisor = 1;
+    if (data.parsed.time_divisor === "min") {
+      divisor = (data.parsed.time_bucket / 60);
+    } else if (data.parsed.time_divisor === "hour") {
+      divisor = (data.parsed.time_bucket / 3600);
+    }
+
     // For each column, need to record a series
     var group_by = data.parsed.dims || [];
     group_by.sort();
@@ -30,6 +37,10 @@ var TimeView = BaseView.extend({
           if (field === "weighted_count") {
             return;
           }
+        }
+
+        if (data.parsed.agg === "$count" || data.parsed.agg === "$sum") {
+          value = value / divisor;
         }
 
         var formatter = presenter.get_field_number_formatter(dataset, field);
