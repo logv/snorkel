@@ -19,6 +19,10 @@ var GraphView = BaseView.extend({
     var self = this;
     var fields = SF.controller().get_fields(self.table);
 		var $el = self.$el;
+    var countEl = $("<h3 />");
+    countEl.addClass("rfloat mrl");
+    $el.append(countEl);
+    var totalCount = 0;
 		$el.height("100%");
     var height = Math.max($(window).height(), 600);
     $el.css("min-height", height + "px");
@@ -67,6 +71,7 @@ var GraphView = BaseView.extend({
       var end = make_node(res._id[dim_two], group_by);
 
       var count = res.count;
+      totalCount += count;
       start.data.weight = (start.data.weight || 0) + count;
       end.data.weight = (end.data.weight || 0) + count;
 
@@ -81,6 +86,7 @@ var GraphView = BaseView.extend({
 
 
     });
+    countEl.html("Samples: " + helpers.number_format(totalCount));
 
     var nodes = [];
     _.each(node_lookup, function(node) {
