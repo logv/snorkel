@@ -7,6 +7,7 @@ function create_throbber(container, text_func) {
   var _throbber_interval = null;
   var _throbber = null;
   var _text_func = text_func;
+  var _cbs = [];
 
   function kick_throbber() {
 
@@ -51,6 +52,10 @@ function create_throbber(container, text_func) {
         _throbber.append(duration);
       }
 
+      _.each(_cbs, function(cb) {
+        cb(now - start);
+      });
+
       return _loading;
     }, 50);
   }
@@ -68,6 +73,9 @@ function create_throbber(container, text_func) {
     kick: kick_throbber,
     set_text_function: function(func) {
       _text_func = func;
+    },
+    tick: function(cb) {
+      _cbs.push(cb);
     }
   };
 }

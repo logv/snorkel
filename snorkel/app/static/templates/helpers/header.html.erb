@@ -3,7 +3,7 @@
 <% add_stylesheet("header") %>
 
 <div class="navbar navbar-fixed-top">
-  <div class="navbar-inner">
+  <div class="navbar-inner" style='padding-right: 10px'>
     <a class="brand" href="<%= url_for("datasets.index") %>" style="padding-right: 0px"><b>snorkel</b> </a>
 
     <img
@@ -19,17 +19,17 @@
     <% } %>
 
     <% if (show_user_status) { %>
-      <ul class="nav pull-right mrl">
+      <ul class="nav pull-right">
       <% if (username) { %>
           <!-- TODO: Replace this with an actual component? -->
-          <li class="">
+          <li class="mrl prl">
             <a href="#user_dialog" class="navbar-text" data-toggle="modal" style="padding: 0px">
               <i class="icon-user icon-white"></i><%= username %>
             </a>
           </li>
       <% } else { %>
         <!-- TODO: Replace this with an actual component? -->
-        <li class="mrl">
+        <li class="">
             <a href="/login?next=/datasets"><i class="icon-user icon-white"></i>Log In</a>
         </li>
 

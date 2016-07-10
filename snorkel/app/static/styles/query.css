@@ -241,7 +241,7 @@ html, body {
     padding-right: 2%;
     width: 95%;
     text-align: left;
-    zoom: 150%;
+    zoom: 120%;
     margin-left: 0px;
     margin-right: 0px;
     overflow-x: hidden;
@@ -477,7 +477,27 @@ a {
 }
 
 #report_bug {
+  float: right;
+  display: block;
+  margin-right: 10px;
+}
+
+#status_bar {
   position: fixed;
-  bottom: 5px;
-  right: 15px;
+  width: 100%;
+  bottom: 0px;
+
+  @media @mobile {
+    bottom: -5px;
+    zoom: 0.75;
+  }
+
+  left: 0px;
+  right: 0px;
+  padding-left: 5px;
+  padding-right: 5px;
+
+
+  z-index: 100;
+  background-color: #ededed;
 }

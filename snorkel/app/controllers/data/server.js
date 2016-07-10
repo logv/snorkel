@@ -42,8 +42,9 @@ var print_input_stats = _.throttle(function() {
         },
         string: {
           dataset: table,
-          dayofweek: now.getDay(),
-          hourofday: now.getHours()
+          dayofmonth: "" + now.getDate(),
+          dayofweek: "" + now.getDay(),
+          hourofday: "" + now.getHours()
         }
       };
 

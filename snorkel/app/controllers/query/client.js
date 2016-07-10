@@ -11,11 +11,7 @@ var views = require("app/client/view");
 var _show_controls = false;
 var ResultsStore = require("app/client/results_store");
 var Throbber = require("app/client/throbber");
-
-
-// Window mutation ftw
-require("app/static/vendor/miuri");
-
+var StatusBar = require("app/client/query_status_bar");
 
 
 var _query_id;
@@ -74,6 +70,9 @@ function QueryState() {
   }
 
   var tr = Throbber.create($("#query_content"), get_text);
+  tr.tick(function(elapsed) {
+    StatusBar.set_query_time(elapsed);
+  });
 
   function reset() {
     _loading = null;
@@ -503,9 +502,7 @@ module.exports = {
       // something more ajaxy, with Backbone's Router
       //
       if (table && this.table && table != this.table) {
-        var uri = new miuri(window.location.pathname);
-        uri.query({ 'table' : table});
-        window.location = uri;
+        window.location = "/query?table=" + table;
       }
 
     },
