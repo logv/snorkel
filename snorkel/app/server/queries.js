@@ -3,6 +3,32 @@
 var db = require_app("server/db");
 var context = require_core("server/context");
 
+var trim_saved_queries = _.throttle(function() {
+  var collection = db.get("query", "results");
+  var one_month = 60 * 60 * 24 * 30 * 1000; // approx 30 days
+  var now = new Date();
+  var to_delete = {
+    created: {
+      $lt: now - one_month
+    },
+    saved: {
+      $ne: true
+    }
+  };
+
+  collection.count(to_delete, function(err, res) {
+    if (res > 0) {
+      console.log("TRIMMING OLD QUERY RESULTS", res);
+      collection.remove(to_delete, function() {
+        console.log("COMPACTING COLLECTION");
+        collection.compactCollection();
+      });
+    }
+  });
+
+
+}, 60000);
+
 function get_query_from_db(hashid, cb) {
 
   var collection = db.get("query", "results");
@@ -30,6 +56,8 @@ function get_saved_queries(conditions, options, cb) {
   collection.ensureIndex("updated");
   collection.ensureIndex("username");
   collection.ensureIndex("saved");
+
+  trim_saved_queries();
 
   cb = context.wrap(cb);
   options.limit = options.limit || 30;
