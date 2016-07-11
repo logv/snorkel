@@ -245,7 +245,7 @@ function get_time_bucket_row() {
 function get_time_normalize_row() {
   var opts = { "" : "", "hour" : "hour", "min" : "minute" };
   var max_results_input = $C("selector", { name: "time_divisor", options: opts });
-  return add_control("time_divisor", "Time Divisor", max_results_input.toString());
+  return add_control("time_divisor", "Normalize", max_results_input.toString());
 }
 
 var hist_bucket_opts = [
