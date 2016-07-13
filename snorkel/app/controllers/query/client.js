@@ -482,7 +482,8 @@ module.exports = {
   events: {
     "click .pane_toggle" : "handle_pane_toggle_clicked",
     "click .logout" : "handle_logout",
-    "click .compare_filter" : "handle_compare_toggle"
+    "click .compare_filter" : "handle_compare_toggle",
+    "click .show_user_dialog" : "handle_user_history"
   },
 
   delegates: {
@@ -692,6 +693,26 @@ module.exports = {
     });
   },
 
+  handle_user_history: function() {
+    // clear out history
+    $("#query_queue .query_tile").remove();
+
+    // Only run this when we open the user dialog!
+    var socket = SF.socket();
+    var table = this.table;
+
+    var throbberWrapper = $("<div style='text-align: center' />");
+    var tr = Throbber.create(throbberWrapper);
+    $("#query_queue .query_list").append(throbberWrapper);
+    tr.start();
+
+    this.query_history_throbber = tr;
+
+    socket.emit("get_saved_queries", table);
+    socket.emit("get_shared_queries", table);
+    socket.emit("get_recent_queries", table);
+  },
+
   compare_mode: function() {
     var compare = views.get_control("compare");
     if (compare) {
@@ -752,6 +773,7 @@ module.exports = {
   },
 
   socket: function(socket) {
+    var self = this;
     socket.on("new_query", handle_new_query);
     socket.on("query_ack", handle_query_ack);
     socket.on("query_results", handle_query_results);
@@ -761,13 +783,18 @@ module.exports = {
 
     socket.on("recent_queries", load_recent_queries);
     socket.on("saved_queries", load_saved_queries);
-    socket.on("shared_queries", load_shared_queries);
+    socket.on("shared_queries", function(queries) {
+      load_shared_queries(queries);
+
+      if (self.query_history_throbber) {
+        self.query_history_throbber.stop();
+      }
+
+    });
 
     // TODO: make sure this is for reals.
     var table = $("select[name=table]").first().val();
-    socket.emit("get_saved_queries", table);
-    socket.emit("get_shared_queries", table);
-    socket.emit("get_recent_queries", table);
+
   },
 
   set_table: function(table) {
