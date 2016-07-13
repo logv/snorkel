@@ -5,11 +5,11 @@ var context = require_core("server/context");
 
 var trim_saved_queries = _.throttle(function() {
   var collection = db.get("query", "results");
-  var one_month = 60 * 60 * 24 * 30 * 1000; // approx 30 days
+  var two_weeks = 60 * 60 * 24 * 14 * 1000; // approx 14 days
   var now = new Date();
   var to_delete = {
     created: {
-      $lt: now - one_month
+      $lt: now - two_weeks
     },
     saved: {
       $ne: true
@@ -21,13 +21,17 @@ var trim_saved_queries = _.throttle(function() {
       console.log("TRIMMING OLD QUERY RESULTS", res);
       collection.remove(to_delete, function() {
         console.log("COMPACTING COLLECTION");
-        collection.compactCollection();
+        try {
+          collection.compactCollection();
+        } catch(e) {
+
+        }
       });
     }
   });
 
 
-}, 60000);
+}, 60 * 1000 * 60);
 
 function get_query_from_db(hashid, cb) {
 
