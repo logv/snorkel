@@ -13,6 +13,40 @@ function check_weco(serie, time_bucket) {
 
   var violations = [];
 
+  var zones = {};
+  function check_point(zone, pt, ev, max_len, threshold) {
+    if (!zones[zone]) {
+      zones[zone] = {
+        count: 0,
+        arr: [],
+        name: zone
+      };
+    }
+
+    if (ev(pt.y)) {
+      zones[zone].count++;
+    }
+
+    if (threshold <= zones[zone].count) {
+      violations.push({ value: pt.x, type: "zone_" + zone});
+    }
+
+    zones[zone].arr.push(pt);
+
+    while (zones[zone].arr.length > (max_len || 0)) {
+      var old_pt = zones[zone].arr.pop();
+      if (ev(old_pt.y)) {
+        zones[zone].count--;
+      }
+    }
+
+  }
+
+  function eval_a(val) { return Math.abs(val) >= 10; }
+  function eval_b(val) { return Math.abs(val) >= 20; }
+  function eval_c(val) { return Math.abs(val) >= 30; }
+  function eval_d(val) { return Math.abs(val) >= 40; }
+
   for (var i = 0; i < serie.length; i++) {
     var pt = serie[i];
     while (expected < pt.x) {
@@ -23,71 +57,24 @@ function check_weco(serie, time_bucket) {
 
     if (missing_val > 5) {
       console.log("WARNING! MULTIPLE MISSING VALUES!");
-      violations.push({value: start, type: "missingno" });
+      violations.push({value: start, type: "missing" });
     }
 
     missing_val = 0;
     start = expected;
 
-    var subslice = serie.slice(Math.max(0, i - 10), i);
+    check_point('a', pt, eval_a, 10, 9);
+    check_point('b', pt, eval_b, 5, 4);
+    check_point('c', pt, eval_c, 3, 2);
+    check_point('d', pt, eval_d, 1, 1);
 
-    var zone_a = 0, zone_b = 0, zone_c = 0, zone_d = 0, total = 0;
-    var top_side = 0, bot_side = 0;
-
-    while (subslice.length > 0) {
-      var el = subslice.pop();
-      total++;
-
-      var y = Math.abs(el.y);
-      if (y >= 10) { zone_a++; }
-      if (y >= 20) { zone_b++; }
-      if (y >= 30) { zone_c++; }
-      if (y >= 50) { zone_d++; }
-      if (el.y > 3) { top_side++; }
-      if (el.y < -3) { bot_side++; }
-
-      if (total === 3) {
-        if (zone_b >= 2) {
-          console.log("FLAGGING ZONE B VIOLATION");
-          violations.push({ value: pt.x, type: "zone_b" });
-        }
-      }
-
-      if (total === 5) {
-        if (zone_a > 4) {
-          console.log("ZONE A VIOLATION!");
-          violations.push({ value: pt.x, type: "zone_a" });
-        }
-      }
-
-      if (zone_c > 3) {
-        console.log("ZONE C VIOLATION!", zone_c, pt.x); 
-        violations.push({ value: pt.x, type: "zone_c" });
-        zone_c = 0;
-      }
-
-      if (zone_d >= 1 && total === 1) {
-        console.log("ZONE D VIOLATION!", zone_c, pt.x); 
-        violations.push({ value: pt.x, type: "zone_d" });
-        zone_d = 0;
-      }
-
-
-      if (total > 9) {
-        if (top_side > 7 || bot_side > 7) {
-          console.log("ALL ON ONE SIDE VIOLATION");
-          violations.push({ value: pt.x, type: "zone_0" });
-        }
-      }
-
-    }
 
   }
 
   return _.filter(violations, function(v) {
-    return v.type === "missingno" || v.type === "zone_c" || v.type === "zone_d"; 
+    return v.type === "missing" || v.type === "zone_c" || v.type === "zone_d";
   });
-  
+
 }
 
 var WecoView = TimeView.extend({
@@ -153,7 +140,8 @@ var WecoView = TimeView.extend({
 
 
     var options = TimeView.prototype.getChartOptions();
-    options.yAxis = {
+    var my_options = {};
+    my_options.yAxis = {
       min: -50,
       max: 50,
       labels: {
@@ -162,7 +150,7 @@ var WecoView = TimeView.extend({
       plotLines: plot_lines
     };
 
-    options.xAxis = {
+    my_options.xAxis = {
       plotLines: _.map(this.violations, function(v) {
         return {
           value: v.value,
@@ -174,6 +162,8 @@ var WecoView = TimeView.extend({
         };
       })
     };
+
+    $.extend(true, options, my_options);
     return options;
   }
 

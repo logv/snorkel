@@ -96,8 +96,8 @@ function get_view_selector_row() {
       "multidist" : "Grouped Dist.",
       "graph" : "DiGraph",
       " " : "--",
-      "weco" : "WECO series",
       "drill" : "Drilldown",
+      "weco" : "WECO Rules",
     },
     delegate: {
       "change": "view_changed"
