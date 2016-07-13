@@ -29,6 +29,7 @@ function check_weco(serie, time_bucket) {
 
     if (threshold <= zones[zone].count) {
       violations.push({ value: pt.x, type: "zone_" + zone});
+      zones[zone].count = 0;
     }
 
     zones[zone].arr.push(pt);
@@ -39,6 +40,8 @@ function check_weco(serie, time_bucket) {
         zones[zone].count--;
       }
     }
+
+    zones[zone].count = Math.max(zones[zone].count, 0);
 
   }
 
