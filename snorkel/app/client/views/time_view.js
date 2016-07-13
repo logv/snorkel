@@ -256,7 +256,7 @@ var TimeView = BaseView.extend({
     doRSSFeed(function(items) {
       if (items && items.length) {
         if (!options.yAxis) {
-          options.xAxis = {};
+          options.yAxis = {};
         }
 
         console.log(items);

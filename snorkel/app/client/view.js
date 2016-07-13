@@ -56,6 +56,7 @@ var SamplesView = require("app/client/views/samples_view");
 var SessionView = require("app/client/views/session_view");
 var ScatterView = require("app/client/views/scatter_view");
 var AreaView = require("app/client/views/area_view");
+var WecoView = require("app/client/views/weco_view");
 var BarView = require("app/client/views/bar_view");
 var DrillView = require("app/client/views/drill_view");
 var GraphView = require("app/client/views/graph_view");

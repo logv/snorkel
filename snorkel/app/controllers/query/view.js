@@ -95,6 +95,8 @@ function get_view_selector_row() {
       "scatter" : "Scatter Plot",
       "multidist" : "Grouped Dist.",
       "graph" : "DiGraph",
+      " " : "--",
+      "weco" : "WECO series",
       "drill" : "Drilldown",
     },
     delegate: {
