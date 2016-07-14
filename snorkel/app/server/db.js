@@ -26,12 +26,19 @@ var context = require_core("server/context");
 var config = require_core("server/config");
 
 var Engine, separator;
-var use_mongo = config.backend.driver === "mongo";
+
+var use_mongo = config.config_driver.indexOf("mongo") === 0;
+var use_tingo = config.config_driver.indexOf("tingo") === 0;
+var use_linvo = config.config_driver.indexOf("linvo") === 0;
+
+if (use_tingo || use_linvo) {
+  use_mongo = false;
+}
 
 if (use_mongo) {
   Engine = require("mongodb");
   separator = "/";
-} else {
+} else if (use_tingo) {
   Engine = require("tingodb")();
   separator = ".";
 }
@@ -145,12 +152,64 @@ function collection_builder(db_name, before_create) {
   };
 }
 
+var LinvoDB = require("linvodb3");
+LinvoDB.dbPath = "./ldb";
+// // options.store = { db: require("level-js") }; // Options passed to LevelUP constructor 
+
+
 var SF_db;
 module.exports = {
   install: function() {
-    SF_db = collection_builder(config.db_name || package_json.name);
-    module.exports.get = SF_db.get;
-    module.exports.raw = SF_db.raw;
+    // if using mongo or tingo, we use one of these
+    if (!use_linvo) {
+      SF_db = collection_builder(config.db_name || package_json.name);
+
+      // if using linvodb, we can try a different one
+      module.exports.get = SF_db.get;
+      module.exports.raw = SF_db.raw;
+      module.exports.toArray = function(cur, cb) {
+        cb = context.wrap(cb);
+        cur.toArray(function(err, docs) {
+          cb(err, docs);
+        });
+
+      };
+    } else {
+      var _collections = {};
+      module.exports.toArray = function(cur, cb) {
+        cb = context.wrap(cb);
+        cur.exec(function(err, docs) {
+          cb(err, docs);
+        });
+
+      },
+      module.exports.get = function() {
+        var args = _.toArray(arguments);
+        var last = args.pop();
+        var cb;
+
+        if (_.isFunction(last)) {
+          cb = last;
+        } else {
+          args.push(last);
+        }
+
+        var db_name = args.join(separator);
+
+        if (!_collections[db_name]) {
+          _collections[db_name] = new LinvoDB(db_name);
+        }
+
+
+        var ret = _collections[db_name];
+        ret.toArray = function(ncb) {
+          ncb(ret); 
+        };
+        if (cb) { cb(ret); }
+        return ret;
+
+      };
+    }
   },
   db: collection_builder
 };

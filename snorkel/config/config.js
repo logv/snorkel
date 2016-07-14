@@ -22,6 +22,13 @@ module.exports = {
   backend: {
     driver: "mongo"
   },
+
+  // which local DB do we store our data in? can be tingodb, mongodb or linvodb.
+  // if using mongodb driver, may as well use mongodb backend.
+  // otherwise, go with linvodb
+  //
+  // (tingodb is in testing)
+  config_driver: "mongo",
   // you should have libsqlite3-dev installed for the npm install of connect-sqlite3 to work
   // or you can swap it with connect-level
   session_store: "connect-sqlite3",

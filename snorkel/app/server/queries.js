@@ -68,34 +68,34 @@ function get_saved_queries(conditions, options, cb) {
   var start = +Date.now()
   var projection = {};
   projection["results.results"] = 0;
-  collection.find(conditions, projection, function(err, cur) {
-    cur.limit(options.limit || 30);
-    cur.sort({ updated: -1 });
-    var ret;
+  var cur = collection.find(conditions, projection);
 
-    cur.toArray(function(err, arr) {
-      var end = +Date.now();
-      console.log("SAVED QUERY FINDING TOOK", end - start, "RESULTS", arr.length);
-      if (!options.no_dedupe) {
-        _.each(arr, function(query) {
-          if (visited[query.hashid]) {
-            if ((visited[query.hashid].updated || 0) < query.updated) {
-              visited[query.hashid] = query;
-            }
-          } else {
+  cur.limit(options.limit || 30);
+  cur.sort({ updated: -1 });
+  var ret;
+
+  db.toArray(cur, function(err, arr) {
+    var end = +Date.now();
+    console.log("SAVED QUERY FINDING TOOK", end - start, "RESULTS", arr.length);
+    if (!options.no_dedupe) {
+      _.each(arr, function(query) {
+        if (visited[query.hashid]) {
+          if ((visited[query.hashid].updated || 0) < query.updated) {
             visited[query.hashid] = query;
           }
+        } else {
+          visited[query.hashid] = query;
+        }
 
-        });
-        ret = _.map(visited, function(v, k) { return v; });
-      } else {
-        ret = arr;
-      }
+      });
+      ret = _.map(visited, function(v) { return v; });
+    } else {
+      ret = arr;
+    }
 
-      if (cb) { cb(ret); }
-    });
-
+    if (cb) { cb(ret); }
   });
+
 
 
 }
@@ -165,16 +165,16 @@ function get_past_results(hashid, cb) {
 function get_saved_query(conditions, cb) {
   var collection = db.get("query", "results");
   cb = context.wrap(cb);
-  collection.find(conditions, { }, function(err, cur) {
-    cur.sort({ updated: -1});
-    cur.limit(1);
-    cur.toArray(function(err, arr) {
-      if (arr && arr.length) {
-        cb(null, arr[0]);
-      } else {
-        cb(err);
-      }
-    });
+  var cur = collection.find(conditions);
+
+  cur.sort({ updated: -1});
+  cur.limit(1);
+  db.toArray(cur, function(err, arr) {
+    if (arr && arr.length) {
+      cb(null, arr[0]);
+    } else {
+      cb(err);
+    }
   });
 }
 

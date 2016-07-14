@@ -293,39 +293,34 @@ function load_saved_query(conditions, cb) {
   var collection = db.get("query", "results");
   cb = context.wrap(cb);
 
-  collection.find(conditions, context.wrap(function(err, cur) {
-    if (err || !cur) {
+  var cur = collection.find(conditions);
+  cur.limit(1).sort({ updated: -1 });
+
+  db.toArray(cur, context.wrap(function(err, arr) {
+    if (err) {
+      console.log(err);
       return cb(null);
     }
 
-    cur.limit(1).sort({ updated: -1 });
+    var obj = arr.pop();
+    if (!obj) {
+      return cb(null);
+    }
 
-    cur.toArray(context.wrap(function(err, arr) {
-      if (err) {
-        console.log(err);
-        return cb(null);
-      }
+    try {
+      obj = JSON.parse(JSON.stringify(obj).replace(/#DOT#/g, "."));
+    } catch(e) {
+    }
 
-      var obj = arr.pop();
-      if (!obj) {
-        return cb(null);
-      }
+    var input_view = _.find(obj.input, function(r) {
+      return r.name === "view";
+    });
 
-      try {
-        obj = JSON.parse(JSON.stringify(obj).replace(/#DOT#/g, "."));
-      } catch(e) {
-      }
+    if (!input_view) {
+      obj.input.push({name: "view", value: obj.parsed.view});
+    }
 
-      var input_view = _.find(obj.input, function(r) {
-        return r.name === "view";
-      });
-
-      if (!input_view) {
-        obj.input.push({name: "view", value: obj.parsed.view});
-      }
-
-      return cb(obj);
-    }));
+    return cb(obj);
   }));
 }
 
@@ -880,17 +875,13 @@ function load_annotations(table, cb) {
     cb(annotations);
   });
 
-  collection.find({}, function(err, cur) {
-    if (err || !cur) {
-      return cb(null);
-    }
+  var cur = collection.find({});
 
-    cur.toArray(context.wrap(function(err, arr) {
-      annotations.items = arr;
-      console.log(arr);
-      after();
-    }));
-  });
+  db.toArray(cur, context.wrap(function(err, arr) {
+    annotations.items = arr;
+    console.log(arr);
+    after();
+  }));
 
   load_rss(table, function(items) {
     annotations.rss = items;

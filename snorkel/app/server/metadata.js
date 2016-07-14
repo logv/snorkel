@@ -130,30 +130,24 @@ module.exports = {
     });
 
     var collection = db.get("dataset", "metadata");
-    collection.find({}, function(err, ret) {
+    var cur = collection.find({});
+    db.toArray(cur, function(err, docs) {
       if (err) {
-        cb(results);
+        cb([]);
         return;
       }
 
-      ret.toArray(function(err, docs) {
-        if (err) {
-          cb([]);
-          return;
-        }
-
-        var grouped = _.groupBy(docs, function(d) {
-          return d.table;
-        });
-
-        _.each(grouped, function(configs, key) {
-          grouped[key] = configs[0];
-        });
-
-        _.extend(results, grouped);
-
-        after();
+      var grouped = _.groupBy(docs, function(d) {
+        return d.table;
       });
+
+      _.each(grouped, function(configs, key) {
+        grouped[key] = configs[0];
+      });
+
+      _.extend(results, grouped);
+
+      after();
     });
 
     backend.get_tables(function(tables) {
