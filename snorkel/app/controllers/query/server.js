@@ -905,7 +905,8 @@ module.exports = {
     "/user" : "user",
     "/dataset" : "dataset",
     "/grafana" : "grafana",
-    "/download" : "download"
+    "/download" : "download",
+    "/weco" : "weco"
   },
   post_routes: {
     "/bounce" : "bounce"
@@ -1042,6 +1043,31 @@ module.exports = {
       get_download();
 
     }
+  },
+  weco: function(ctx) {
+    var time_helper = require_app("client/views/time_helper");
+    var weco_helper = require_app("client/views/weco_helper");
+
+    get_query(function(query) {
+      if (query) {
+        var res = context("res");
+        var data = query.results.query;
+        var ret = time_helper.prepare(data);
+        console.log("PREPARED TIME RESULTS");
+
+        var options = {
+          time_bucket: data.parsed.time_bucket,
+          start: data.parsed.start_ms,
+          end: data.parsed.end_ms
+        };
+
+        var normalized_data = weco_helper.normalize_series(ret, options);
+        var violations = weco_helper.find_violations(normalized_data, options);
+        res.write(JSON.stringify(violations));
+        res.end();
+      }
+    });
+
   },
   bounce: post_bounce,
   load_rss: load_rss,
