@@ -2,7 +2,7 @@
 // runs WECO rules on our time series array and
 // flags potentials
 var one_day = 24 * 60 * 60 * 1000;
-function check_weco(serie, options) {
+function check_weco(serie, options, serie_name) {
   var time_bucket = options.time_bucket;
 
   var start = options.start || serie[0].x;
@@ -15,13 +15,14 @@ function check_weco(serie, options) {
   var missing_val = 0;
 
   var violations = [
-    { value: day_cutoff, training: true, type: "marker" },
-    { value: end_cutoff, end: true, type: "marker" } 
+    { value: day_cutoff, active: false, type: "marker" },
+    { value: end_cutoff, active: true, early: true, type: "marker" }
   ];
 
   var zones = {};
 
-  console.log("CHECKING WECO", start, end);
+  var active_violations = [];
+
   function check_point(zone, pt, ev, max_len, threshold) {
     if (!zones[zone]) {
       zones[zone] = {
@@ -36,9 +37,45 @@ function check_weco(serie, options) {
     }
 
     if (threshold <= zones[zone].count) {
-      console.log("VIOLATION", pt.x, pt.x < day_cutoff, pt.x > end_cutoff);
-      violations.push({ value: pt.x, type: "zone_" + zone, training: pt.x < day_cutoff, end: pt.x >= end_cutoff });
+      var violation = {
+        value: pt.x,
+        recovery: 3,
+        type: "zone_" + zone,
+        active: pt.x >= day_cutoff,
+        early: pt.x >= end_cutoff,
+       series: serie_name
+      };
+      violations.push(violation);
+      active_violations.push(violation);
       zones[zone].count = 0;
+    } else {
+      if (!pt.final) {
+
+        // recover any active violations!
+        _.each(active_violations, function(v) {
+          if (!v.recovery) {
+            var recovery = {
+              value: pt.x,
+              type: "recover",
+              // special recovery keys
+              recover_value: v.value,
+              recover_type: v.type,
+              active: pt.x >= day_cutoff,
+             series: serie_name
+            };
+
+            violations.push(recovery);
+          }
+
+          v.recovery = (v.recovery || 0) - 1
+        });
+
+        active_violations = _.filter(active_violations, function(v) {
+          return (v.recovery || 0) >= 0;
+        });
+      }
+
+
     }
 
     zones[zone].arr.push(pt);
@@ -66,13 +103,14 @@ function check_weco(serie, options) {
       missing_val++;
 
       if (missing_val > 5) {
-        console.log("WARNING! MULTIPLE MISSING VALUES!");
-        var training = false;
-        if (start < day_cutoff) {
-          training = true;
-          
+        var active = false;
+        if (start > day_cutoff) {
+          active = true;
+
         }
-        violations.push({value: start, type: "missing", training: training });
+        var violation = {value: start, type: "missing", active: active, series: serie_name };
+        violations.push(violation);
+        active_violations.push(violation);
 
 
         start = expected;
@@ -92,10 +130,15 @@ function check_weco(serie, options) {
   var valid_types = {
     marker: 1,
     missing: 1,
+    recover: 1,
     zone_c: 1,
     zone_d: 1
   }
   return _.filter(violations, function(v) {
+    if (v.type === "recover") {
+      return valid_types[v.recover_type];
+    }
+
     return valid_types[v.type];
   });
 
@@ -106,7 +149,7 @@ module.exports = {
   find_violations: function(ret, options) {
     var violations = [];
     _.each(ret, function(serie) {
-      violations = violations.concat(check_weco(serie.data, options));
+      violations = violations.concat(check_weco(serie.data, options, serie.name));
     });
 
     return violations;
@@ -136,7 +179,7 @@ module.exports = {
         max = Math.max(pt.y, max);
       });
 
-      serie.data.push({ x: options.end, y: 0});
+      serie.data.push({ x: options.end, y: 0, final: true});
       serie.data.sort(function(a, b) {
         return a.x - b.x;
       });

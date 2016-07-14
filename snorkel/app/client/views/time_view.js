@@ -11,9 +11,10 @@ var TimeView = BaseView.extend({
 
     var dataset = this.table;
     var is_compare = this.compare_query === data;
+    this.max_x = data.parsed.end_ms;
 
     var series = time_helper.prepare(data, {
-      dataset: dataset, 
+      dataset: dataset,
       is_compare: is_compare,
       helpers: helpers,
       presenter: presenter
@@ -96,6 +97,9 @@ var TimeView = BaseView.extend({
 
           return el.html();
         }
+      },
+      xAxis: {
+        max: this.max_x
       },
       plotOptions: {
         series: {

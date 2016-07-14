@@ -53,21 +53,38 @@ var WecoView = TimeView.extend({
 
     my_options.xAxis = {
       plotLines: _.map(this.violations, function(v) {
-        var color = "#f00";
-        if (v.training === true) {
+        var color = "#0a0";
+        if (v.type === "recover") {
           color = "#0f0";
         }
+        var width = 1;
+        if (v.active === true) {
+          width = 1;
+          color = "#f00";
+          if (v.type === "recover") {
+            color = "#0f0";
+          }
+        }
 
-        if (v.end === true) {
+        if (v.early) {
           color = "#00f";
+        }
+
+        var label = v.type;
+        if (v.type == "marker") {
+          if (v.active) {
+            label = "alert zone (end)";
+          } else {
+            label = "alert zone (start)";
+          }
         }
 
         return {
           value: v.value,
-          width: 1,
+          width: width,
           color: color,
           label: {
-            text: v.type
+            text: label
           }
         };
       })

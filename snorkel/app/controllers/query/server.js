@@ -645,6 +645,7 @@ function log_query(query_data, user) {
 }
 
 function handle_new_query_with_meta(meta, query_id, query_data, socket, done) {
+  done = context.wrap(done);
   var pipeline = backend.prep_pipeline(query_data, meta);
   var compare_pipeline;
   var compare_data;
@@ -1039,25 +1040,27 @@ module.exports = {
     var time_helper = require_app("client/views/time_helper");
     var weco_helper = require_app("client/views/weco_helper");
 
-    get_query(function(query) {
-      if (query) {
+    get_query(function(data) {
+      if (data) {
         var res = context("res");
-        var data = query.results.query;
-        var ret = time_helper.prepare(data);
-        console.log("PREPARED TIME RESULTS");
+        var query = data.query;
+        var ret = time_helper.prepare(query);
 
         var options = {
-          time_bucket: data.parsed.time_bucket,
-          start: data.parsed.start_ms,
-          end: data.parsed.end_ms
+          time_bucket: query.parsed.time_bucket,
+          start: query.parsed.start_ms,
+          end: query.parsed.end_ms
         };
 
         var normalized_data = weco_helper.normalize_series(ret, options);
         var violations = weco_helper.find_violations(normalized_data, options);
-        res.write(JSON.stringify(violations));
+        res.write(JSON.stringify({
+          violations: violations,
+          query: query
+        }));
         res.end();
       }
-    });
+    }, true /* no saved queries allowed */);
 
   },
   bounce: post_bounce,
