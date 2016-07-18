@@ -101,7 +101,11 @@ function check_weco(serie, options, serie_name) {
     var pt = serie[i];
     while (expected < pt.x) {
       expected += time_bucket * 1000;
-      missing_val++;
+
+      // we only alert on missing data not inside the early warning window
+      if (expected < end_cutoff) {
+        missing_val++;
+      }
     }
 
     // 3 in a row is missing
