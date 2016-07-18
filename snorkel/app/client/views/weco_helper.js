@@ -7,6 +7,7 @@ function check_weco(serie, options, serie_name) {
 
   var start = options.start || serie[0].x;
   var end = options.end || serie[serie.length - 1].x;
+  var very_start = start;
 
   var day_cutoff = end - one_day;
   var end_cutoff = end - (time_bucket*1000*3);
@@ -101,22 +102,30 @@ function check_weco(serie, options, serie_name) {
     while (expected < pt.x) {
       expected += time_bucket * 1000;
       missing_val++;
-
-      if (missing_val > 5) {
-        var active = false;
-        if (start > day_cutoff) {
-          active = true;
-
-        }
-        var violation = {value: start, type: "missing", active: active, series: serie_name };
-        violations.push(violation);
-        active_violations.push(violation);
-
-
-        start = expected;
-        missing_val = 0;
-      }
     }
+
+    // 3 in a row is missing
+    if (missing_val >= 3) {
+      var active = false;
+      if (start > day_cutoff) {
+        active = true;
+
+      }
+
+      if (very_start === start) {
+        var new_start = parseInt(start / one_day, 10) * one_day;
+        // we splice to the nearest day if we can't see the start...
+        start = new_start;
+      }
+
+      // if the missing val is larger than 3 days, i just want to snap it to
+      // the most recent day it went missing
+      var violation = {value: start, type: "missing", active: active, series: serie_name };
+      violations.push(violation);
+      active_violations.push(violation);
+    }
+
+
 
     missing_val = 0;
     start = expected;
