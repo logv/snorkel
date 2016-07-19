@@ -177,12 +177,23 @@ module.exports = {
 
       _.each(serie.data, function(pt) {
         n += 1;
-        delta = pt.y - avg;
+        var trimmed_y = pt.y;
+
+        std = Math.sqrt(m2 / (n-1)) * 1.134;
+        // huberization: trim by 1.5 std then multiply std by 1.134 at the end
+        // assumes normal distribution of error
+        if (std > 0) {
+          trimmed_y = parseInt(Math.min(pt.y, 1.5 * std + avg), 10);
+          trimmed_y = parseInt(Math.max(trimmed_y, (-1.5 * std) + avg), 10);
+        }
+
+        delta = trimmed_y - avg;
+
         avg += delta / n;
         m2 += delta*(pt.y - avg);
       });
 
-      std = Math.sqrt(m2 / (n-1));
+      std = Math.sqrt(m2 / (n-1)) * 1.134;
       var min, max = 0;
       _.each(serie.data, function(pt) {
         pt.y = (pt.y - avg) / std * 10;
