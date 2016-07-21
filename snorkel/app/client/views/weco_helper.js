@@ -50,31 +50,40 @@ function check_weco(serie, options, serie_name) {
       active_violations.push(violation);
       zones[zone].count = 0;
     } else {
-      if (!pt.final) {
+      // recover any active violations!
+      _.each(active_violations, function(v) {
+        // if we are currently in active territory
+        // and the violation is still open, mark it
+        // as active
+        if (pt.x >= day_cutoff) {
+          v.active = true;
+        }
 
-        // recover any active violations!
-        _.each(active_violations, function(v) {
-          if (!v.recovery) {
-            var recovery = {
-              value: pt.x,
-              type: "recover",
-              // special recovery keys
-              recover_value: v.value,
-              recover_type: v.type,
-              active: pt.x >= day_cutoff,
-             series: serie_name
-            };
+        if (pt.final) {
+          return;
+        }
 
-            violations.push(recovery);
-          }
 
-          v.recovery = (v.recovery || 0) - 1
-        });
+        if (!v.recovery) {
+          var recovery = {
+            value: pt.x,
+            type: "recover",
+            // special recovery keys
+            recover_value: v.value,
+            recover_type: v.type,
+            active: pt.x >= day_cutoff,
+           series: serie_name
+          };
 
-        active_violations = _.filter(active_violations, function(v) {
-          return (v.recovery || 0) >= 0;
-        });
-      }
+          violations.push(recovery);
+        }
+
+        v.recovery = (v.recovery || 0) - 1;
+      });
+
+      active_violations = _.filter(active_violations, function(v) {
+        return (v.recovery || 0) >= 0;
+      });
 
 
     }
