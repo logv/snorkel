@@ -8,16 +8,17 @@ function check_weco(serie, options, serie_name) {
   var start = options.start || serie[0].x;
   var end = options.end || serie[serie.length - 1].x;
   var very_start = start;
+  var end_buckets = options.end_zone || 3;
 
   var day_cutoff = end - one_day;
-  var end_cutoff = end - (time_bucket*1000*3);
+  var end_cutoff = end - (time_bucket*1000*end_buckets);
 
   var expected = start;
   var missing_val = 0;
 
   var violations = [
-    { value: day_cutoff, active: false, type: "marker" },
-    { value: end_cutoff, active: true, early: true, type: "marker" }
+    { time: day_cutoff, active: false, type: "marker" },
+    { time: end_cutoff, active: true, early: true, type: "marker" }
   ];
 
   var zones = {};
@@ -38,13 +39,14 @@ function check_weco(serie, options, serie_name) {
     }
 
     if (threshold <= zones[zone].count) {
+      // TODO: early should be decided on many factors
       var violation = {
-        value: pt.x,
+        time: pt.x,
+        value: pt.y,
         recovery: 3,
         type: "zone_" + zone,
         active: pt.x >= day_cutoff,
-        early: pt.x >= end_cutoff,
-       series: serie_name
+        series: serie_name
       };
       violations.push(violation);
       active_violations.push(violation);
@@ -66,11 +68,12 @@ function check_weco(serie, options, serie_name) {
 
         if (!v.recovery) {
           var recovery = {
-            value: pt.x,
+            time: pt.x,
             type: "recover",
             // special recovery keys
-            recover_value: v.value,
+            recover_time: v.time,
             recover_type: v.type,
+            recover_value: v.value,
             active: pt.x >= day_cutoff,
            series: serie_name
           };
@@ -133,7 +136,7 @@ function check_weco(serie, options, serie_name) {
 
       // if the missing val is larger than 3 days, i just want to snap it to
       // the most recent day it went missing
-      var violation = {value: start, type: "missing", active: active, series: serie_name };
+      var violation = {time: start, type: "missing", active: active, series: serie_name };
       violations.push(violation);
       active_violations.push(violation);
     }

@@ -80,7 +80,7 @@ var WecoView = TimeView.extend({
         }
 
         return {
-          value: v.value,
+          value: v.time,
           width: width,
           color: color,
           label: {
