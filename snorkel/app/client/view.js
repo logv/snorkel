@@ -57,6 +57,7 @@ var SessionView = require("app/client/views/session_view");
 var ScatterView = require("app/client/views/scatter_view");
 var AreaView = require("app/client/views/area_view");
 var WecoView = require("app/client/views/weco_view");
+var HWView = require("app/client/views/holtwinters_view");
 var BarView = require("app/client/views/bar_view");
 var DrillView = require("app/client/views/drill_view");
 var GraphView = require("app/client/views/graph_view");
@@ -90,8 +91,12 @@ function handle_update_view(view) {
     customControlsEl.empty();
 
     var controlEls = custom_controls(fields);
-    customControlsEl.append(controlEls);
-    customControlsEl.stop(true).slideDown();
+    var customForm = $("<form class='custom_controls' />");
+    customForm.append(controlEls);
+    customControlsEl.append(customForm);
+    customControlsEl.stop(true).slideDown(function() {
+      customControlsEl.css({ height: "auto" });
+    });
 
   } else {
     customControlsEl.stop(true).slideUp();

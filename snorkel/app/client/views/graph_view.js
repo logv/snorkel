@@ -27,7 +27,7 @@ var GraphView = BaseView.extend({
     var height = Math.max($(window).height(), 600);
     $el.css("min-height", height + "px");
 
-    var query_params = self.data.parsed;
+    var query_params = self.data.parsed.custom || self.data.parsed;
     var dim_one = query_params.dim_one;
     var dim_two = query_params.dim_two;
 
@@ -175,7 +175,7 @@ function build_custom_controls(fields) {
   });
 
 
-  var query_params = SF.controller().get_current_query();
+  var query_params = SF.controller().get_custom_params();
   var dim_one = query_params.dim_one;
   var dim_two = query_params.dim_two;
 

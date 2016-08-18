@@ -5,6 +5,7 @@
   "vendor" : [
     "app/static/vendor/bootstrap.min.js",
     "app/static/vendor/jquery.deserialize.js",
+    "app/static/vendor/jquery.serialize-object.js",
     "app/static/vendor/jquery-deparam.js",
     "app/static/vendor/fastclick.js",
     "app/static/vendor/strtotime.js",

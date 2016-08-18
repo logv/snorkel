@@ -97,7 +97,8 @@ function get_view_selector_row() {
       "graph" : "DiGraph",
       " " : "--",
       "drill" : "Drilldown",
-      "weco" : "WECO Rules",
+      "holtwinters" : "Forecasting",
+      "weco" :        "WECO Alerts",
     },
     delegate: {
       "change": "view_changed"

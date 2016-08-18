@@ -11,6 +11,15 @@ var BaseView = window.Backbone.View.extend({
   handle_data: function(data) {
     this.table = data.parsed.table;
 
+    if (!_.isObject(data.parsed.custom)) {
+      try {
+        data.parsed.custom = JSON.parse(data.parsed.custom || "{}");
+      } catch(e) {
+        console.log("COULDNT PARSE CUSTOM DATA PARAMS?", data.parsed.custom);
+        data.parsed.custom = {};
+      }
+    }
+
     function get_text() {
       return $("<h1>").html("Waiting for comparison");
     }

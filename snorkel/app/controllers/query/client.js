@@ -526,7 +526,7 @@ module.exports = {
   },
 
   get_query_from_dom: function() {
-    var formEl = this.$page.find("#query_sidebar form");
+    var formEl = this.$page.find("#query_sidebar form.sidebar_form");
 
     formEl
       .find("[data-disabled=true]")
@@ -558,13 +558,21 @@ module.exports = {
     var json_filters = JSON.stringify(filter_data);
     form_str += "&filters=" + json_filters;
 
+    var customForm = this.$page.find("#query_sidebar form.custom_controls");
+    var custom_obj = customForm.serializeObject();
+    var json_custom = JSON.stringify(custom_obj);
+    form_str += "&custom=" + json_custom;
+
+
+    form_data.push({name: "custom", value: json_custom });
     form_data.push({name: "baseview", value: views.QUERIES[view] || grapher.baseview });
     form_data.push({name: "filters", value: json_filters});
 
     return {
       string: form_str,
       data: form_data,
-      filters: filter_data
+      filters: filter_data,
+      custom: custom_obj
     };
 
   },
@@ -590,13 +598,31 @@ module.exports = {
     return this.query_params || {};
   },
 
+  get_custom_params: function() {
+    if (this.query_params) {
+      if (_.isObject(this.query_params.custom)) {
+        return this.query_params.custom;
+      } else {
+        try {
+          return JSON.parse(this.query_params.custom || "{}");
+        } catch(e) {
+          console.log("COULDNT QUERY PARAM PARSE", this.query_params.custom);
+        }
+      }
+    }
+
+    return {};
+  },
+
   set_dom_from_query: function(query_str) {
     var query = $.deparam(query_str);
+
     this.query_params = query;
+
     var view = query.view;
     this.update_view(view || "table");
 
-    var formEl = this.$page.find("#query_sidebar form");
+    var formEl = this.$page.find("#query_sidebar form.sidebar_form");
     formEl.deserialize(query_str);
     formEl.find(":input[name]").each(function() {
       var val = $(this).val();

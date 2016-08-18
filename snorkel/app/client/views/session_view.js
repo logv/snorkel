@@ -14,7 +14,10 @@ var SessionView = BaseView.extend({
   build_overview: function(rows, field, tableEl, headers) {
     var self = this;
     var plotted_vals = [];
-    var color_field = self.query.parsed.event_field;
+
+    // this is for old timeline queries sake
+    var parsed = self.query.parsed;
+    var color_field = parsed.event_field || parsed.custom.event_field;
 
     var formatter = presenter.get_field_number_formatter(self.table, field);
 
@@ -289,7 +292,7 @@ function build_custom_controls(fields) {
   });
 
 
-  var query_params = SF.controller().get_current_query();
+  var query_params = SF.controller().get_custom_params();
   $C("selector", {
     name: "event_field",
     options: options,
