@@ -5,7 +5,7 @@
         <div class="item <%= index == 0 ? "active" : "" %>" data-id="<%=  s.title  %>" style='height: 100%'>
             <h1 class='mbl' style='text-align: center'><%= s.title %></h1>
             <hr />
-            <img class='mtl' src="<%= s.src %>" > </img>
+            <img style='max-width: 1000px; width: 90%; ' class='mtl' src="<%= s.src %>" > </img>
             <div class="caption"><%= s.caption || "" %></div>
         </div>
       <% }); %>
