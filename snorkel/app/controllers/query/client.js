@@ -633,7 +633,7 @@ module.exports = {
 
       if ($(this).val() && typeof query[name] !== "undefined") {
         $(this).val(query[name]);
-        $(this).trigger("liszt:updated");
+        $(this).trigger("chosen:updated");
       }
     });
 
@@ -643,7 +643,7 @@ module.exports = {
       var name = $(this).attr("name");
       var val = query[name];
       $(this).val(val);
-      $(this).trigger("liszt:updated");
+      $(this).trigger("chosen:updated");
     });
 
 

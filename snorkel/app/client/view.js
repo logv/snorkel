@@ -291,7 +291,7 @@ function redraw_graph(id, query, show_details) {
 function update_control(name, value) {
   var control = get_control(name).find(":input");
   control.val(value);
-  control.trigger("liszt:updated");
+  control.trigger("chosen:updated");
 }
 
 module.exports = {
