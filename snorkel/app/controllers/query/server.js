@@ -85,6 +85,12 @@ function marshall_query(form_data) {
   query_data.time_field = value_of(form_data, 'time_field', 'time');
 
   var custom = value_of(form_data, 'custom', '{}');
+  var custom_data = {};
+  try {
+    custom_data = JSON.parse(custom);
+  } catch(e) {
+
+  }
   query_data.custom = custom;
 
   var limit = 100;
@@ -111,8 +117,8 @@ function marshall_query(form_data) {
   var now = Date.now();
 
   // For single dim group bys
-  query_data.dim_one = value_of(form_data, 'dim_one');
-  query_data.dim_two = value_of(form_data, 'dim_two');
+  query_data.dim_one = custom_data.dim_one;
+  query_data.dim_two = custom_data.dim_two;
 
   if (query_data.dim_one) { query_data.dims.push(query_data.dim_one); }
   if (query_data.dim_two) { query_data.dims.push(query_data.dim_two); }
