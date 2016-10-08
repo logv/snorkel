@@ -28,7 +28,7 @@ module.exports = {
   // otherwise, go with linvodb
   //
   // (tingodb is in testing)
-  config_driver: "mongo",
+  config_driver: "linvo",
   // you should have libsqlite3-dev installed for the npm install of connect-sqlite3 to work
   // or you can swap it with connect-level
   session_store: "connect-sqlite3",

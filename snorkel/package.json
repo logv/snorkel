@@ -14,8 +14,6 @@
       "squel" : "x",
       "pg" : "4.3.0",
       "linvodb3" : "x",
-      "level-js" : "x",
-      "tingodb" : "x",
       "connect-sqlite3" : "x"
     }
 }

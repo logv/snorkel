@@ -4,7 +4,7 @@ module.exports = {
   config_driver: "linvo",
   backend: {
     driver: "sybil",
-    bin_path: "/home/okay/go/bin/sybil",
+    bin_path: "sybil",
     db: "snorkel"
   },
 };
