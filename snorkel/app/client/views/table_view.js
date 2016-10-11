@@ -304,6 +304,10 @@ var TableView = BaseView.extend({
     });
 
     var options = {
+      height: "100px",
+      legend: {
+        enabled: false,
+      },
       chart: {
           type: 'scatter',
           zoomType: 'xy',
@@ -338,7 +342,7 @@ var TableView = BaseView.extend({
       }],
     };
 
-    $C("highcharter", {skip_client_init: true}, function(cmp) {
+    $C(that.graph_component, {skip_client_init: true}, function(cmp) {
       $C("modal", {title: "overview of " + field + " values"}, function(modal) {
         modal.$el.find(".modal-body")
           .append(cmp.$el)

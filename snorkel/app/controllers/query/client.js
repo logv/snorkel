@@ -823,6 +823,10 @@ module.exports = {
 
   },
 
+  set_grapher: function(component) {
+    console.log("USING", component, "FOR GRAPHING");
+    this.graph_component = component;
+  },
   set_table: function(table) {
     this.table = table;
     SF.trigger('query:table');

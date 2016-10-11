@@ -26,6 +26,10 @@ function calc_cdf(sorted_hist_arr, total, w_total) {
     w_sum_total += (w_count * value);
     sum_total += (count * value);
 
+    if (count === 0) {
+      return;
+    }
+
     var percentile;
     // we are weighting
     if (w_total) {
@@ -76,7 +80,6 @@ function calc_cdf(sorted_hist_arr, total, w_total) {
 var DistView = BaseView.extend({
   baseview: helpers.VIEWS.HIST,
   prepare: function(data) {
-    console.log("PREP:", data);
     var series = [];
     var col = data.parsed.col || data.parsed.cols[0];
 
@@ -224,21 +227,18 @@ var DistView = BaseView.extend({
       }
 
       var options = {
+        height: 500,
         chart: {
-          inverted: true
+        height: 500,
+          inverted: true,
+          type: "line"
         },
         series: [
           {
             data: self.data.percentiles,
-            name: "Query Results",
+            name: "Value",
             color: "rgba(0, 0, 200, 0.5)"
           },
-          {
-            data: (self.compare_data && self.compare_data.percentiles) || [],
-            name: "Comparison",
-            dashStyle: "LongDash",
-            color: "rgba(200, 0, 0, 0.5)"
-          }
         ],
         xAxis: {
           reversed: false,
@@ -252,6 +252,16 @@ var DistView = BaseView.extend({
         }
       };
 
+      if (self.compare_data) {
+        
+        options.series.push({
+          data: (self.compare_data && self.compare_data.percentiles) || [],
+          name: "Comparison",
+          dashStyle: "LongDash",
+          color: "rgba(200, 0, 0, 0.5)"
+        });
+      }
+
       var cumDensityEl = $("<h2 class='cdf_density'>Cumulative Density Graph</h2>");
       outerEl.append(cumDensityEl);
 
@@ -260,7 +270,7 @@ var DistView = BaseView.extend({
 
       outerEl.append(cdfEl);
 
-      $C("highcharter", {skip_client_init: true}, function(cmp) {
+      $C(self.graph_component, {skip_client_init: true}, function(cmp) {
         // get rid of query contents...
 
         cdfEl
@@ -278,21 +288,17 @@ var DistView = BaseView.extend({
       outerEl.append(distEl);
 
       var dist_options = {
+        height: 500,
         chart: {
-          inverted: false
+          inverted: false,
+          type: 'line'
         },
         series: [
           {
             data: self.data.dist,
-            name: "Query Results",
+            name: "Density (in %)",
             color: "rgba(0, 0, 200, 0.5)"
           },
-          {
-            data: (self.compare_data && self.compare_data.dist) || [],
-            name: "Comparison",
-            dashStyle: "LongDash",
-            color: "rgba(200, 0, 0, 0.5)"
-          }
         ],
         xAxis: {
           min: xmin,
@@ -309,7 +315,16 @@ var DistView = BaseView.extend({
         }
       };
 
-      $C("highcharter", {skip_client_init: true}, function(cmp) {
+      if (self.compare_data) {
+          dist_options.series.push({
+            data: (self.compare_data && self.compare_data.dist) || [],
+            name: "Comparison",
+            dashStyle: "LongDash",
+            color: "rgba(200, 0, 0, 0.5)"
+          });
+      }
+
+      $C(self.graph_component, {skip_client_init: true}, function(cmp) {
         // get rid of query contents...
 
         distEl
@@ -361,9 +376,12 @@ var DistView = BaseView.extend({
 
 
       var glance_options = {
+        legend: {
+          enabled: false,
+        },
         chart: {
-          height: 100,
-          type: "spline"
+          height: 300,
+          type: "line"
         },
         xAxis: {
           min: xmin,
@@ -413,27 +431,30 @@ var DistView = BaseView.extend({
         series: [
           {
             data: glance_data,
-            name: "Percentiles",
+            name: "Percentile",
             marker: {
               enabled : true,
               shape: "square"
             },
             color: "rgba(0, 0, 200, 0.5)"
           },
-          {
-            data: glance_compare_data,
-            name: "Percentiles (comparison)",
-            marker: {
-              enabled : true
-            },
-            color: "rgba(200, 0, 0, 0.5)"
-          }
         ],
         yAxis: {
-          enabled: true,
+          enabled: false,
           reversed: false
         }
       };
+
+      if (self.compare_data) {
+        glance_options.series.push({
+          data: glance_compare_data,
+          name: "Percentile (comparison)",
+          marker: {
+            enabled : true
+          },
+          color: "rgba(200, 0, 0, 0.5)"
+        });
+      }
 
       var glanceEl = $("<h2>At a glance</h2>")
 
@@ -454,7 +475,7 @@ var DistView = BaseView.extend({
       }
       glanceEl.append(samplesEl);
 
-      $C("highcharter", {skip_client_init: true}, function(cmp) {
+      $C(self.graph_component, {skip_client_init: true}, function(cmp) {
         // get rid of query contents...
 
         glanceEl
@@ -603,6 +624,7 @@ var DistView = BaseView.extend({
 
     var tabEl = $("<div>");
     outerEl.append(tabEl);
+    outerEl.css("padding-bottom", "100px");
 
     var not_rendered = true;
     $C("tabs", { tabs: tabs, active: "Numbers" } , function(cmp) {

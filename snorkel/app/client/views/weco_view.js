@@ -45,9 +45,6 @@ var WecoView = TimeView.extend({
     my_options.yAxis = {
       min: -50,
       max: 50,
-      labels: {
-        enabled: false
-      },
       plotLines: plot_lines
     };
 

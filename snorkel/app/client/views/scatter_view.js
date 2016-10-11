@@ -40,6 +40,12 @@ var ScatterView = SamplesView.extend({
     var series = [];
     var field_one = this.data.parsed.cols[0];
     var field_two = this.data.parsed.cols[1];
+    var max_x = Number.MIN_SAFE_INTEGER;
+    var max_y = Number.MIN_SAFE_INTEGER;
+    var min_x = Number.MAX_SAFE_INTEGER;
+    var min_y = Number.MAX_SAFE_INTEGER;
+    var self = this;
+
     _.each(this.points, function(point_group, name) {
       var color_str = helpers.get_rgba(name);
       var serie = {
@@ -49,6 +55,10 @@ var ScatterView = SamplesView.extend({
       };
       series.push(serie);
       _.each(point_group, function(result) {
+        min_x = Math.min(result.integer[field_one], min_x);
+        min_y = Math.min(result.integer[field_two], min_y);
+        max_x = Math.max(result.integer[field_one], max_x);
+        max_y = Math.max(result.integer[field_two], max_y);
         serie.data.push({
           x: result.integer[field_one],
           y: result.integer[field_two],
@@ -62,8 +72,11 @@ var ScatterView = SamplesView.extend({
           type: 'scatter',
           zoomType: 'xy',
       },
+      legend: { enabled: true },
       xAxis: {
         type: "linear",
+        min: min_x,
+        max: max_x,
         title: {
           text: presenter.get_field_name(this.table, field_one)
         }
@@ -97,6 +110,8 @@ var ScatterView = SamplesView.extend({
         }
       },
       yAxis: {
+        min: min_y,
+        max: max_y,
         title: {
           text: presenter.get_field_name(this.table, field_two)
         }
@@ -106,7 +121,7 @@ var ScatterView = SamplesView.extend({
     };
 
     var $el = this.$el;
-    $C("highcharter", {skip_client_init: true}, function(cmp) {
+    $C(self.graph_component, {skip_client_init: true}, function(cmp) {
         // There's a little setup cost to highcharts, maybe?
       $el.append(cmp.$el);
       cmp.client(options);

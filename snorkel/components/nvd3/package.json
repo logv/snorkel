@@ -1,0 +1,7 @@
+{
+  "main" : "nvd3",
+  "helpers": [ "vendor/d3.v3", "vendor/nv.d3" ],
+  "style": "nvd3.css",
+  "styles": ["nv.d3"],
+  "template": "nvd3.html.erb"
+}

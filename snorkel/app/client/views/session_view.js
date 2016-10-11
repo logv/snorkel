@@ -14,6 +14,7 @@ var SessionView = BaseView.extend({
   build_overview: function(rows, field, tableEl, headers) {
     var self = this;
     var plotted_vals = [];
+    var grouped_series = {};
 
     // this is for old timeline queries sake
     var parsed = self.query.parsed;
@@ -24,8 +25,15 @@ var SessionView = BaseView.extend({
     _.each(rows, function(result) {
       var count = result.integer.weighted_count || result.integer.count || 1;
       var of_total = Math.max(count / rows.length, 0.15);
-      var color = (result.string && result.string[color_field]) || "";
+      var color = (result.string && result.string[color_field]) || "default";
       var value = result.integer[field];
+
+      if (!grouped_series[color]) {
+        
+        grouped_series[color] = { data: [], key: color, color: helpers.get_rgba(color) }
+      }
+
+
 
       if (formatter) {
         value = parseInt(formatter(value, value), 10);
@@ -34,9 +42,11 @@ var SessionView = BaseView.extend({
       value = value * 1000; // expect the timestamp to be in seconds
 
 
-      plotted_vals.push({
+      grouped_series[color].data.push({
         x: value,
         name: color,
+        key: color,
+        color: helpers.get_rgba(color, of_total),
         result: result,
         y: 2,
         marker: {
@@ -48,7 +58,7 @@ var SessionView = BaseView.extend({
 
     var options = {
       chart: {
-          type: 'scatter',
+          type: 'time_scatter',
           zoomType: 'x',
       },
       xAxis: {
@@ -82,6 +92,7 @@ var SessionView = BaseView.extend({
         }
       },
       yAxis: {
+        enabled: false,
         labels: {
           enabled: false
         }
@@ -118,23 +129,18 @@ var SessionView = BaseView.extend({
           }
         }
       },
-      series: [{
-        data: plotted_vals,
-        marker: {
-          symbol: 'diamond',
-          lineColor:'rgba(0,0,0,0)',
-          lineWidth: 0,
-        }
-      }],
+      series: _.values(grouped_series),
     };
 
     var $el = $("<div />");
-    $C("highcharter", {skip_client_init: true}, function(cmp) {
+    $C(self.graph_component, {skip_client_init: true}, function(cmp) {
       $el.append(cmp.$el);
 
       cmp.$el.height("100px");
       cmp.$el.width("100%");
       cmp.$el.css("display", "inline-block");
+      options.height = "100px";
+      options.width = "100%";
 
       // There's a little setup cost to highcharts, maybe?
       cmp.client(options);
@@ -184,9 +190,7 @@ var SessionView = BaseView.extend({
     var rows = {};
     var samples = {};
     _.each(data.results, function(result) {
-      var group_by = _.map(dims, function(d) {
-        return result.string[d] || result.integer[d];
-      });
+      var group_by = helpers.result_key(dims, result);
 
       var row = [];
       _.each(all_cols, function(field) {

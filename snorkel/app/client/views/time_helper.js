@@ -1,4 +1,44 @@
 var _labels = {};
+function add_missing_values(serie, time_bucket, start, end) {
+  serie = _.sortBy(serie, function(s) { return s.x; } );
+
+  var expected = start;
+  var new_serie = [];
+  var pt;
+  var missing = 0;
+
+  for (var i = 0; i < serie.length; i++) {
+    pt = serie[i];
+    expected += time_bucket * 1000;
+
+    while (expected < pt.x) {
+      missing += 1;
+      new_serie.push({
+        x: expected,
+        y: 0
+      });
+
+      expected += time_bucket * 1000;
+    }
+
+    new_serie.push(pt);
+  }
+
+  // fills in the missing values at the end of the series
+  while (expected < end) {
+    expected += time_bucket * 1000;
+    missing += 1;
+    pt = {
+      x: expected,
+      y: 0
+    };
+
+    new_serie.push(pt);
+  }
+
+  return new_serie;
+}
+
 function time_prepare(data, options) {
   if (!options) {
     options = {};
@@ -93,6 +133,7 @@ function time_prepare(data, options) {
   });
 
   _.each(series, function(serie) {
+    serie.data = add_missing_values(serie.data, data.parsed.time_bucket, data.parsed.start_ms, data.parsed.end_ms);
     serie.data.sort(function(a, b) {
       return a.x - b.x;
     });

@@ -112,8 +112,9 @@ var DrillView = BaseView.extend({
       var el = $("<div />");
       el.css('height', 400);
       var options = {
+        height: "400px",
         chart: {
-          type: 'pie'
+          type: 'bar'
         },
         xAxis: {
           categories: _.map(values, function(f) { return f.name; })
@@ -135,7 +136,7 @@ var DrillView = BaseView.extend({
         }]
       };
 
-      $C("highcharter", {skip_client_init: true}, function(cmp) {
+      $C(self.graph_component, {skip_client_init: true}, function(cmp) {
         el
           .append(cmp.$el)
           .show();

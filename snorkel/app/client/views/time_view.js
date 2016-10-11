@@ -46,6 +46,8 @@ var TimeView = BaseView.extend({
       return "No samples";
     }
 
+    this.data = data;
+
   },
 
   getChartOptions: function() {
@@ -54,7 +56,7 @@ var TimeView = BaseView.extend({
     var options = {
       chart: {
         zoomType: "x",
-        type: this.chart_type || 'line'
+        type: this.chart_type || 'time'
       },
       legend: {enabled: true},
       tooltip: {
@@ -124,11 +126,12 @@ var TimeView = BaseView.extend({
   // are ready
   render: function() {
     // render with this.series
-    var data = this.data.concat(this.compare_data || []);
+    var data = this.data;
 
     var options = this.getChartOptions();
     var $el = this.$el;
     var table = this.table;
+    var self = this;
 
     options.series = data;
 
@@ -167,7 +170,7 @@ var TimeView = BaseView.extend({
     }
 
     function doDrawGraph() {
-      $C("highcharter", {skip_client_init: true}, function(cmp) {
+      $C(self.graph_component, {skip_client_init: true}, function(cmp) {
         // get rid of query contents...
         $el
           .append(cmp.$el)
@@ -191,9 +194,10 @@ var TimeView = BaseView.extend({
           options.yAxis = {};
         }
 
-        console.log(items);
+        if (!options.xAxis.plotLines) {
+          options.xAxis.plotLines = [];
+        }
 
-        options.xAxis.plotLines = [];
         _.each(items, function(item) {
           options.xAxis.plotLines.push({
             color: "rgba(240, 240, 240, 80)",

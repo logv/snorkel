@@ -333,6 +333,12 @@ function load_saved_query(conditions, cb) {
   }));
 }
 
+
+
+var GRAPH_DRIVERS_TO_COMPONENT = {
+  "highcharts" : "highcharter",
+  "nvd3" : "nvd3"
+};
 function get_index() {
 
   if (controller.require_https()) { return; }
@@ -345,6 +351,15 @@ function get_index() {
   context("query_table", table);
   context("title", "snorkel");
 
+  var graph_driver = config.frontend.graph_driver || "nvd3";
+  var graph_component = GRAPH_DRIVERS_TO_COMPONENT[graph_driver]
+  if (!graph_component) {
+    // ruh roh... gotta revert to d3
+    console.log("Can't find graph component for", graph_driver);
+    console.log("Defaulting to", graph_component);
+  }
+
+  bridge.controller("query", "set_grapher", graph_component);
   bridge.controller("query", "set_table", table);
 
   var editEl = $("<a>Settings</a>")

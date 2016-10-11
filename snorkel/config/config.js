@@ -19,6 +19,10 @@ module.exports = {
   max_http_sockets: 1000,
   max_https_sockets: 1000,
   require_https: true,
+  frontend: {
+    // this could be "highcharts", too
+    graph_driver: "nvd3"
+  },
   backend: {
     driver: "mongo"
   },

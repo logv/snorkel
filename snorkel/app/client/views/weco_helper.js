@@ -111,6 +111,10 @@ function check_weco(serie, options, serie_name) {
 
   for (var i = 0; i < serie.length; i++) {
     var pt = serie[i];
+    if (pt.x >= end_cutoff) {
+      break;
+    }
+
     while (expected < pt.x) {
       expected += time_bucket * 1000;
 

@@ -111,6 +111,7 @@ var MultiDistView = DistView.extend({
       });
 
       var glance_options = {
+        height: 300,
         chart: {
           height: 100,
           type: "spline"
@@ -154,7 +155,7 @@ var MultiDistView = DistView.extend({
 
       var glanceEl = $("<h2>At a glance</h2>");
 
-      $C("highcharter", {skip_client_init: true}, function(cmp) {
+      $C(self.graph_component, {skip_client_init: true}, function(cmp) {
         // get rid of query contents...
 
         glanceEl
@@ -185,8 +186,6 @@ var MultiDistView = DistView.extend({
       var cumDensityEl = $("<h2 class='cdf_density'>Cumulative Density Graphs</h2>");
       var cdfEl = $("<div class='span12'/>");
       var distEl = $("<div class='span12'/>");
-      cdfEl.css("height", "500px");
-      distEl.css("height", "500px");
 
       el.append(cumDensityEl);
       el.append(cdfEl);
@@ -195,6 +194,7 @@ var MultiDistView = DistView.extend({
       el.append(distEl);
 
       var options = {
+        height: 500,
         chart: {
           inverted: true
         },
@@ -216,7 +216,7 @@ var MultiDistView = DistView.extend({
 
       };
 
-      $C("highcharter", {skip_client_init: true}, function(cmp) {
+      $C(self.graph_component, {skip_client_init: true}, function(cmp) {
         cdfEl.append(cmp.$el);
         cmp.client(options); // since we skipped client init
       });
@@ -231,6 +231,7 @@ var MultiDistView = DistView.extend({
       });
 
       var dist_options = {
+        height: 500,
         chart: {
           inverted: false
         },
@@ -254,7 +255,7 @@ var MultiDistView = DistView.extend({
         }
       };
 
-      $C("highcharter", {skip_client_init: true}, function(cmp) {
+      $C(self.graph_component, {skip_client_init: true}, function(cmp) {
         // get rid of query contents...
 
         distEl

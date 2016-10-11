@@ -103,6 +103,7 @@ var OverView = BaseView.extend({
   render: function() {
     var div = $("<div />");
     var num = this.data.rows.length;
+    var self = this;
 
     div.append($("<div>").html("The below is a quick summary of <strong>" + num + "</strong> samples pulled from the backend. "));
 
@@ -162,6 +163,9 @@ var OverView = BaseView.extend({
       });
 
       var options = {
+        legend: {
+          enabled: false,
+        },
         chart: {
             type: 'scatter',
             zoomType: 'xy',
@@ -198,7 +202,7 @@ var OverView = BaseView.extend({
       };
 
       var el = $("<div class='' style='height: 100px'/>");
-      $C("highcharter", {skip_client_init: true}, function(cmp) {
+      $C(self.graph_component, {skip_client_init: true}, function(cmp) {
         cmp.$el.css("display", "inline-block");
         cmp.$el.css("width", "90%");
 
@@ -221,8 +225,11 @@ var OverView = BaseView.extend({
       });
 
       var options = {
+        legend: {
+          enabled: false,
+        },
         chart: {
-          type: 'pie',
+          type: 'bar',
           plotBackgroundColor: null,
           plotBorderWidth: null,
           plotShadow: false,
@@ -256,10 +263,10 @@ var OverView = BaseView.extend({
 
       var values = [];
       _.each(_.first(sorted_vals, shown_vals), function(val) {
-        values.push([format(col, val),(counted_vals[val] / total * 100)]);
+        values.push({ x: format(col, val), y: (counted_vals[val] / total * 100)});
       });
 
-      $C("highcharter", {skip_client_init: true}, function(cmp) {
+      $C(self.graph_component, {skip_client_init: true}, function(cmp) {
         // get rid of query contents...
         top_vals_el
           .append(cmp.$el)

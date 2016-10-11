@@ -10,6 +10,8 @@ var BaseView = window.Backbone.View.extend({
   },
   handle_data: function(data) {
     this.table = data.parsed.table;
+    this.graph_component = SF.controller().graph_component;
+
 
     if (!_.isObject(data.parsed.custom)) {
       try {

@@ -98,6 +98,10 @@ var BarView = BaseView.extend({
     var datas = [];
     var compare_datas = [];
     _.each(cols, function(col) {
+      if (!serieses[col]) {
+        return;
+      }
+
       datas.push(serieses[col]);
       compare_datas.push(compare_series[col]);
     });
@@ -112,9 +116,11 @@ var BarView = BaseView.extend({
   render: function() {
     console.log("RENDERING BAR VIEW", this);
     var serieses = this.serieses;
-    if (this.compare_serieses) {
+    if (this.compare_serieses && this.compare_serieses.length) {
       serieses = serieses.concat(this.compare_serieses);
     }
+
+    var serieses = _.filter(serieses, function(s) { return s; });
 
     var options = {
       chart: {
@@ -210,7 +216,7 @@ var BarView = BaseView.extend({
     }
 
     var $el = this.$el;
-    $C("highcharter", {skip_client_init: true}, function(cmp) {
+    $C(this.graph_component, {skip_client_init: true}, function(cmp) {
       // get rid of query contents...
       $el
         .append(cmp.$el)
@@ -227,7 +233,6 @@ var excludes = _.clone(helpers.STD_EXCLUDES);
 SF.trigger("view:add", "bar", {
   include: helpers.STD_INPUTS
     .concat(helpers.inputs.COMPARE)
-    .concat(helpers.inputs.STACKING)
     .concat(helpers.inputs.SORT_BY),
   icon: "noun/table.svg"
 }, BarView);

@@ -49,6 +49,18 @@ module.exports = {
     // deep merge.
     $.extend(true, chart_options, options);
 
+    // translate certain chart types!
+    var CHART_TRANSLATION = {
+      'bar' : 'column',
+      'time' : 'line',
+      'time_scatter' : 'scatter'
+    };
+
+    var tr_type = CHART_TRANSLATION[chart_options.chart.type];
+    if (tr_type) {
+      chart_options.chart.type = tr_type;
+    }
+
     Highcharts.setOptions({global: { useUTC: false }});
     var chart = new Highcharts.Chart(chart_options);
   }
