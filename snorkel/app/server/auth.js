@@ -12,16 +12,23 @@ var parseCookie = require("express").cookieParser(session.secret());
 
 var USERS = {};
 
-try {
-  var users = readfile(config.authorized_users);
-  _.each(users.split("\n"), function(user_line) {
-    var user_data = user_line.split(":");
-    var passhash = user_data.pop();
-    var username = user_data.pop();
-    USERS[username] = passhash;
-  });
+function read_users() {
+  try {
+    var users_obj = {}
+    var users = readfile(config.authorized_users);
+    _.each(users.split("\n"), function(user_line) {
+      var user_data = user_line.split(":");
+      var passhash = user_data.pop();
+      var username = user_data.pop();
+      users_obj[username] = passhash;
+    });
 
-} catch (e) {};
+    USERS = users_obj;
+
+  } catch (e) {};
+}
+
+read_users();
 
 if (!Object.keys(USERS).length) {
   console.log("AUTH: default login is 'test' / 'me'");
@@ -119,6 +126,8 @@ module.exports = {
 
     passport.use(new LocalStrategy(
       function(username, password, done) {
+        read_users();
+
         // creates a user, with an incrementing ID from RAM
         var passhash = USERS[username] || "lkj";
         if (htpasswd.validate && htpasswd.validate(passhash, password)) {
