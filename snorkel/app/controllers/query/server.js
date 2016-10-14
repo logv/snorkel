@@ -1064,27 +1064,39 @@ module.exports = {
     var time_helper = require_app("client/views/time_helper");
     var weco_helper = require_app("client/views/weco_helper");
 
-    get_query(function(data) {
-      if (data) {
-        var res = context("res");
-        var query = data.query;
-        var ret = time_helper.prepare(query);
+    function get_weco() {
+      console.log("GENERATING WECO");
+      get_query(function(data) {
+        if (data) {
+          var res = context("res");
+          var query = data.query;
+          var ret = time_helper.prepare(query);
 
-        var options = {
-          time_bucket: query.parsed.time_bucket,
-          start: query.parsed.start_ms,
-          end: query.parsed.end_ms
-        };
+          var options = {
+            time_bucket: query.parsed.time_bucket,
+            start: query.parsed.start_ms,
+            end: query.parsed.end_ms
+          };
 
-        var normalized_data = weco_helper.normalize_series(ret, options);
-        var violations = weco_helper.find_violations(normalized_data, options);
-        res.write(JSON.stringify({
-          violations: violations,
-          query: query
-        }));
-        res.end();
-      }
-    }, true /* no saved queries allowed */);
+          var normalized_data = weco_helper.normalize_series(ret, options);
+          var violations = weco_helper.find_violations(normalized_data, options);
+          res.write(JSON.stringify({
+            violations: violations,
+            query: query
+          }));
+          res.end();
+        }
+      }, true /* no saved queries allowed */);
+
+    }
+
+    if (!config.no_api_auth) {
+      auth.require_user(get_weco)();
+    } else {
+      get_weco();
+
+    }
+
 
   },
   bounce: post_bounce,
