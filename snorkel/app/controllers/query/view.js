@@ -96,7 +96,7 @@ function get_view_selector_row() {
       "multidist" : "Grouped Dist.",
       "graph" : "DiGraph",
       " " : "--",
-      "drill" : "Drilldown",
+      "drill" : "Impact Attr.",
       "holtwinters" : "Forecasting",
       "weco" :        "WECO Alerts",
     },

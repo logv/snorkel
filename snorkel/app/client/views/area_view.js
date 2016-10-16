@@ -8,11 +8,30 @@ var AreaView = TimeView.extend({
     this.chart_type = 'area';
   },
 
+  finalize: function() {
+    var total = {};
+    _.each(this.data, function(series) {
+      _.each(series.data, function(pt) {
+        var tpt = total[pt.x] || { y: 0, x: pt.x, samples: 0};
+        tpt.y += pt.y;
+        tpt.samples += pt.samples || 0;
+        total[pt.x] = tpt;
+      });
+    });
+
+    var sorted_vals = _.sortBy(_.values(total), function(pt) {
+      return pt.x;
+    });
+
+    this.data.push({ data: sorted_vals, name: "Total", color: "#333"});
+    TimeView.prototype.finalize.call(this, arguments)
+  },
+
   getChartOptions: function() {
     var options = TimeView.prototype.getChartOptions.apply(this);
     var my_options = {
       chart: {
-        type: 'area'
+        type: 'time'
       },
       plotOptions: {
         area: {
