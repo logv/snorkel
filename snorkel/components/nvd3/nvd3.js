@@ -1,4 +1,3 @@
-
 function drawYLine(chart, svg, line) {
   var yScale = chart.yAxis.scale();
   var yValue = line.value;
@@ -202,6 +201,12 @@ module.exports = {
 
         chart.interactiveLayer.tooltip.valueFormatter(formatWithSampleCount)
 
+
+        var tsFormat = d3.time.format('%b %-d, %Y %I:%M%p');
+        chart.interactiveLayer.tooltip.headerFormatter(function (d) { return tsFormat(new Date(d)); });
+
+
+
         chart.xAxis
           .showMaxMin(false)
           // .rotateLabels(-45) // Want longer labels? Try rotating them to fit easier.
@@ -233,8 +238,12 @@ module.exports = {
           });
         });
 
+        var tsFormat = d3.time.format('%b %-d, %Y %I:%M%p');
         chart.tooltip.contentGenerator(function (obj) {
+          var header = $("<div />").append(tsFormat(new Date(obj.value)));
+
           var htmlEl = $("<div />");
+          htmlEl.append(header);
           // TODO: fix to print the proper timestamp
           htmlEl.append("<b>" + obj.point.name + "</b>");
           return htmlEl.html();
