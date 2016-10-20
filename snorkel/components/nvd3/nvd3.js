@@ -263,7 +263,8 @@ module.exports = {
         var chart = nv.models.scatterChart()
           .interactiveUpdateDelay(100)
           .duration(100)
-          chart.pointShape("diamond")
+
+        chart.pointShape("diamond")
           .pointRange([45, 50]);
 
         chart.scatter.dispatch.on("elementClick", function(e) {
@@ -301,6 +302,11 @@ module.exports = {
       var chart = chartCB();
       chart.duration(0);
 
+      var MAX_LEGEND_ITEMS = 20;
+      if (highcharts_options.series.length > MAX_LEGEND_ITEMS) {
+        legend = false;
+      }
+
       chart
         .showLegend(legend)       //Show the legend, allowing users to turn on/off line series.
         .x(function(d) {
@@ -332,10 +338,15 @@ module.exports = {
 
       if (highcharts_options.xAxis && highcharts_options.xAxis.min) {
         chart.forceX([highcharts_options.xAxis.min, highcharts_options.xAxis.max]);
+        chart.xDomain([highcharts_options.xAxis.min, highcharts_options.xAxis.max])
       }
       if (highcharts_options.yAxis && highcharts_options.yAxis.min) {
         chart.forceY([highcharts_options.yAxis.min, highcharts_options.yAxis.max]);
+        chart.yDomain([highcharts_options.yAxis.min, highcharts_options.yAxis.max])
       }
+
+
+
 
       // here chart is your nvd3 model
 

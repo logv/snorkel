@@ -67,6 +67,36 @@ var ScatterView = SamplesView.extend({
       });
     });
 
+
+    // checking for reversed axes in scatter plot
+    var custom_params = this.query.parsed.custom || {};
+    var reverse_axis = custom_params.reverse_axis;
+
+    var tmp;
+    switch (reverse_axis) {
+      case 'reverse_b':
+        tmp = min_x;
+        min_x = max_x;
+        max_x = tmp;
+        tmp = min_y;
+        min_y = max_y;
+        max_y = tmp;
+        break;
+      case 'reverse_x':
+        tmp = min_x;
+        min_x = max_x;
+        max_x = tmp;
+        break;
+      case 'reverse_y':
+        tmp = min_y;
+        min_y = max_y;
+        max_y = tmp;
+        break;
+      default:
+        break
+    }
+    // end reversed axes
+
     var options = {
       chart: {
           type: 'scatter',
@@ -132,8 +162,39 @@ var ScatterView = SamplesView.extend({
   icon: "noun/pin.svg"
 });
 
+function build_custom_controls() {
+  var custom_controls = $("<div class='clearfix'/>");
+
+  var custom_params = SF.controller().get_custom_params();
+
+  $C("selector", {
+    name: "reverse_axis",
+    options: {
+      "none" : "Normal",
+      "reverse_y" : "Reverse Y Axis",
+      "reverse_x" : "Reverse X Axis",
+      "reverse_b" : "Reverse Both Axes"
+    },
+    selected: custom_params.reverse_axis,
+  }, function(selector) {
+    $C("query_control_row", {
+      label: "Reverse Axis?",
+      component: selector.toString()
+    }, function(cmp) {
+      custom_controls.append("<div />");
+      custom_controls.append(cmp.$el);
+
+    });
+  });
+
+
+  return custom_controls;
+
+}
+
 var excludes = helpers.inputs.MULTI_AGG;
 SF.trigger("view:add", "scatter",  {
+  custom_controls: build_custom_controls,
   include: _.difference(
     helpers.STD_INPUTS
       .concat(helpers.inputs.GROUP_BY)
