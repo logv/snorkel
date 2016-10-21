@@ -40,6 +40,7 @@ var ScatterView = SamplesView.extend({
     var series = [];
     var field_one = this.data.parsed.cols[0];
     var field_two = this.data.parsed.cols[1];
+
     var max_x = Number.MIN_SAFE_INTEGER;
     var max_y = Number.MIN_SAFE_INTEGER;
     var min_x = Number.MAX_SAFE_INTEGER;
@@ -55,10 +56,15 @@ var ScatterView = SamplesView.extend({
       };
       series.push(serie);
       _.each(point_group, function(result) {
-        min_x = Math.min(result.integer[field_one], min_x);
-        min_y = Math.min(result.integer[field_two], min_y);
-        max_x = Math.max(result.integer[field_one], max_x);
-        max_y = Math.max(result.integer[field_two], max_y);
+        if (_.isFinite(result.integer[field_one])) {
+          min_x = Math.min(result.integer[field_one], min_x);
+          max_x = Math.max(result.integer[field_one], max_x);
+        }
+        if (_.isFinite(result.integer[field_two])) {
+          min_y = Math.min(result.integer[field_two], min_y);
+          max_y = Math.max(result.integer[field_two], max_y);
+        }
+
         serie.data.push({
           x: result.integer[field_one],
           y: result.integer[field_two],
