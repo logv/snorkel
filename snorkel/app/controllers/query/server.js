@@ -116,6 +116,14 @@ function marshall_query(form_data) {
   var end_str_ms = value_of(form_data, 'end', 'now');
   var now = Date.now();
 
+  var custom_start_str_ms = value_of(form_data, 'custom_start', '');
+  var custom_end_str_ms = value_of(form_data, 'custom_end', '');
+
+  if (custom_end_str_ms !== "" && custom_start_str_ms !== "") {
+    start_str_ms = custom_start_str_ms;
+    end_str_ms = custom_end_str_ms;
+  }
+
   // For single dim group bys
   query_data.dim_one = custom_data.dim_one;
   query_data.dim_two = custom_data.dim_two;

@@ -3,7 +3,7 @@
 <%= set_default("show_timestamp", true) %>
 
 <% if (show_timestamp) { %>
-  <div class="alert alert-info clearfix"> 
+  <div class="alert alert-info clearfix">
     <div class='btn btn-primary refresh pull-left'>update results</div>
     <div class='btn btn history pull-left mll'>see past results</div>
 
@@ -14,6 +14,37 @@
 
   </div>
 <% } %>
+
+<div class='clearfix mtl'>
+  <small class='rfloat'>
+    <span class='query_range_label mtl'>start:</span>
+    <span class=''>
+      <b>
+        <% var d = new Date(query.parsed.start_ms) %>
+        <span style='width: 80px; display: inline-block'>
+          <%= d.toLocaleDateString() %>
+        </span>
+        <span style='width: 80px; text-align: right; margin-right: 10px'>
+          <%= d.toLocaleTimeString('en-US', { hour12: false }) %>
+        </span>
+      </b>
+    </span><br />
+
+    <span class='query_range_label'>end:</span>
+    <span class=''>
+      <% var d = new Date(query.parsed.end_ms) %>
+      <b>
+        <span style='width: 80px; display: inline-block'>
+          <%= d.toLocaleDateString() %>
+        </span>
+        <span style='width: 80px; text-align: right; margin-right: 10px'>
+          <%= d.toLocaleTimeString('en-US', { hour12: false }) %>
+        </span>
+      </b>
+    </span>
+  </small>
+</div>
+
 
 <h3> <%= title %> </h3>
 <p> <%= description %> </p>

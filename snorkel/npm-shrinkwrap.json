@@ -288,9 +288,9 @@
       "resolved": "https://registry.npmjs.org/connect-mongo/-/connect-mongo-0.3.2.tgz"
     },
     "longjohn": {
-      "version": "0.2.0",
-      "from": "https://registry.npmjs.org/longjohn/-/longjohn-0.2.0.tgz",
-      "resolved": "https://registry.npmjs.org/longjohn/-/longjohn-0.2.0.tgz"
+      "version": "0.2.11",
+      "from": "https://registry.npmjs.org/longjohn/-/longjohn-0.2.11.tgz",
+      "resolved": "https://registry.npmjs.org/longjohn/-/longjohn-0.2.11.tgz"
     },
     "Faker": {
       "version": "0.5.7",

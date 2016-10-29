@@ -22,6 +22,12 @@ var HELP_STRINGS = {
   "start" : {
     content: "all samples newer than the start time will be aggregated"
   },
+  "custom_start" : {
+    content: "Accepts format like: DD/MM/YYYY HH:MM, April 25th or -10 weeks"
+  },
+  "custom_end" : {
+    content: "Accepts format like: DD/MM/YYYY HH:MM, April 25th or -10 weeks"
+  },
   "end" : {
     content: "all samples that are from before the end time will be aggregated"
   },
@@ -203,9 +209,25 @@ function get_time_inputs() {
 
   control_box.append($("<div id='time_inputs' style='position: relative; top: -40px'>"));
   control_box.append($("<hr />"));
+
+  var custom_start = $C("textinput", { name: "custom_start" });
+  var custom_end = $C("textinput", { name: "custom_end" });
+  var custom_start_box = add_control("custom_start", "Start", custom_start.toString());
+  var custom_end_box = add_control("custom_end", "End", custom_end.toString());
+
+  $(custom_end_box).find(".control-group").addClass("hidden");
+  $(custom_start_box).find(".control-group").addClass("hidden");
+
+  var time_toggler = $("<div class='clearfix' style='margin-right: 45px;'/>").append("<small class='rfloat'><a href='#' class='custom_time_inputs'>loading...</a></small>");
+
   control_box.append($(start_row));
+  control_box.append(custom_start_box);
   control_box.append($(end_row));
+  control_box.append(custom_end_box);
+
+  control_box.append(time_toggler);
   control_box.append($(compare_row));
+
 
   return control_box;
 }

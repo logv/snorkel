@@ -166,7 +166,7 @@ module.exports = {
 
         if (sid) {
           store.get(sid, function(err, session) {
-            if (err) {
+            if (err || !session) {
               return cb(err, false);
             }
 

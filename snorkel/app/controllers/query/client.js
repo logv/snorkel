@@ -164,6 +164,8 @@ function handle_query_results(data) {
     ResultsStore.add_results_data(data);
   }
 
+  views.show_query_details(data.clientid, data);
+
 }
 
 function handle_compare_results(data) {
@@ -483,7 +485,8 @@ module.exports = {
     "click .pane_toggle" : "handle_pane_toggle_clicked",
     "click .logout" : "handle_logout",
     "click .compare_filter" : "handle_compare_toggle",
-    "click .show_user_dialog" : "handle_user_history"
+    "click .show_user_dialog" : "handle_user_history",
+    "click .custom_time_inputs" : "handle_custom_time_inputs"
   },
 
   delegates: {
@@ -586,7 +589,6 @@ module.exports = {
       handle_compare_results(obj.results.compare);
       that.set_dom_from_input(obj.input);
 
-      views.show_query_details(obj.clientid, obj, true /* show client timestamp */);
     });
 
     // Gotta wait for certain components...
@@ -636,6 +638,17 @@ module.exports = {
         $(this).trigger("chosen:updated");
       }
     });
+
+    // we toggle the custom time inputs depending on whether they have data in
+    // them or not.
+    var custom_start = views.get_control("custom_start");
+    var custom_end = views.get_control("custom_start");
+    // both time inputs need to be filled out. right?
+    if (custom_start || custom_end) {
+      this.show_custom_time_inputs();
+    } else {
+      this.hide_custom_time_inputs();
+    }
 
     // deserialization for multiselects. grr.
     var multiselects = this.$page.find("#query_sidebar form select[multiple]");
@@ -863,6 +876,60 @@ module.exports = {
 
   update_view: function(view) {
     views.update_controls(view);
+  },
+
+  show_custom_time_inputs: function() {
+    var startControl = views.get_control_row("start");
+    var endControl = views.get_control_row("end");
+
+    var customStartRow = views.get_control_row("custom_start");
+    var customEndRow = views.get_control_row("custom_end");
+
+    startControl.slideUp();
+    endControl.slideUp();
+
+    customStartRow.slideDown();
+    customEndRow.slideDown();
+
+    startControl.addClass('hidden');
+    endControl.addClass('hidden');
+    customStartRow.removeClass("hidden");
+    customEndRow.removeClass("hidden");
+
+    this.$el.find(".custom_time_inputs").text("quick select time");
+
+
+
+  },
+  hide_custom_time_inputs: function() {
+    var startControl = views.get_control_row("start");
+    var endControl = views.get_control_row("end");
+
+    var customStartRow = views.get_control_row("custom_start");
+    var customEndRow = views.get_control_row("custom_end");
+
+    views.set_control("custom_start", "");
+    views.set_control("custom_end", "");
+
+    customStartRow.slideUp();
+    customEndRow.slideUp();
+    startControl.slideDown();
+    endControl.slideDown();
+
+    customStartRow.addClass("hidden");
+    customEndRow.addClass("hidden");
+    startControl.removeClass('hidden');
+    endControl.removeClass('hidden');
+
+    this.$el.find(".custom_time_inputs").text("use custom time");
+  },
+
+  handle_custom_time_inputs: function() {
+    if (views.get_control_row("start").is(":visible")) {
+      this.show_custom_time_inputs();
+    } else if (views.get_control_row("custom_start").is(":visible")) {
+      this.hide_custom_time_inputs();
+    }
   },
 
   handle_pane_toggle_clicked: _.debounce(function(e) {

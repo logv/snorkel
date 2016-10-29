@@ -154,6 +154,18 @@ function handle_update_view(view) {
         $(this).html("Add comparison filter");
       });
     }
+
+    // we toggle the custom time inputs depending on whether they have data in
+    // them or not.
+    var custom_start = get_control_value("custom_start");
+    var custom_end = get_control_value("custom_end");
+    // both time inputs need to be filled out. right?
+    if (custom_start && custom_end) {
+      SF.controller().show_custom_time_inputs();
+    } else {
+      SF.controller().hide_custom_time_inputs();
+    }
+
   }
 }
 
@@ -304,6 +316,7 @@ module.exports = {
   QUERIES: QUERIES,
   set_control: update_control,
   get_control: get_control_value,
+  get_control_row: get_control_row,
   set_default_container: function(container) {
     _container = container;
   },

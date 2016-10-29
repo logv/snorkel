@@ -7,11 +7,13 @@ module.exports = {
 
   hide: function() {
     this._showing = false;
-    this.$el.find('.helpover').popover('hide');
+    this.$el.find('.helpover').popover('destroy');
+    this.$el.find('.popover').remove();
   },
 
   show: function() {
     this._showing = true;
+    this.$el.find('.helpover').popover(this.opts || {});
     this.$el.find('.helpover').popover('show');
   },
 
