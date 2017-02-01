@@ -131,7 +131,7 @@ module.exports = {
         // creates a user, with an incrementing ID from RAM
         var passhash = USERS[username] || "lkj";
         if (htpasswd.validate && htpasswd.validate(passhash, password)) {
-          done(null, new_user(username)); 
+          done(null, new_user(username));
         } else if (_.isFunction(htpasswd) && htpasswd(passhash, password)) {
           done(null, new_user(username));
         } else {
@@ -159,10 +159,19 @@ module.exports = {
     io.authorize(function(req, cb) {
       var that = this;
       var cookie = req.headers.cookie;
+
+      // sub in a default session for logged out user sockets
+      // TODO: properly error handle every case with the SID
+      // and make sure the __user is set in all possible cases
+      req.headers.session = {
+        __user: {
+          username: "__awkward__"
+        }
+      };
+
       parseCookie(req, null, function() {
         var sid = req.signedCookies['connect.sid'];
         var store = session.store();
-
 
         if (sid) {
           store.get(sid, function(err, session) {
