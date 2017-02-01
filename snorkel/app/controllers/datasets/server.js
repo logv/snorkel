@@ -84,8 +84,10 @@ function render_datasets() {
         var table_name = metadata_.name.table_name || metadata_.name;
         var dataset_tokens = table_name.split(backend.SEPARATOR);
         var display_name = metadata_.display_name || dataset_tokens.join("/");
-        while (display_name.indexOf(backend.SEPARATOR) >= 0) {
-          display_name = display_name.replace(backend.SEPARATOR, "/");
+        if (backend.SEPARATOR != "/") {
+          while (display_name.indexOf(backend.SEPARATOR) >= 0) {
+            display_name = display_name.replace(backend.SEPARATOR, "/");
+          }
         }
 
         found_data[table_name] = metadata_;
