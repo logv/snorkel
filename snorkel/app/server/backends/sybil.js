@@ -17,7 +17,6 @@ function path_exists(path) {
   var fs = require('fs');
   try {
       fs.statSync(path);
-      console.log("Using local sybil path,", path);
       return true;
   }
   catch (e) {
@@ -27,9 +26,15 @@ function path_exists(path) {
 if (!path_exists(BIN_PATH.trim())) {
   console.log("Using global sybil path");
   BIN_PATH = "sybil ";
+} else{
+  console.log("Using local sybil path,", path);
 }
 
-var DB_DIR = "./"
+var DB_DIR = config.data_dir || config.backend.db_dir || cwd;
+if (!path_exists(DB_DIR.trim())) {
+  console.log("Can't find DB dir:", DB_DIR);
+}
+
 // TODO:
 // implement weighting columns
 // implement sort by

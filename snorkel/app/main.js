@@ -18,9 +18,14 @@ module.exports = {
   insteadof_store: function() {
     var connect  = main.connect;
     var session_store_module = config.session_store || "connect-sqlite3";
-    var SessionStore = require(session_store_module)(connect);
+    var session_dir = config.data_dir || "./";
 
-    var store = new SessionStore();
+    var SessionStore = require(session_store_module)(connect);
+    var options = {
+      dir: session_dir
+    };
+
+    var store = new SessionStore(options);
     require_core("server/store").set(store);
   },
   setup_context: function(ctx) {

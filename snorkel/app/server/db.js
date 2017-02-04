@@ -152,9 +152,7 @@ function collection_builder(db_name, before_create) {
   };
 }
 
-var LinvoDB = require("linvodb3");
-LinvoDB.dbPath = "./ldb";
-// // options.store = { db: require("level-js") }; // Options passed to LevelUP constructor 
+// // options.store = { db: require("level-js") }; // Options passed to LevelUP constructor
 
 
 var SF_db;
@@ -175,6 +173,17 @@ module.exports = {
 
       };
     } else {
+      var LinvoDB = require("linvodb3");
+      var fs = require("fs");
+      var ldb_dir = config.data_dir || ".";
+      LinvoDB.dbPath = ldb_dir + "/ldb";
+
+      try {
+        fs.mkdirSync(LinvoDB.dbPath);
+      } catch(e) {
+
+      }
+
       var _collections = {};
       module.exports.toArray = function(cur, cb) {
         cb = context.wrap(cb);
@@ -203,7 +212,7 @@ module.exports = {
 
         var ret = _collections[db_name];
         ret.toArray = function(ncb) {
-          ncb(ret); 
+          ncb(ret);
         };
         if (cb) { cb(ret); }
         return ret;
