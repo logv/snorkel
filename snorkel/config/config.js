@@ -30,7 +30,7 @@ module.exports = {
   // If the data_dir is set, we try to write all our data into this directory.
   // This includes: session store, query results and sybil data
   // The main purpose of this is for SNAP support
-  data_dir: process.env.SNAP_DATA || ".",
+  data_dir: ".",
   // which local DB do we store our data in? can be tingodb, mongodb or linvodb.
   // if using mongodb driver, may as well use mongodb backend.
   // otherwise, go with linvodb
