@@ -5,6 +5,7 @@ module.exports = {
   behind_proxy: false,
   config_driver: "linvo",
   data_dir: data_dir,
+  config_dir: data_dir,
   authorized_users: data_dir + "/config/users.htpasswd",
   http_port: process.env.PORT || 3000,
   frontend: {
