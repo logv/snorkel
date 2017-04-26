@@ -230,7 +230,7 @@ module.exports = {
 
     function render_table_header(int_col) {
       var header = $("<tr>");
-      var headers = [ "name", "display name", "description", "hidden", "formatter" ];
+      var headers = [ "name", "display name", "description", "hidden"];
       if (int_col) {
         headers.push("groupable");
       }

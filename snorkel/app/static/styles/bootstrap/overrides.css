@@ -78,17 +78,11 @@ button.close {
   }
 }
 
-.editable-container.editable-inline {
-  width: 100%;
-}
-
-.editable-container.editable-inline .editable-input {
-  width: 100%;
-}
 .editable-container.editable-inline .editable-buttons {
-  display: block;
+  display: inline-block;
+  zoom: 0.5;
   margin-top: 10px;
-  margin-left: 0px;
+  margin-left: 5px;
 }
 
 

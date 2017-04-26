@@ -1,3 +1,13 @@
-.column_metadata_row .editable-click {
+&.column_metadata_row {
+  min-height: 40px;
+  height: 40px;
+}
+
+&.column_metadata_row .editable-click {
   cursor: pointer;
 }
+
+td {
+  min-width: 100px;
+}
+

@@ -42,7 +42,8 @@ module.exports = {
           {value: 'true', text: 'true'},
           {value: 'false', text: 'false'}
         ],
-        mode: 'popup',
+        showbuttons: false,
+        mode: 'inline',
         type: 'select'
       });
     });
@@ -53,7 +54,7 @@ module.exports = {
           {value: 'true', text: 'true'},
           {value: 'false', text: 'false'}
         ],
-        mode: 'popup',
+        mode: 'inline',
         type: 'select'
       });
     });
@@ -64,15 +65,34 @@ module.exports = {
           {value: 'true', text: 'true'},
           {value: 'false', text: 'false'}
         ],
-        mode: 'popup',
+        showbuttons: false,
+        mode: 'inline',
         type: 'select'
       });
     });
 
     $C("xeditable", {}, function() {
-      that.$el.find("td .editable[data-name='formatter']").editable({
-        mode: 'popup',
-        type: 'textarea'
+      that.$el.find("td .editable[data-name='str_formatter']").editable({
+        source: [
+          {value: 'link', text: 'link'},
+        ],
+        showbuttons: false,
+        mode: 'inline',
+        type: 'select'
+      });
+    });
+
+    $C("xeditable", {}, function() {
+      that.$el.find("td .editable[data-name='num_formatter']").editable({
+        source: [
+          {value: 'number', text: 'number'},
+          {value: 'bytes', text: 'bytes'},
+          {value: 'seconds', text: 'seconds'},
+          {value: 'milliseconds', text: 'milliseconds'},
+        ],
+        showbuttons: false,
+        mode: 'inline',
+        type: 'select'
       });
     });
 
