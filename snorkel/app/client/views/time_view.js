@@ -12,12 +12,15 @@ var TimeView = BaseView.extend({
     var dataset = this.table;
     var is_compare = this.compare_query === data;
     this.max_x = data.parsed.end_ms;
+    var fill_missing = this.fill_missing;
+    var custom_params = data.parsed.custom || {};
 
     var series = time_helper.prepare(data, {
       dataset: dataset,
       is_compare: is_compare,
       helpers: helpers,
-      presenter: presenter
+      presenter: presenter,
+      fill_missing: custom_params.fill_missing || fill_missing
     });
 
     // map the series into an array instead of a dictionary
@@ -226,7 +229,36 @@ var TimeView = BaseView.extend({
   icon: "noun/line.svg"
 });
 
+function build_custom_controls() {
+  var custom_controls = $("<div class='clearfix'/>");
+
+  var custom_params = SF.controller().get_custom_params();
+
+  $C("selector", {
+    name: "fill_missing",
+    options: {
+      "" : "Ignore",
+      "zero" : "Treat as Zero"
+    },
+    selected: custom_params.fill_missing,
+  }, function(selector) {
+    $C("query_control_row", {
+      label: "Missing Data",
+      component: selector.toString()
+    }, function(cmp) {
+      custom_controls.append("<div />");
+      custom_controls.append(cmp.$el);
+
+    });
+  });
+
+  return custom_controls;
+}
+
+TimeView.prototype.build_custom_controls = build_custom_controls;
+
 SF.trigger("view:add", "time",  {
+    custom_controls: build_custom_controls,
     include: helpers.STD_INPUTS
       .concat(helpers.inputs.TIME_BUCKET)
       .concat(helpers.inputs.TIME_FIELD)

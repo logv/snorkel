@@ -1078,7 +1078,9 @@ module.exports = {
         if (data) {
           var res = context("res");
           var query = data.query;
-          var ret = time_helper.prepare(query);
+          var ret = time_helper.prepare(query, {
+            fill_missing: true
+          });
 
           var options = {
             time_bucket: query.parsed.time_bucket,

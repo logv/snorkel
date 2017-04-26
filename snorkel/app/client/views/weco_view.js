@@ -8,6 +8,7 @@ var weco = require("app/client/views/weco_helper");
 var WecoView = TimeView.extend({
   prepare: function(data) {
     var self = this;
+    self.fill_missing = true;
     this.time_bucket = data.parsed.time_bucket;
     var ret = TimeView.prototype.prepare(data);
 
@@ -95,6 +96,7 @@ var WecoView = TimeView.extend({
 
 
 SF.trigger("view:add", "weco",  {
+  custom_controls: TimeView.prototype.build_custom_controls,
   include: helpers.STD_INPUTS
     .concat(helpers.inputs.TIME_BUCKET)
     .concat(helpers.inputs.TIME_FIELD),

@@ -132,8 +132,12 @@ function time_prepare(data, options) {
     });
   });
 
+
   _.each(series, function(serie) {
-    serie.data = add_missing_values(serie.data, data.parsed.time_bucket, data.parsed.start_ms, data.parsed.end_ms);
+    if (options.fill_missing == "zero") {
+      serie.data = add_missing_values(serie.data, data.parsed.time_bucket, data.parsed.start_ms, data.parsed.end_ms);
+    }
+
     serie.data.sort(function(a, b) {
       return a.x - b.x;
     });
