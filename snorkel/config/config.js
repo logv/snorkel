@@ -64,6 +64,7 @@ module.exports = {
     url: null
   },
   upload_csv: false,
+  show_tour: false, // display the snorkel tour screens? mostly useful for demo installs
   slog: true,
   // This is the default max data size of the collection. Each dataset will
   // only grow to this size and no further, ideally
