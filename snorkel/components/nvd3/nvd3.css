@@ -14,3 +14,9 @@
 .light {
   font-weight: normal;
 }
+
+&.draw-markers .nv-point {
+  stroke-opacity: 1!important;
+  stroke-width: 5px!important;
+  fill-opacity: 1!important;
+}

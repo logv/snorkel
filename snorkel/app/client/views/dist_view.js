@@ -293,11 +293,18 @@ var DistView = BaseView.extend({
           inverted: false,
           type: 'line'
         },
+        plotOptions: {
+          series: {
+            marker: {
+              enabled: true,
+            }
+          },
+        },
         series: [
           {
             data: self.data.dist,
             name: "Density (in %)",
-            color: "rgba(0, 0, 200, 0.5)"
+            color: "rgba(0, 0, 200, 0.5)",
           },
         ],
         xAxis: {
@@ -351,6 +358,7 @@ var DistView = BaseView.extend({
         glance_data.push({
           x : self.data.percentiles[p*10][1],
           y: p,
+          shape: "square",
           marker: {
             radius: odd ? 4 : 8,
             symbol: odd ? "circle" : "diamond"
@@ -361,6 +369,7 @@ var DistView = BaseView.extend({
           glance_compare_data.push({
             x : self.compare_data.percentiles[p*10][1],
             y: p,
+            shape: "square",
             marker: {
               radius: odd ? 4 : 8,
               symbol: odd ? "circle" : "diamond"
@@ -395,6 +404,7 @@ var DistView = BaseView.extend({
               enabled: false
             },
             marker: {
+              enabled: true,
               states: {
                 hover: {
                   enabled: false

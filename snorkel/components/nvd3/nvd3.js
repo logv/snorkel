@@ -97,6 +97,8 @@ module.exports = {
     var show_x = true, show_y = true;
     var skip_zero_values = false;
 
+    var plot_options = highcharts_options.plotOptions || {};
+
     if (highcharts_options.yAxis) {
       var show_y_axis = highcharts_options.yAxis.enabled;
       if (!_.isUndefined(show_y_axis)) {
@@ -370,7 +372,11 @@ module.exports = {
 
       d3.select(svg)
         .datum(myData)
-        .call(chart)
+        .call(chart);
+
+      if (plot_options.series && plot_options.series.marker && plot_options.series.marker.enabled) {
+        self.$el.addClass("draw-markers");
+      }
 
       function drawPlotLines() {
         self.$el.find(".plotline, .plotline_text").remove();
