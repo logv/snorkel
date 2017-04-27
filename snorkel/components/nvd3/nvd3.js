@@ -1,3 +1,74 @@
+// Format function for the tooltip values column.
+
+function makeGenerator(tooltip) {
+  return function tooltipGenerator(d) {
+      if (d === null) {
+          return '';
+      }
+
+      var table = d3.select(document.createElement("table"));
+      var theadEnter = table.selectAll("thead")
+          .data([d])
+          .enter().append("thead");
+
+      theadEnter.append("tr")
+          .append("td")
+          .attr("colspan", 3)
+          .append("strong")
+          .classed("x-value", true)
+          .html(tooltip.headerFormatter()(d.value));
+
+      var tbodyEnter = table.selectAll("tbody")
+          .data([d])
+          .enter().append("tbody");
+
+      var trowEnter = tbodyEnter.selectAll("tr")
+              .data(function(p) { return p.series})
+              .enter()
+              .append("tr")
+              .classed("highlight", function(p) { return p.highlight});
+
+      trowEnter.append("td")
+          .classed("legend-color-guide",true)
+          .append("div")
+          .style("background-color", function(p) { return p.color});
+
+      trowEnter.append("td")
+          .classed("key",true)
+          .classed("total",function(p) { return !!p.total})
+          .html(function(p, i) { return tooltip.keyFormatter()(p.key, i)});
+
+      trowEnter.append("td")
+          .classed("value",true)
+          .html(function(p,i) {
+           if (d.series.length > 15 && d.value !== p.data.x) {this.parentNode.style.display = "none";}
+           return tooltip.valueFormatter()(p.value,i,p)
+        });
+
+      trowEnter.filter(function (p,i) { return p.percent !== undefined }).append("td")
+          .classed("percent", true)
+          .html(function(p, i) { return "(" + d3.format('%')(p.percent) + ")" });
+
+      trowEnter.selectAll("td").each(function(p) {
+          if (p.highlight) {
+              var opacityScale = d3.scale.linear().domain([0,1]).range(["#fff",p.color]);
+              var opacity = 0.6;
+              d3.select(this)
+                  .style("border-bottom-color", opacityScale(opacity))
+                  .style("border-top-color", opacityScale(opacity))
+              ;
+          }
+      });
+
+      var html = table.node().outerHTML;
+      if (d.footer !== undefined)
+          html += "<div class='footer'>" + d.footer + "</div>";
+      return html;
+
+  };
+}
+
+
 function drawYLine(chart, svg, line) {
   var yScale = chart.yAxis.scale();
   var yValue = line.value;
@@ -78,7 +149,6 @@ function formatWithSampleCount(d, i, p) {
 
   return d;
 }
-
 module.exports = {
   tagName: "div",
   className: "",
@@ -201,7 +271,10 @@ module.exports = {
         console.dir(chart);
         chart.dispatch.on("renderEnd", drawPlotLines);
 
-        chart.interactiveLayer.tooltip.valueFormatter(formatWithSampleCount)
+
+        chart.interactiveLayer.tooltip.valueFormatter(formatWithSampleCount);
+	chart.interactiveLayer.tooltip.contentGenerator(
+          makeGenerator(chart.interactiveLayer.tooltip));
 
 
         var tsFormat = d3.time.format('%b %-d, %Y %I:%M%p');
