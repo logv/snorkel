@@ -122,6 +122,13 @@ function collection_builder(db_name, before_create) {
           _created[db_name] = true;
 
           var collection = db.collection(db_name);
+          collection._addIndex = function(name) {
+            var opts = {};
+            opts[name] = 1;
+            collection.ensureIndex(opts);
+
+          }
+
           cb(collection);
         });
       }
@@ -214,6 +221,11 @@ module.exports = {
         ret.toArray = function(ncb) {
           ncb(ret);
         };
+
+        ret._addIndex = function(name) {
+          ret.ensureIndex({fieldName: name});
+        }
+
         if (cb) { cb(ret); }
         return ret;
 

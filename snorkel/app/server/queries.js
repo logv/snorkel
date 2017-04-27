@@ -5,11 +5,13 @@ var context = require_core("server/context");
 
 var trim_saved_queries = _.throttle(function() {
   var collection = db.get("query", "results");
-  var two_weeks = 60 * 60 * 24 * 14 * 1000; // approx 14 days
+  var one_week = 60 * 60 * 24 * 7 * 1000; // approx 7 days
+  var two_weeks = one_week * 2;
+  var four_weeks = one_week * 4;
   var now = new Date();
   var to_delete = {
     created: {
-      $lt: now - two_weeks
+      $lt: now - (four_weeks*6) // 6 months of history
     },
     saved: {
       $ne: true
@@ -19,16 +21,42 @@ var trim_saved_queries = _.throttle(function() {
   collection.count(to_delete, function(err, res) {
     if (res > 0) {
       console.log("TRIMMING OLD QUERY RESULTS", res);
-      collection.remove(to_delete, function() {
-        console.log("COMPACTING COLLECTION");
+      collection.remove(to_delete, { multi: true , justOne: false }, function(err, res) {
+        if (err) {
+          console.log("ERR", err);
+        }
+
+        var end = +Date.now();
         try {
           collection.compactCollection();
+          console.log("COMPACTING COLLECTION TOOK", end - now);
         } catch(e) {
 
         }
       });
     }
   });
+
+  var anon_delete = {
+    created: { $lt: now - one_week },
+    username: { $eq: "anon" }
+  };
+
+  collection.remove(anon_delete, function(err, res) {
+    if (err) {
+      console.log("ERR", err);
+    }
+    console.log("COMPACTING COLLECTION");
+    try {
+      collection.compactCollection();
+      var end = +Date.now();
+      console.log("COMPACTING COLLECTION TOOK", end - now);
+    } catch(e) {
+
+    }
+  });
+
+
 
 
 }, 60 * 1000 * 60);
@@ -56,10 +84,11 @@ function get_saved_queries(conditions, options, cb) {
   var collection = db.get("query", "results");
 
   // Need to ensure indeces on any parts of this table that we are querying
-  collection.ensureIndex("parsed.table");
-  collection.ensureIndex("updated");
-  collection.ensureIndex("username");
-  collection.ensureIndex("saved");
+  collection._addIndex("parsed.table");
+  collection._addIndex("created");
+  collection._addIndex("updated");
+  collection._addIndex("username");
+  collection._addIndex("saved");
 
   trim_saved_queries();
 
@@ -68,6 +97,7 @@ function get_saved_queries(conditions, options, cb) {
   var start = +Date.now()
   var projection = {};
   projection["results.results"] = 0;
+  projection["results"] = 0;
   var cur = collection.find(conditions, projection);
 
   cur.limit(options.limit || 30);
