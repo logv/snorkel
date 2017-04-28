@@ -18,6 +18,7 @@ var page = require_core("server/page");
 var bridge = require_core("server/bridge");
 var template = require_core("server/template");
 
+var rbac = require_app("server/rbac");
 var auth = require_app("server/auth");
 var backend = require_app("server/backend");
 var metadata = require_app("server/metadata");
@@ -347,7 +348,7 @@ var GRAPH_DRIVERS_TO_COMPONENT = {
   "highcharts" : "highcharter",
   "nvd3" : "nvd3"
 };
-function get_index() {
+function get_index(ctx, api) {
 
   if (controller.require_https()) { return; }
 
@@ -358,6 +359,8 @@ function get_index() {
 
   context("query_table", table);
   context("title", "snorkel");
+
+  if (!rbac.check("query", table, ctx.req.user.username)) { return; }
 
   var graph_driver = config.frontend.graph_driver || "nvd3";
   var graph_component = GRAPH_DRIVERS_TO_COMPONENT[graph_driver]

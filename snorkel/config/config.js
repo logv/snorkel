@@ -8,6 +8,7 @@ module.exports = {
     port: 59036
   },
   authorized_users: "config/users.htpasswd",
+  authorized_roles: "config/users.rbac",
   superuser: {
     "admin" : true
   },

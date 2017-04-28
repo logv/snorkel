@@ -7,6 +7,7 @@ module.exports = {
   data_dir: data_dir,
   config_dir: data_dir,
   authorized_users: data_dir + "/config/users.htpasswd",
+  authorized_roles: data_dir + "/config/users.rbac",
   http_port: process.env.PORT || 3000,
   frontend: {
     graph_driver: "nvd3"

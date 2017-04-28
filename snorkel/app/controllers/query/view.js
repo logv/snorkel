@@ -6,6 +6,7 @@ var bridge = require_core("server/bridge");
 var page = require_core("server/page");
 
 
+var rbac = require_app("server/rbac");
 var backend = require_app("server/backend");
 var metadata = require_app("server/metadata");
 var view_helper = require_app("client/views/helpers");
@@ -114,6 +115,9 @@ function get_view_selector_row() {
 }
 
 function get_table_selector() {
+  var req = context("req");
+  var user = req.user;
+
   return page.async(function(flush_data) {
     metadata.all(function(configs) {
       backend.get_tables(function(tables) {
@@ -122,6 +126,10 @@ function get_table_selector() {
         _.each(tables, function(table) {
           var config = configs[table.table_name];
           if (config.metadata.hide_dataset === 'true') {
+            return;
+          }
+
+          if (!rbac.check("query", table.table_name, user.username)) {
             return;
           }
 

@@ -1,20 +1,20 @@
 {
   "name": "snorkel",
-    "description": "node.js realtime analytics explorer",
-    "version": "0.0.19",
-    "private": true,
-    "dependencies": {
-      "superfluous" : "x",
-      "hashids" : "x",
-      "amqp" : "x",
-      "htpasswd" : "x",
-      "json-stable-stringify" : "x",
-      "passport-google" : "x",
-      "trust-proxy" : "x",
-      "squel" : "x",
-      "pg" : "4.3.0",
-      "linvodb3" : "x",
-      "connect-sqlite3" : "x"
-    }
+  "description": "node.js realtime analytics explorer",
+  "version": "0.0.20",
+  "private": true,
+  "dependencies": {
+    "amqp": "x",
+    "connect-sqlite3": "x",
+    "hashids": "x",
+    "htpasswd": "x",
+    "json-stable-stringify": "x",
+    "linvodb3": "x",
+    "minimatch": "^3.0.3",
+    "passport-google": "x",
+    "pg": "4.3.0",
+    "squel": "x",
+    "superfluous": "x",
+    "trust-proxy": "x"
+  }
 }
-

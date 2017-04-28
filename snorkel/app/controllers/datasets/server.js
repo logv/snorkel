@@ -2,6 +2,7 @@
 
 var $ = require("cheerio");
 
+var rbac = require_app("server/rbac");
 var db = require_app("server/db");
 var config = require_core("server/config");
 var context = require_core("server/context");
@@ -60,6 +61,7 @@ function render_datasets() {
 
       _.each(datasets, function(table) {
         if (table.table_name === "undefined") { return; }
+
         var metadata_ = {
           name: table.table_name,
           description: ''
@@ -112,6 +114,8 @@ function render_datasets() {
         var display_name = metadata_.display_name;
         var dataset_tokens = display_name.split("/");
         var superset = dataset_tokens[0];
+
+        if (!rbac.check("query", table.table_name, user.username)) { return; }
 
         var editable = dataset_is_editable(table.table_name, user);
         var cmp = $C("dataset_tile", {

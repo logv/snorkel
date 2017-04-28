@@ -209,13 +209,13 @@ module.exports = {
   require_user: function(func) {
     var ensure = this.ensure;
 
-    return function() {
+    return function(ctx, api) {
       var req = context("req");
       var res = context("res");
       var that = this;
 
       ensure(req, res, function() {
-        func.apply(that, arguments)
+        func.apply(that, [ctx, api]);
       });
     };
   }
