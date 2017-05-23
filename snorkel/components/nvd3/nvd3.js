@@ -411,14 +411,24 @@ module.exports = {
           .tickFormat(d3.format('.02f'));
       }
 
+
       if (highcharts_options.xAxis && highcharts_options.xAxis.min) {
         chart.forceX([highcharts_options.xAxis.min, highcharts_options.xAxis.max]);
         chart.xDomain([highcharts_options.xAxis.min, highcharts_options.xAxis.max])
       }
-      if (highcharts_options.yAxis && highcharts_options.yAxis.min) {
-        chart.forceY([highcharts_options.yAxis.min, highcharts_options.yAxis.max]);
-        chart.yDomain([highcharts_options.yAxis.min, highcharts_options.yAxis.max])
+
+      var y_axis_min = 0;
+      var y_axis_max = null;
+      if (highcharts_options.yAxis) {
+        if (highcharts_options.yAxis.min) {
+          y_axis_min = highcharts_options.yAxis.min;
+        }
+
+        if (highcharts_options.yAxis.max) {
+          y_axis_max = highcharts_options.yAxis.max;
+        }
       }
+      chart.forceY([y_axis_min, y_axis_max]);
 
 
 
