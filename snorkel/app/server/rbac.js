@@ -100,7 +100,6 @@ var ACL = {
       });
     });
 
-    console.log("PERM", allow, perm, table, user);
     return allow;
   }
 };

@@ -20,7 +20,11 @@ var GraphView = BaseView.extend({
     var fields = SF.controller().get_fields(self.table);
 		var $el = self.$el;
     var countEl = $("<h3 />");
-    countEl.addClass("rfloat mrl");
+    countEl.css({
+      position: "absolute",
+      right: "20px"
+    });
+
     $el.append(countEl);
     var totalCount = 0;
 		$el.height("100%");
@@ -155,6 +159,11 @@ var GraphView = BaseView.extend({
         if( e.cyTarget === cy ){
           cy.elements().removeClass('faded');
         }
+      });
+
+      cy.resize();
+      $(window).on('resize', function() {
+        cy.resize() ;
       });
     });
   }
