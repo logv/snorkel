@@ -200,6 +200,11 @@ function initialize_data(data, season_sizes, alpha, beta, gamma) {
       var sum = _.reduce(same_offset, function(memo, num){ return memo + (num||0); }, 0);
 
       I[gamma_index][j] = sum / same_offset.length;
+
+      if (!_.isFinite(I[gamma_index][j])) {
+        I[gamma_index][j] = 1;
+      }
+
       if (gamma_index > 0) {
         if (ADDITIVE_MODEL) {
           I[gamma_index][j] = 0;
