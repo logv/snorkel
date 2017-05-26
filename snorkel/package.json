@@ -1,7 +1,7 @@
 {
   "name": "snorkel",
   "description": "node.js realtime analytics explorer",
-  "version": "0.0.20",
+  "version": "0.1.0",
   "private": true,
   "dependencies": {
     "amqp": "x",
