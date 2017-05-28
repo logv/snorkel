@@ -878,6 +878,23 @@ module.exports = {
     views.update_controls(view);
   },
 
+  set_custom_time_inputs: function(start, end) {
+    var customStartRow = views.get_control_row("custom_start");
+    var customEndRow = views.get_control_row("custom_end");
+
+    var start_str = start.toLocaleDateString('en-us') + " " + start.toLocaleTimeString('en-us');
+    var end_str = end.toLocaleDateString('en-us') + " " + end.toLocaleTimeString('en-us');
+
+    var offset = start.getTimezoneOffset();
+    var hours = offset / 60 * 100;
+
+    start_str += " GMT-" + hours;
+    end_str += " GMT-" + hours;
+
+    customStartRow.find("input[type=text]").val(start_str);
+    customEndRow.find("input[type=text]").val(end_str);
+  },
+
   show_custom_time_inputs: function() {
     var startControl = views.get_control_row("start");
     var endControl = views.get_control_row("end");

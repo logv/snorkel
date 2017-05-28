@@ -270,6 +270,7 @@ module.exports = {
 
         console.dir(chart);
         chart.dispatch.on("renderEnd", drawPlotLines);
+        chart.dispatch.on("renderEnd", _.throttle(drawFocusFilters, 50));
 
 
         chart.interactiveLayer.tooltip.valueFormatter(formatWithSampleCount);
@@ -295,7 +296,8 @@ module.exports = {
           .tickPadding(10)
           .tickFormat(customTimeFormat);
 
-      return chart;
+        drawFocusFilters();
+        return chart;
       },
       'time_scatter' : function() {
         legend = false;
@@ -459,6 +461,58 @@ module.exports = {
 
       if (plot_options.series && plot_options.series.marker && plot_options.series.marker.enabled) {
         self.$el.addClass("draw-markers");
+      }
+
+      function drawFocusFilters() {
+        var focused_template = "<span <%= style_str %>'>start:</span> <b><%= start_date_str %></b><br /><span <%= style_str %>>end:</span> <b><%= end_date_str %> </b>";
+        var date_template_str = "<span style='width: 80px; display: inline-block;'> <%= date.toLocaleDateString()%> </span><span style='width: 80px; display: inline-block;'> <%= date.toLocaleTimeString()%> </span>";
+
+        var focusEl = self.$el.find(".focusfilter");
+        if (!focusEl.length) {
+          focusEl = $("<div class='focusfilter mtl mll box' ><div class='text lfloat' style='margin-left: 50px'/></div>");
+          focusEl.css("float", "left");
+          focusEl.css("font-size", "85%");
+
+          var clickEl = $("<a href='#' class='lfloat mll btn btn-primary'>add custom time filters</a>");
+          clickEl.on("click", function() {
+            var extents = chart.focus.brush.extent();
+            var start_date = new Date(extents[0]);
+            var end_date = new Date(extents[1]);
+
+            SF.controller().show_custom_time_inputs();
+            SF.controller().set_custom_time_inputs(start_date, end_date);
+
+          });
+          focusEl.append(clickEl);
+
+          self.$el.append(focusEl);
+        }
+
+        if (chart && chart.focus) {
+          var extents = chart.focus.brush.extent();
+          var start_date = new Date(extents[0]);
+          var end_date = new Date(extents[1]);
+
+
+          var start_date_str = _.template(date_template_str, { date: start_date });
+          var end_date_str = _.template(date_template_str, {date: end_date });
+
+          if (+start_date != +end_date) {
+            focusEl.find('.text').html(
+              _.template(focused_template, {
+                start_date_str: start_date_str,
+                end_date_str: end_date_str,
+                style_str: "style='width: 80px; display: inline-block;'" }
+              )
+            );
+
+            focusEl.show();
+          } else {
+            focusEl.hide();
+
+          }
+
+        }
       }
 
       function drawPlotLines() {
