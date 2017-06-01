@@ -1,5 +1,84 @@
-snorkel (0.0.15-1) unstable; urgency=low
+snorkel (0.1.1-1) unstable; urgency=low
 
+  * quick select custom time filters from time series graphs
+
+ -- okay <okay.zed@gmail.com> Sun May 28 10:20:20 2017 -0700
+
+snorkel (0.1.0-1) unstable; urgency=low
+
+  * update multi-seasonal forecasting model to work with sparse data
+  * add access controls using RBAC rules (see config.js and users.rbac)
+  * turn the snorkel landing page off by default
+  * better nvd3 tooltips
+
+ -- okay <okay.zed@gmail.com> Fri May 26 16:24:00 2017 -0700
+
+snorkel (0.0.20-1) unstable; urgency=low
+
+  * packaging for snapcraft and app image
+
+ -- okay <okay.zed@gmail.com> Wed Feb 8 10:48:03 2017 -0800
+
+snorkel (0.0.19-3) unstable; urgency=low
+
+  * fix mongo bugs (thanks adhil!)
+  * update repository link (thanks bruce!)
+
+ -- okay <okay.zed@gmail.com> Wed Feb 1 05:12:23 2017 -0800
+
+snorkel (0.0.19-2) unstable; urgency=low
+
+  * add custom time inputs for all views
+  * add reversable axes to scatter plot
+  * use summed line charts instead of area charts
+
+ -- okay <okay.zed@gmail.com> Sat Oct 29 14:29:51 2016 -0700
+
+snorkel (0.0.19-1) unstable; urgency=low
+
+  * switch to nvd3 for primary plotting
+  * add time series forecasting
+  * add weco process control view
+  * fix chosen selector bug
+
+ -- okay <okay.zed@gmail.com> Tue Oct 11 13:54:33 2016 -0700
+
+snorkel (0.0.18-2) unstable; urgency=low
+
+  * add dataset listing page
+  * switch default config engine to linvo db (levelup based)
+  * add directed graph view
+  * upgrade chosen plugin to 1.6
+  * polishing distribution view
+  * updating screenshots
+  * remove adhoc CSV upload feature
+ -- okay <okay.zed@gmail.com>
+
+snorkel (0.0.18-1) unstable; urgency=low
+
+  * further upgrades to work with sybil
+  * update to flatly theme
+  * fix bootstrap popovers in different views
+ -- okay <okay.zed@gmail.com>
+
+snorkel (0.0.17-1) unstable; urgency=low
+
+  * upgrade to support any mongo or postgres database using postgres_raw and
+  monog_raw backend adapters
+  * add support for grafana dashboarding via custom endpoint
+  * remove old dashboarding code
+ -- okay <okay.zed@gmail.com>
+
+snorkel (0.0.16-1) unstable; urgency=low
+
+  * initial support for sybil: a backend built for instrumentation
+  * Update to using google oauth instead of google open ID
+  * update dataset settings page a bit
+
+ -- okay <okay.zed@gmail.com>
+
+
+snorkel (0.0.15-1) unstable; urgency=low
   * new views, new backends, split cores
 
  -- okay <okay.zed@gmail.com>  Wed, 06 Nov 2013 09:10:16 -0700
