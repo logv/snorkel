@@ -503,20 +503,26 @@ function get_columns(table, cb) {
 
   console.log("GETTING COLUMNS", table)
   run_query_cmd("-info -json -table " + table, function(err, info) {
-    var cols = []
-    var PREFIX_RE = /^(integer_|string_|set_)/;
-    _.each(info.columns.ints, function(col) {
-      cols.push({name: col, type_str: 'integer', display_name: col.replace(PREFIX_RE, '')});
-    });
+    var cols;
+    if (err || !info || !info.columns) {
+      cols = {};
+    } else {
 
-    _.each(info.columns.strs, function(col) {
-      cols.push({name: col, type_str: 'string', display_name: col.replace(PREFIX_RE, '')});
-    });
+      var cols = []
+      var PREFIX_RE = /^(integer_|string_|set_)/;
+      _.each(info.columns.ints, function(col) {
+        cols.push({name: col, type_str: 'integer', display_name: col.replace(PREFIX_RE, '')});
+      });
 
-    _cached_columns[table] = {
-      results: cols,
-      updated: Date.now()
-    };
+      _.each(info.columns.strs, function(col) {
+        cols.push({name: col, type_str: 'string', display_name: col.replace(PREFIX_RE, '')});
+      });
+
+      _cached_columns[table] = {
+        results: cols,
+        updated: Date.now()
+      };
+    }
 
 
     _.each(_pending[table], function(_cb) {
