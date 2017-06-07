@@ -62,14 +62,14 @@ function fuzzy_time(time_str, now, delta) {
 
 function estimate_time_buckets(query_interval, buckets) {
   var best_bucket_count = buckets || 1000;
-  var min_intervals = [ 5, 10, 30, 60, 120, 360, 720 ];
+  var min_intervals = [ 5, 10, 30, 60, 120, 360, 720, 1440 ];
   var i, interval_ms;
 
 
   for (i = 0; i < min_intervals.length; i++) {
     var interval = min_intervals[i] * 60 * 1000;
+    interval_ms = min_intervals[i] * 60;
     if (query_interval / interval < best_bucket_count) {
-      interval_ms = min_intervals[i] * 60;
       break;
     }
   }
