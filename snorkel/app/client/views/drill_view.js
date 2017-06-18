@@ -1,8 +1,12 @@
+
+
 "use strict";
 
 var helpers = require("app/client/views/helpers");
 var presenter = require("app/client/views/presenter");
 var BaseView = require("app/client/views/base_view");
+
+
 var DrillView = BaseView.extend({
   baseview: helpers.VIEWS.TABLE,
   render: function() {
@@ -175,12 +179,14 @@ var DrillView = BaseView.extend({
     var data = this.data;
     var compare_data = this.compare_data;
     var $el = $("<div />");
+    var self = this;
+    var agg = self.query.parsed.agg;
 
     _.each(data, function(stats, col) {
-      headers.push(col + " avg");
-      headers.push("avg without row");
-      headers.push("delta");
-      headers.push("delta / avg");
+      headers = headers.concat(
+        _.map([ col + " AGG", "AGG without row", "delta", "delta / AGG"],
+          function(r) { return r.replace("AGG", agg); })
+        );
 
       var formatter = presenter.get_field_formatter(dataset, col);
 
@@ -198,9 +204,17 @@ var DrillView = BaseView.extend({
         if (!rows[group]) {
           rows[group] = [group, helpers.count_format(stats.counts[group])];
         }
-        rows[group].push(formatter(stats.values[group]));
-        rows[group].push(formatter(stats.avgs[group]));
+
+        if (agg == "$avg") {
+          rows[group].push(formatter(stats.avgs[group]));
+        } else if (agg == "$count") {
+          rows[group].push(formatter(stats.counts[group]));
+        } else if (agg == "$sum") {
+          rows[group].push(formatter(stats.values[group]));
+        }
+
         rows[group].push(stats.deltas[group].toFixed(2));
+        rows[group].push(stats.greater - stats.deltas[group]);
         rows[group].push(diff.toFixed(4));
       }
 
@@ -215,13 +229,15 @@ var DrillView = BaseView.extend({
 
 
         });
-        compare_rows.total.push(compare_stats.avg.toFixed(2));
+        compare_rows.total.push(compare_stats.greater.toFixed(2));
+
         compare_rows.total.push("");
         compare_rows.total.push("");
         compare_rows.total.push("");
       }
 
-      rows.total.push(stats.avg.toFixed(2));
+      rows.total.push(stats.greater.toFixed(2));
+
       rows.total.push("");
       rows.total.push("");
       rows.total.push("");
@@ -235,8 +251,6 @@ var DrillView = BaseView.extend({
     });
     var table = helpers.build_table(dataset, headers, rows);
     var compare_table = helpers.build_table(dataset, headers, compare_rows);
-
-    var self = this;
 
     $el.append($("<h2>after</h2>"));
     $el.append(table);
@@ -253,15 +267,38 @@ var DrillView = BaseView.extend({
       var delta_headers = ["", "samples"];
       _.each(compare_data, function(stats, col) {
 
-        delta_headers = delta_headers.concat([ col + " avg", "new avg with old row", "delta from real avg", "impact"]);
+        delta_headers = delta_headers.concat(
+          _.map([ col + " AGG", "new AGG with old row", "delta from real AGG", "impact"],
+            function(r) { return r.replace("AGG", agg); })
+          );
+
+
         _.each(_.keys(self.groups), function(group) {
           var new_data = data[col];
-          var subtracted = new_data.total - ((new_data.counts[group] || 0) * (new_data.values[group] || 0));
-          var addtracted = subtracted + ((stats.counts[group] || 0) * (stats.values[group]||0));
-          var new_avg = addtracted / ((new_data.minus_counts[group] || new_data.count) + (stats.counts[group] || 0));
+          var subtracted, addtracted, delta, frac;
+          var old_val, new_val;
 
-          var delta = new_data.avg - new_avg;
-          var frac = delta / new_data.avg * 100;
+          if (agg == "$avg") {
+            subtracted = new_data.total - ((new_data.counts[group] || 0) * (new_data.values[group] || 0));
+            addtracted = subtracted + ((stats.counts[group] || 0) * (stats.values[group]||0));
+            new_val = addtracted / ((new_data.minus_counts[group] || new_data.count) + (stats.counts[group] || 0));
+
+            old_val = new_data.avg;
+          } else if (agg == "$sum") {
+            subtracted = new_data.total - (new_data.values[group] || 0);
+            new_val = subtracted + (stats.values[group]||0);
+            old_val = new_data.total;
+
+          } else {
+            subtracted = new_data.count - (new_data.counts[group] || 0);
+            old_val = new_data.count;
+            new_val = subtracted + (stats.counts[group] || 0);
+
+
+          }
+
+          delta = old_val- new_val;
+          frac = delta / old_val * 100;
 
           if (!delta_rows[group]) {
             delta_rows[group] = [ group, helpers.count_format((stats.counts[group] || 0)) + "->" +
@@ -271,8 +308,8 @@ var DrillView = BaseView.extend({
           delta_rows[group].push((stats.values[group]||0).toFixed(2) + "->" +
             (new_data.values[group] || 0).toFixed(2));
 
-          delta_rows[group].push(new_avg.toFixed(2));
-          delta_rows[group].push((new_data.avg - new_avg).toFixed(2));
+          delta_rows[group].push(new_val.toFixed(2));
+          delta_rows[group].push((old_val - new_val).toFixed(2));
           delta_rows[group].push(frac.toFixed(2) + "%");
 
           movements[group] = frac;
@@ -298,7 +335,13 @@ var DrillView = BaseView.extend({
     self.groups = self.groups || {};
     self.parsed = data.parsed;
 
-    _.each(data.parsed.cols, function(col) {
+    var agg = data.parsed.agg;
+    var cols = data.parsed.cols;
+    if (agg == "$count" && !cols.length) {
+      cols = [ "count" ];
+    }
+
+    _.each(cols, function(col) {
       ret[col] = {};
       var sums = {};
       var counts = {};
@@ -309,7 +352,14 @@ var DrillView = BaseView.extend({
       var avgs = {};
 
       var col_total = _.reduce(data.results, function(memo, res) {
-        return memo + ((res.weighted_count  || res.count) * res[col]);
+        if (agg == "$avg") {
+          return memo + ((res.weighted_count  || res.count) * res[col]);
+        } else if (agg == "$sum") {
+          return memo + res[col];
+        } else {
+          return memo + (res.weighted_count  || res.count);
+
+        }
       }, 0);
 
       var col_count = _.reduce(data.results, function(memo, res) {
@@ -329,11 +379,33 @@ var DrillView = BaseView.extend({
         values[group] = row[col];
       });
 
+
+      var greater;
+      if (agg == "$avg") {
+        greater = col_avg;
+      } else if (agg == "$sum") {
+        greater = col_total;
+      } else if (agg == "$count") {
+        greater = col_count;
+      }
+
       // Maybe compare how different it is to the real average.
       _.each(sums, function(sum, group) {
+        var col_val, group_val;
         avgs[group] = sum / minus_counts[group];
-        deltas[group] = col_avg - avgs[group];
-        diffs[group] = deltas[group] / col_avg;
+        if (agg == "$avg") {
+          col_val = col_avg;
+          col_val = avgs[group];
+        } else if (agg == "$sum") {
+          col_val = col_total;
+          group_val = values[group];
+        } else if (agg == "$count") {
+          col_val = col_count;
+          group_val = counts[group];
+        }
+
+        deltas[group] = col_val - group_val;
+        diffs[group] = deltas[group] / col_val;
       });
 
       ret[col].deltas = deltas;
@@ -346,6 +418,8 @@ var DrillView = BaseView.extend({
       ret[col].total = col_total;
       ret[col].avgs = avgs;
       ret[col].values = values;
+
+      ret[col].greater = greater;
     });
 
 
