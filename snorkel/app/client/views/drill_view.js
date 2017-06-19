@@ -45,8 +45,8 @@ var DrillView = BaseView.extend({
     samplesEl.html("samples: " + self.data[first_col].count);
     if (this.compare_data) {
       samplesEl.html("samples: " +
-        this.data[first_col].count + " -> " +
-        this.compare_data[first_col].count);
+        this.compare_data[first_col].count + " -> " +
+        this.data[first_col].count);
     }
 
     var avgEl = $("<div />");
@@ -56,8 +56,8 @@ var DrillView = BaseView.extend({
       curAvgEl.html(col + ": "  + formatter(self.data[col].avg));
       if (self.compare_data) {
         curAvgEl.html(col + ": " +
-          formatter(self.data[col].avg).html() + " -> " +
-          formatter(self.compare_data[col].avg).html());
+          formatter(self.compare_data[col].greater).html() + " -> " +
+          formatter(self.data[col].greater).html());
       }
 
       avgEl.append(curAvgEl);
@@ -214,7 +214,7 @@ var DrillView = BaseView.extend({
         }
 
         rows[group].push(stats.deltas[group].toFixed(2));
-        rows[group].push(stats.greater - stats.deltas[group]);
+        rows[group].push((stats.greater - stats.deltas[group]).toFixed(2));
         rows[group].push(diff.toFixed(4));
       }
 
@@ -395,7 +395,7 @@ var DrillView = BaseView.extend({
         avgs[group] = sum / minus_counts[group];
         if (agg == "$avg") {
           col_val = col_avg;
-          col_val = avgs[group];
+          group_val = avgs[group];
         } else if (agg == "$sum") {
           col_val = col_total;
           group_val = values[group];
