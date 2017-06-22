@@ -1,6 +1,3 @@
-snorkel
-=======
-
 <b>snorkel</b> is a real time data analysis  tool,  meant  to  answer  questions
 about the *now*.  At its heart, snorkel is built on  the  idea  that  iterative
 analysis is key to understanding.  In other words - when graphs move, it  should
@@ -18,4 +15,9 @@ documents
 
 
 [grafana snorkel datasource](https://github.com/logV/grafana-snorkel-datasource) is a plugin for grafana (3.0) to query snorkel. While this plugin is in early stages, grafana is quite amazing.
+
+in action
+---------
+
+![snorkel gif](http://logv.org/~okay/snorkel_gifs/demo.gif)
 
