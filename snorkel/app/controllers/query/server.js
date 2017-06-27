@@ -802,6 +802,7 @@ function save_query(socket, query, name, description) {
   queries.get_saved_query(conditions, function(err, obj) {
     if (err || !obj) {
       console.log("FAILED TO SAVE", conditions);
+      socket.emit("save_query_failed", err);
       return;
     }
 
@@ -811,7 +812,7 @@ function save_query(socket, query, name, description) {
     obj.updated = +Date.now();
 
     var collection = db.get("query", "results");
-    collection.update({_id: obj._id}, obj);
+    collection.update({_id: obj._id}, obj, {multi: false});
 
     socket.emit("saved_query", obj);
   });
