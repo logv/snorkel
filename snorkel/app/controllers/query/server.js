@@ -83,7 +83,7 @@ function marshall_query(form_data) {
   query_data.dims = array_of(form_data, 'group_by', ["browser"]);
   query_data.view = value_of(form_data, 'view', 'table');
   query_data.baseview = value_of(form_data, 'baseview', query_data.view);
-  query_data.time_field = value_of(form_data, 'time_field', 'time');
+  query_data.time_field = value_of(form_data, 'time_field');
 
   var custom = value_of(form_data, 'custom', '{}');
   var custom_data = {};

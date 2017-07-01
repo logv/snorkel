@@ -341,6 +341,8 @@ function add_int_and_time_filters(query_spec) {
     console.log("Couldn't guess at TIME COL", e)
   }
 
+  // TODO: uncomment when the query_spec.time_field is put into common usage
+//  var tf = query_spec.opts.time_field || query_spec.meta.metadata.time_col || df;
   var tf = query_spec.meta.metadata.time_col || df;
 
   if (query_spec.opts.start_ms) {

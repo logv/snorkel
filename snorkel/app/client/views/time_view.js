@@ -261,7 +261,6 @@ SF.trigger("view:add", "time",  {
     custom_controls: build_custom_controls,
     include: helpers.STD_INPUTS
       .concat(helpers.inputs.TIME_BUCKET)
-      .concat(helpers.inputs.TIME_FIELD)
       .concat(helpers.inputs.COMPARE)
       .concat(helpers.inputs.SORT_BY),
     icon: "noun/line.svg"
