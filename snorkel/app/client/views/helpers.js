@@ -207,7 +207,7 @@ module.exports = {
     if (el.find(".cell_data").length) {
       value = el.find(".cell_data").attr("data-value");
     } else {
-      value = el.html();
+      value = el.text();
     }
 
     return [field_name, op, value];
