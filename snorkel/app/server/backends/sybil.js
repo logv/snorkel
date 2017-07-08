@@ -346,11 +346,11 @@ function add_int_and_time_filters(query_spec) {
   var tf = query_spec.meta.metadata.time_col || df;
 
   if (query_spec.opts.start_ms) {
-    filters.push(tf + ":gt:" + query_spec.opts.start_ms / 1000);
+    filters.push(tf + ":gt:" + parseInt(query_spec.opts.start_ms / 1000, 10));
   }
 
   if (query_spec.opts.end_ms) {
-    filters.push(tf + ":lt:" + query_spec.opts.end_ms / 1000);
+    filters.push(tf + ":lt:" + parseInt(query_spec.opts.end_ms / 1000, 10));
   }
 
   _.each(query_spec.opts.filters, function(f) {
