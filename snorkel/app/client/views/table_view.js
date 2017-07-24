@@ -165,7 +165,7 @@ var TableView = BaseView.extend({
 
     var col_name = $th.attr('data-name');
     var col_type = presenter.get_field_type(this.table, col_name);
-    var col_value = $td.find(".value_cell").attr("data-value") || $td.html();
+    var col_value = $td.find(".value_cell").attr("data-value") || $td.find(".cell_data").attr("data-value") || $td.text();
 
     div.attr("data-value", col_value);
     div.attr("data-name", col_name);
