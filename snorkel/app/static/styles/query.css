@@ -500,3 +500,32 @@ a {
   z-index: 100;
   background-color: #ededed;
 }
+
+#announcements {
+  margin-top: 80px;
+  /* landscape tablet, desktop and up */
+  @media (min-width: 768px) {
+    height: 100%;
+    margin-left: 330px;
+    overflow-y: scroll;
+
+    visibility: visible !important;
+    /* to account for the header positioning, we add margin to our inner child */
+  }
+
+  @media (max-width: 767px) {
+    margin-left: 0px;
+    position: absolute;
+    min-width: 100%;
+    min-height: 100%;
+    left: 0;
+    top: 0;
+
+  }
+
+  .seen {
+    display: none;
+  }
+
+
+}

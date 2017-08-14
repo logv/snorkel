@@ -6,12 +6,19 @@
       <a href="#user_dialog" class="btn show_user_dialog" style="position: absolute; right: 5px; " data-toggle="modal"> History </a>
     </div>
 
-    <div class="below no-select" id="query_sidebar">
+    <div class="below no-select" id="query_sidebar" style='padding-bottom: 200px'>
       <%= render_query_sidebar() %>
+
     </div>
 
+
     <div id="query_content_wrapper">
+      <div id="announcements" class="above clearfix">
+        <%= render_announcements() %>
+      </div>
+
       <div id="query_content" class="above clearfix">
+
         <%= render_query_content() %>
       </div>
     </div>

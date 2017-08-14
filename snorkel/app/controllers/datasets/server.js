@@ -14,6 +14,7 @@ var EventEmitter = require('events').EventEmitter;
 var auth = require_app("server/auth");
 var backend = require_app("server/backend");
 var metadata = require_app("server/metadata");
+var announcements = require_app("server/announcements");
 
 function dataset_is_editable(dataset, user) {
   var split_set = dataset.split("/");
@@ -173,6 +174,7 @@ function render_datasets() {
 module.exports = {
   routes: {
     "" : "index",
+    "/announcements" : "get_announcements",
     "/edit" : "get_edit",
     "/info" : "get_info"
   },
@@ -198,7 +200,7 @@ module.exports = {
   }),
 
 
-  get_edit: auth.require_user(function() {
+  get_announcements: auth.require_user(function(ctx, api) {
     var req = context("req");
     var res = context("res");
 
@@ -206,10 +208,93 @@ module.exports = {
     var subset = req.query.subset;
     var table = req.query.table || (dataset + "/" + subset);
 
-    var header_str = template.render("helpers/header.html.erb");
+    var edit_header_link = $("<div class='mtm mbl mll lfloat' />");
+    var editEl = $("<a style='color: white'>Settings</a>")
+      .addClass("dataset_settings mrl mll")
+      .attr('href', '/datasets/edit?table=' +  table)
+      .attr('target', '_blank');
+
+    var edit_link = editEl.toString();
+    edit_header_link.append(edit_link);
+
+
+    var announcementEl = $("<a style='color: white'>Back to Table</a>")
+      .addClass("back_to_table mrl mll")
+      .attr('href', '/query?table=' +  table);
+
+
+    edit_header_link.append(announcementEl.toString());
+
+    var header_str = template.render("helpers/header.html.erb", {
+      tabs: function() {
+        return $("<div>")
+          .append(edit_header_link)
+          .html();
+      }
+    });
+
+    bridge.controller("datasets", "set_table", table);
+
+    var user = req.user;
+    var editable = rbac.check("admin", table, user.username);
+
+    api.template.add_stylesheet("announcements");
+    var render_async = template.partial("datasets/announcements.html.erb", {
+      editable: editable,
+      render_announcements: function() {
+        return announcements.render(ctx, api);
+      }
+    });
+
+
+    page.render({
+      content: render_async.toString(),
+      header: header_str,
+      socket: true,
+      component: true});
+    bridge.flush_data();
+
+
+  }),
+
+  get_edit: auth.require_user(function(ctx, api) {
+    var req = context("req");
+    var res = context("res");
+
+    var dataset = req.query.dataset;
+    var subset = req.query.subset;
+    var table = req.query.table || (dataset + "/" + subset);
+
+    var edit_header_link = $("<div class='mtm mbl mll lfloat' />");
+    var editEl = $("<a style='color: white'>Announcements</a>")
+      .addClass("dataset_announcements mrl mll")
+      .attr('href', '/datasets/announcements?table=' +  table)
+      .attr('target', '_blank');
+
+    var edit_link = editEl.toString();
+    edit_header_link.append(edit_link);
+
+
+    var announcementEl = $("<a style='color: white'>Back to Table</a>")
+      .addClass("back_to_table mrl mll")
+      .attr('href', '/query?table=' +  table);
+
+
+    edit_header_link.append(announcementEl.toString());
+
+    var header_str = template.render("helpers/header.html.erb", {
+      tabs: function() {
+        return $("<div>")
+          .append(edit_header_link)
+          .html();
+      }
+    });
+
     bridge.controller("datasets", "set_table", table);
 
     var _metadata;
+    var user = req.user;
+    var editable = rbac.check("admin", table, user.username);
 
     function render_column(col_data) {
       var data = _.clone(col_data);
@@ -277,6 +362,10 @@ module.exports = {
           render_column: render_column,
           render_table_header: render_table_header,
           time_col: timeColEl.toString(),
+          render_announcements: function() {
+            return announcements.render(ctx, api);
+          },
+          editable: editable,
           hidden_col: hiddenEl.toString()
         });
 
@@ -296,6 +385,9 @@ module.exports = {
   }),
 
   socket: function(socket) {
+    announcements.install(socket);
+
+    var user = socket.session.__user;
     socket.on("set_metadata", function(table, metadata_) {
       if (table && metadata_) {
         metadata.set(table, metadata_, function() {
@@ -313,9 +405,9 @@ module.exports = {
       socket.emit("cleared_cache");
     });
 
+
     socket.on("drop", function(dataset) {
       // Validate this is an easily droppable dataset
-      var user = socket.session.__user;
       if (dataset_is_editable(dataset, user)) {
         console.log("DROPPING ", dataset);
 

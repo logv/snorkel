@@ -1,0 +1,7 @@
+{
+  "main" : "dataset_announcement",
+  "helpers": [],
+  "style": "dataset_announcement.css",
+  "styles": [],
+  "template": "dataset_announcement.html.erb"
+}

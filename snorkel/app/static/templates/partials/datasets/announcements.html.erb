@@ -1,0 +1,32 @@
+<div class="announcements mtl">
+
+  <div class="old_announcements mtl">
+    <%= render_announcements() %>
+  </div>
+
+  <% if (editable) { %>
+    <h2 >New Announcement</h2>
+
+    <div class="preview"> </div>
+
+    <form id="dataset_announcements" class='form'>
+
+      <div>
+        <input class='form-control' name="title" type="text" placeholder="title..." />
+      </div>
+
+      <div>
+        <select class='form-control' name="type" placeholder="Announcement Level">
+          <option value="info">Informational </option>
+          <option value="warning">Warning </option>
+          <option value="urgent">Urgent </option>
+        </select>
+      </div>
+      <div>
+        <textarea class='form-control' name="text" placeholder="announcement text"> </textarea>
+      </div>
+
+      <div class='btn btn-primary new_announcement'>add announcement</div>
+    </form>
+  <% } %>
+</div>

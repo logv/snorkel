@@ -13,7 +13,10 @@ module.exports = {
     "click .save" : "handle_save_metadata",
     "click .cancel" : "handle_discard_metadata",
     "click .clear_cache" : "handle_clear_metadata",
-    "keyup .dataset_finder" : "handle_select_datasets"
+    "click .new_announcement" : "handle_new_announcement",
+    "keyup .dataset_finder" : "handle_select_datasets",
+    "keyup form#dataset_announcements" : "preview_new_announcement",
+    "change form#dataset_announcements select" : "preview_new_announcement"
   },
   initialize: function() {
     $(".dataset_finder").focus();
@@ -149,6 +152,32 @@ module.exports = {
     console.log("CLEARING METADATA CACHE", dataset);
     SF.socket().emit("clear_cache", dataset);
   },
+  handle_new_announcement: function() {
+    var dataset = this.table;
+    var obj  = $("form#dataset_announcements").serializeObject();
+    this.$el.find(".preview").empty();
+    SF.socket().emit("new_announcement", dataset, obj, function(ann) {
+      ann.editable = true;
+      $("form#dataset_announcements")[0].reset();
+      $C("dataset_announcement", ann, function(cmp) {
+        $(".old_announcements").prepend(cmp.$el);
+      });
+    });
+  },
+  preview_new_announcement: _.throttle(function() {
+    var dataset = this.table;
+    var obj  = $("form#dataset_announcements").serializeObject();
+    console.log("OBJ", obj);
+    obj.editable = false;
+    obj.createdAt = new Date();
+    obj.user = "you";
+    var $el = this.$el;
+    $C("dataset_announcement", { comment: obj, editable: false }, function(cmp) {
+      $el.find(".preview").empty();
+      $el.find(".preview").append(cmp.$el);
+    });
+
+  }),
   delegates: {
     handle_delete_clicked: function(obj) {
       var dataset = obj.dataset;

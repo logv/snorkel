@@ -1,0 +1,47 @@
+
+
+.dataset_announcement {
+  padding: 10px;
+  max-width: 600px;
+  margin-bottom: 10px;
+  border-radius: 0px;
+}
+
+.dataset_announcement.urgent {
+  border: 2px solid red;
+  background-color: #faa;
+}
+
+.dataset_announcement.warning {
+  border: 2px solid orange;
+  background-color: #fea;
+}
+
+.dataset_announcement.info {
+  border: 2px solid #aaf;
+  background-color: #eef;
+}
+
+.dataset_announcement .seen {
+  opacity: 0.9;
+}
+
+.title {
+  font-size: 120%;
+}
+
+.byline {
+  margin-top: 10px;
+  font-size: 80%;
+}
+
+.text {
+  margin-top: 10px;
+  line-height: 1em;
+}
+
+.hide_announcement,
+.delete {
+  cursor: pointer;
+  float: right;
+}

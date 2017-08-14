@@ -493,7 +493,7 @@ module.exports = {
       backend.get_stats(context("query_table"), function(stats) {
 
         function get_stats_box(stats) {
-          var box = $("<div class='stats' style='padding-bottom: 100px'/>");
+          var box = $("<div class='stats' />");
           box.append($("<h2>Stats: </h2>"));
           box.append($("<h4>Dataset Size: </h4>")
             .append(view_helper.byte_format(stats.size)));

@@ -1,0 +1,47 @@
+<div class="dataset_announcement hidden clearfix <%= comment.type %>">
+  <div class='title'>
+    <b>
+      <%= comment.title %>
+    </b>
+
+    <% if (!editable) { %>
+      <span class='hide_announcement rfloat'>
+        <i class='icon-minus'> </i>
+      </span>
+    <% } %>
+
+  </div>
+
+  <div class='text'>
+    <%= comment.text %>
+  </div>
+
+  <div class='byline'>
+    <span class='author'>
+      from <%= comment.user %>
+
+
+    </span>
+
+    on
+
+    <small class='date'>
+      <%= (new Date(comment.createdAt)).toLocaleString() %>
+    </small>
+
+  </div>
+
+
+
+  <% if (editable) { %>
+    <div class='editable'>
+    <span class='delete rfloat' data-id="<%= _id %>" >
+    <span class='archive rfloat' data-id="<%= _id %>" >
+
+      delete
+    </span>
+
+
+    </div>
+  <% } %>
+</div>

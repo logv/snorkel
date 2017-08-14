@@ -27,6 +27,7 @@ var view = require_app("controllers/query/view");
 var queries = require_app("server/queries");
 
 var strtotime = require_vendor("strtotime");
+var announcements = require_app("server/announcements");
 
 var __results_id = 0;
 
@@ -481,14 +482,25 @@ function get_index(ctx, api) {
     });
   }
 
+
   var edit_header_link = $("<div class='mtm mbl mll lfloat' />");
   editEl = $("<a style='color: white'>Settings</a>")
-    .addClass("dataset_settings")
+    .addClass("dataset_settings mrl mll")
     .attr('href', '/datasets/edit?table=' +  table)
     .attr('target', '_blank');
 
   var edit_link = editEl.toString();
   edit_header_link.append(edit_link);
+
+
+  var announcementEl = $("<a style='color: white'>Announcements</a>")
+    .addClass("dataset_announcements mrl mll")
+    .attr('href', '/datasets/announcements?table=' +  table)
+    .attr('target', '_blank');
+
+
+  edit_header_link.append(announcementEl.toString());
+
   var header_str = template.render("helpers/header.html.erb", {
     tabs: function() {
       var view_selector = $("<div class='lfloat' />")
@@ -502,6 +514,9 @@ function get_index(ctx, api) {
   });
 
   var template_str = template.render("controllers/query.html.erb", {
+      render_announcements: function() {
+        return announcements.render_one(ctx, api);
+      },
       render_query_content: render_query_content,
       render_query_sidebar: render_query_sidebar
     });

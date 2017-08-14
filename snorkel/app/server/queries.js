@@ -72,13 +72,6 @@ function get_query_from_db(hashid, cb) {
   });
 }
 
-function get_saved() {
-  var query_id = context("req").query.id;
-  get_query_from_db(query_id, function(obj) {
-    res.end(JSON.stringify(obj));
-  });
-}
-
 function get_saved_queries(conditions, options, cb) {
   var visited = {};
   var collection = db.get("query", "results");
