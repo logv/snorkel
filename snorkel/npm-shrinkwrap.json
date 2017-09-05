@@ -5178,9 +5178,9 @@
               "resolved": "https://registry.npmjs.org/cookie/-/cookie-0.3.1.tgz"
             },
             "uws": {
-              "version": "0.12.0",
-              "from": "uws@0.12.0",
-              "resolved": "https://registry.npmjs.org/uws/-/uws-0.12.0.tgz"
+              "version": "0.14.5",
+              "from": "uws@0.14.5",
+              "resolved": "https://registry.npmjs.org/uws/-/uws-0.14.5.tgz"
             }
           }
         },
