@@ -73,10 +73,6 @@ html, body {
 #query_content {
   background-color: #fff;
 
-  > *:first-child {
-    margin-top: 60px;
-  }
-
   /* landscape tablet, desktop and up */
   @media (min-width: 768px) {
     height: 100%;
@@ -84,7 +80,6 @@ html, body {
     overflow-y: scroll;
 
     visibility: visible !important;
-    /* to account for the header positioning, we add margin to our inner child */
   }
 
   @media (max-width: 767px) {
@@ -94,6 +89,13 @@ html, body {
     min-height: 100%;
     left: 0;
     top: 0;
+
+
+    /* to account for the header positioning, we add margin to our inner child */
+    > *:first-child {
+      margin-top: 60px;
+    }
+
 
   }
 
