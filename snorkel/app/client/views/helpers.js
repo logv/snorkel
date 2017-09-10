@@ -34,6 +34,12 @@ function result_key(group_by, result) {
   return row.join(",");
 }
 
+// https://stackoverflow.com/questions/3561493/is-there-a-regexp-escape-function-in-javascript/3561711#3561711
+function escapeRegex(s) {
+  return s.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
+}
+
+
 
 function countToSize(count) {
     var sizes = ['', 'K', 'M', 'G', 'T', 'P', 'Z' ];
@@ -193,8 +199,9 @@ module.exports = {
     var filter_type = wrapper.attr("data-type");
     var value = wrapper.attr("data-value");
 
-    value = value.replace(/\(/g, "\\(");
-    value = value.replace(/\)/g, "\\)");
+    if (filter_type == "string") {
+      value = escapeRegex(value);
+    }
 
     return [name, op, value];
 
@@ -211,8 +218,9 @@ module.exports = {
       value = el.text();
     }
 
-    value = value.replace(/\(/g, "\\(");
-    value = value.replace(/\)/g, "\\)");
+    if (field_type == "string") {
+      value = escapeRegex(value);
+    }
 
     return [field_name, op, value];
   },
