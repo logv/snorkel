@@ -193,9 +193,10 @@ module.exports = {
     var filter_type = wrapper.attr("data-type");
     var value = wrapper.attr("data-value");
 
-    var filter = [name, op, value];
+    value = value.replace(/\(/g, "\\(");
+    value = value.replace(/\)/g, "\\)");
 
-    return filter;
+    return [name, op, value];
 
   },
   get_filter_for_cell: function(table, el) {
@@ -209,6 +210,9 @@ module.exports = {
     } else {
       value = el.text();
     }
+
+    value = value.replace(/\(/g, "\\(");
+    value = value.replace(/\)/g, "\\)");
 
     return [field_name, op, value];
   },
