@@ -12,6 +12,9 @@ var cwd = process.cwd()
 
 var BIN_PATH = config.backend.bin_path || path.join(cwd, "./bin/sybil ");
 var DATASET_SEPARATOR = "@"
+var FIELD_SEPARATOR = ",";
+var RECORD_SEPARATOR = ":";
+var CUSTOM_SEPARATORS = false;
 
 function path_exists(path) {
   var fs = require('fs');
@@ -45,8 +48,47 @@ function get_cmd(bin, arg_string) {
   return bin + " " + arg_string
 }
 
+function get_cmd_info(cb) {
+  var query_args = " version -json";
+  var cmd = get_cmd(BIN_PATH, query_args);
+  cb = context.wrap(cb);
+  child_process.exec(cmd, {
+    cwd: DB_DIR,
+  }, function(err, stdout, stderr) {
+    var parsed;
+    try {
+      parsed = JSON.parse(stdout);
+    } catch(e) {
+
+      cb("Error Parsing JSON", null);
+      return;
+    }
+
+    cb(err, parsed);
+  });
+}
+
+
+get_cmd_info(function(err, info) {
+  if (err) {
+    return;
+  }
+
+  console.log("GOT CMD INFO", info);
+  if (info.field_separator) {
+    CUSTOM_SEPARATORS = true;
+    RECORD_SEPARATOR = String.fromCharCode(30);
+    FIELD_SEPARATOR = String.fromCharCode(31);
+  }
+});
+
 function run_query_cmd(arg_string, cb) {
-  var cmd = get_cmd(BIN_PATH, " query -read-log " + arg_string);
+  var query_args = " query -read-log ";
+  if (CUSTOM_SEPARATORS) {
+    query_args = query_args + " -field-separator '" + FIELD_SEPARATOR + "' " + "-filter-separator '" + RECORD_SEPARATOR + "' ";
+  }
+
+  var cmd = get_cmd(BIN_PATH, query_args + arg_string);
   cb = context.wrap(cb);
   console.log("RUNNING COMMAND", cmd);
   child_process.exec(cmd, {
@@ -185,14 +227,14 @@ function add_dims_and_cols(query_spec) {
     });
 
     if (dims.length > 0) {
-      var group_by = dims.join(",");
+      var group_by = dims.join(FIELD_SEPARATOR);
       if (group_by.trim() !== "") {
         cmd_args += " -group " + group_by + " ";
       }
     }
   }
   if (query_spec.opts.cols.length) {
-    var int_by = query_spec.opts.cols.join(",");
+    var int_by = query_spec.opts.cols.join(FIELD_SEPARATOR);
     cmd_args += " -int " + int_by + " ";
 
     if (query_spec.opts.agg && query_spec.opts.agg.indexOf("$p") === 0) {
@@ -346,11 +388,11 @@ function add_int_and_time_filters(query_spec) {
   var tf = query_spec.meta.metadata.time_col || df;
 
   if (query_spec.opts.start_ms) {
-    filters.push(tf + ":gt:" + parseInt(query_spec.opts.start_ms / 1000, 10));
+    filters.push(tf + RECORD_SEPARATOR + "gt" + RECORD_SEPARATOR + parseInt(query_spec.opts.start_ms / 1000, 10));
   }
 
   if (query_spec.opts.end_ms) {
-    filters.push(tf + ":lt:" + parseInt(query_spec.opts.end_ms / 1000, 10));
+    filters.push(tf + RECORD_SEPARATOR + "lt" + RECORD_SEPARATOR + parseInt(query_spec.opts.end_ms / 1000, 10));
   }
 
   _.each(query_spec.opts.filters, function(f) {
@@ -361,7 +403,7 @@ function add_int_and_time_filters(query_spec) {
     }
     var value = f.conditions[0].value; //hardcoded for now
 
-    filters.push(column + ':' + f.conditions[0].op.replace("$", "") + ':' + value);
+    filters.push(column + RECORD_SEPARATOR + f.conditions[0].op.replace("$", "") + RECORD_SEPARATOR + value);
   });
 
 
@@ -375,7 +417,7 @@ function add_int_and_time_filters(query_spec) {
     return args;
   }
 
-  return " -int-filter \"" + filters.join(",") + "\" " + args;
+  return " -int-filter \"" + filters.join(FIELD_SEPARATOR) + "\" " + args;
 }
 
 function add_str_filters(query_spec) {
@@ -403,14 +445,14 @@ function add_str_filters(query_spec) {
 
     var value = f.conditions[0].value; //hardcoded for now
 
-    filters.push(column + ':' + op + ':' + value);
+    filters.push(column + RECORD_SEPARATOR + op + RECORD_SEPARATOR + value);
   });
 
   if (filters.length === 0) {
     return "";
   }
 
-  return "-str-filter \"" + filters.join(",") + "\" ";
+  return "-str-filter \"" + filters.join(FIELD_SEPARATOR) + "\" ";
 }
 
 function run_samples_query(table, query_spec, cb) {
