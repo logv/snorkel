@@ -516,14 +516,14 @@ a {
   }
 
   @media (max-width: 767px) {
-    margin-left: 0px;
-    position: absolute;
-    min-width: 100%;
-    min-height: 100%;
-    left: 0;
-    top: 0;
-
+    margin-left: 10px;
+    .dataset_announcement {
+      position: absolute;
+      width: 100%;
+      z-index: 100;
+    }
   }
+
 
   .seen {
     display: none;
