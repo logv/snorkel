@@ -171,10 +171,13 @@ function marshall_query(form_data) {
   }
 
 
-  var hist_bucket = parseInt(value_of(form_data, 'hist_bucket', null), 10);
+
+  var hist_bucket_str = value_of(form_data, 'hist_bucket', null);
+  var hist_bucket = parseInt(hist_bucket_str, 10);
 
   // TODO: have views take more part in augmenting query data?
   query_data.hist_bucket = hist_bucket;
+  query_data.hist_bucket_str = hist_bucket_str;
   query_data.time_bucket = time_bucket;
   query_data.time_divisor = time_divisor;
 

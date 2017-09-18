@@ -15,6 +15,8 @@ var DATASET_SEPARATOR = "@"
 var FIELD_SEPARATOR = ",";
 var RECORD_SEPARATOR = ":";
 var CUSTOM_SEPARATORS = false;
+var HAS_HDR_HIST = false;
+var HAS_LOG_HIST = false;
 
 function path_exists(path) {
   var fs = require('fs');
@@ -79,6 +81,14 @@ get_cmd_info(function(err, info) {
     CUSTOM_SEPARATORS = true;
     RECORD_SEPARATOR = String.fromCharCode(30);
     FIELD_SEPARATOR = String.fromCharCode(31);
+  }
+
+  if (info.hdr_hist) {
+    HAS_HDR_HIST = true;
+  }
+
+  if (info.log_hist) {
+    HAS_LOG_HIST = true;
   }
 });
 
@@ -244,6 +254,15 @@ function add_dims_and_cols(query_spec) {
     if (query_spec.opts.hist_bucket) {
       cmd_args += " -int-bucket " + query_spec.opts.hist_bucket + " ";
 
+    }
+
+    if (query_spec.opts.hist_bucket_str == "log_hist") {
+      cmd_args += " -op hist -loghist ";
+
+    }
+
+    if (query_spec.opts.hist_bucket_str == "hdr_hist") {
+      cmd_args += " -op hist -hdr ";
     }
 
 
@@ -674,6 +693,20 @@ var PCSDriver = _.extend(driver.Base, {
   get_columns: get_cached_columns,
   clear_cache: function(table, cb) {},
   drop_dataset: function(table, cb) {},
+  extra_buckets: function() {
+
+    var ret = {};
+    if (HAS_LOG_HIST) {
+      ret["log_hist"] = "dynamic";
+
+    }
+
+    if (HAS_HDR_HIST) {
+      ret["hdr_hist"] = "hdr";
+    }
+
+    return ret;
+  },
   extra_metrics: function() {
 
     return {

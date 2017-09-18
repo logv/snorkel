@@ -139,10 +139,20 @@ module.exports = {
   get_stats: driver.get_stats,
   clear_cache: driver.clear_cache,
   get_tables: driver.get_tables,
+  extra_buckets: function() {
+    if (_.isFunction(driver.extra_buckets)) {
+      return driver.extra_buckets();
+    }
+
+    if (_.isObject(driver.extra_buckets)) {
+      return driver.extra_buckets;
+    }
+  },
+
   extra_metrics: function() {
     if (_.isFunction(driver.extra_metrics)) {
       return driver.extra_metrics();
-    } 
+    }
 
     if (_.isObject(driver.extra_metrics)) {
       return driver.extra_metrics;
