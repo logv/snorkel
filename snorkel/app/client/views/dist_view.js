@@ -61,12 +61,26 @@ function calc_cdf(sorted_hist_arr, total, w_total) {
     perc.push([p, value]);
   }
 
+  var perc_dist = [];
+  var count_dist = [];
+
+  var val = 0;
+  var counts = {};
   _.each(perc, function(p) {
     p[0] = p[0] / 10;
+
+    if (p[0] % 1 === 0 || (p[0] - 0.5) % 1 === 0) {
+      val = p[1];
+      counts[val] = (counts[val] || 0) + 0.5;
+    }
+  });
+
+  _.each(counts, function(v, k) {
+    count_dist.push([k, v, v]);
   });
 
   return {
-    dist: dist,
+    dist: count_dist,
     percentiles: perc,
     weighted_count: w_sum,
     cdf: cdf,
@@ -137,7 +151,8 @@ var DistView = BaseView.extend({
 
   render: function() {
     var self = this;
-    var xmin = self.data.percentiles[50][1]; // p5
+    var xmin = self.data.percentiles[0][1]; // p5
+    var xzero = self.data.percentiles[0][1];
     var xmax = self.data.percentiles[960][1]; // p95
     var dataset = this.table; 
 
@@ -229,9 +244,10 @@ var DistView = BaseView.extend({
       var options = {
         height: 500,
         chart: {
-        height: 500,
+          height: 500,
           inverted: true,
-          type: "line"
+          type: "line",
+          zoomType: "x",
         },
         series: [
           {
@@ -246,7 +262,6 @@ var DistView = BaseView.extend({
         },
         yAxis: {
           min: xmin,
-          max: xmax,
           reversed: false,
           plotLines: plot_lines.concat(ks_lines)
         }
@@ -284,14 +299,15 @@ var DistView = BaseView.extend({
       var distEl = $("<div class='span12'/>");
       distEl.css("height", "500px");
 
-      outerEl.append($("<h2 class='mll'>Probability Density</h2>"));
+      outerEl.append($("<h2 class='mll mtl'>Probability Density</h2>"));
       outerEl.append(distEl);
 
       var dist_options = {
         height: 500,
         chart: {
           inverted: false,
-          type: 'line'
+          type: 'line',
+          zoomType: "x"
         },
         plotOptions: {
           series: {
@@ -308,7 +324,7 @@ var DistView = BaseView.extend({
           },
         ],
         xAxis: {
-          min: xmin,
+          min: xzero,
           max: xmax,
           reversed: false,
           plotLines: plot_lines,

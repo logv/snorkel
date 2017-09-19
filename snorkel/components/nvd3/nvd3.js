@@ -249,8 +249,21 @@ module.exports = {
       var CHARTS = {
       'line' : function() {
         skip_zero_values = true;
-        var chart = nv.models.lineChart()
-          .useInteractiveGuideline(true)  //We want nice looking tooltips and a guideline!
+
+        var chart;
+        if (highcharts_options.chart.zoomType == 'x') {
+          chart = nv.models.lineWithFocusChart()
+            .useInteractiveGuideline(true)  //We want nice looking tooltips and a guideline!
+
+          chart.dispatch.on("renderEnd", _.throttle(function() {
+            drawPlotLines();
+          }, 50));
+
+        } else {
+          chart = nv.models.lineChart();
+        }
+
+
 
         chart.xAxis
           .showMaxMin(true)
@@ -261,7 +274,7 @@ module.exports = {
         chart.x2Axis
           .showMaxMin(true);
 
-      return chart;
+        return chart;
       },
       'time' : function() {
         var chart = nv.models.lineWithFocusChart()
@@ -269,12 +282,14 @@ module.exports = {
           .xScale(d3.time.scale());
 
         console.dir(chart);
-        chart.dispatch.on("renderEnd", drawPlotLines);
-        chart.dispatch.on("renderEnd", _.throttle(drawFocusFilters, 50));
+        chart.dispatch.on("renderEnd", _.throttle(function() {
+          drawPlotLines();
+          drawFocusFilters();
+        }, 50));
 
 
         chart.interactiveLayer.tooltip.valueFormatter(formatWithSampleCount);
-	chart.interactiveLayer.tooltip.contentGenerator(
+        chart.interactiveLayer.tooltip.contentGenerator(
           makeGenerator(chart.interactiveLayer.tooltip));
 
 
@@ -353,11 +368,22 @@ module.exports = {
 
         chart.xAxis.ticks(5);
 
-	return chart;
+        return chart;
 
       },
+      'linearea' : function() {
+        var chart = nv.models.stackedAreaChart()
+          .useInteractiveGuideline(true);
+
+          chart.xAxis
+            .showMaxMin(false)
+            // .rotateLabels(-45) // Want longer labels? Try rotating them to fit easier.
+            .tickPadding(10);
+
+        return chart;
+      },
       'area' : function() {
-	var chart = nv.models.stackedAreaChart()
+        var chart = nv.models.stackedAreaChart()
           .xScale(d3.time.scale())
           .useInteractiveGuideline(true);
 
@@ -369,7 +395,7 @@ module.exports = {
             .tickFormat(function(d) { return customTimeFormat(new Date(d)); })
             .tickPadding(10);
 
-	return chart;
+        return chart;
       },
       'bar' : bar_chart,
       'column' : bar_chart

@@ -53,6 +53,7 @@ module.exports = {
     var CHART_TRANSLATION = {
       'bar' : 'column',
       'time' : 'line',
+      'linearea' : 'area',
       'time_scatter' : 'scatter'
     };
 
