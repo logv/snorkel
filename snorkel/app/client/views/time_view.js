@@ -237,8 +237,8 @@ function build_custom_controls() {
   $C("selector", {
     name: "fill_missing",
     options: {
-      "" : "Ignore",
-      "zero" : "Treat as Zero"
+      "zero" : "Treat as Zero",
+      "" : "Ignore"
     },
     selected: custom_params.fill_missing,
   }, function(selector) {
