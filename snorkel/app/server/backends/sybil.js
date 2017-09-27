@@ -17,6 +17,7 @@ var RECORD_SEPARATOR = ":";
 var CUSTOM_SEPARATORS = false;
 var HAS_HDR_HIST = false;
 var HAS_LOG_HIST = false;
+var HAS_QUERY_CACHE = false;
 
 function path_exists(path) {
   var fs = require('fs');
@@ -90,10 +91,19 @@ get_cmd_info(function(err, info) {
   if (info.log_hist) {
     HAS_LOG_HIST = true;
   }
+
+  if (info.query_cache) {
+    HAS_QUERY_CACHE = true;
+  }
 });
 
 function run_query_cmd(arg_string, cb) {
   var query_args = " query -read-log ";
+
+  if (HAS_QUERY_CACHE) {
+    query_args += " -cache-queries ";
+  }
+
   if (CUSTOM_SEPARATORS) {
     query_args = query_args + " -field-separator '" + FIELD_SEPARATOR + "' " + "-filter-separator '" + RECORD_SEPARATOR + "' ";
   }
