@@ -70,7 +70,7 @@ function parse_perms(perms) {
 var ACL = {
   check: function(perm, table, user) {
     var allow = false;
-    var groups = readfile(config.authorized_roles);
+    var groups = readfile.all(config.authorized_roles);
 
     var perms = groups.split("\n");
     var perm_lookups = parse_perms(perms);

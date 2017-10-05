@@ -9,6 +9,7 @@ var page = require_core("server/page");
 var rbac = require_app("server/rbac");
 var backend = require_app("server/backend");
 var metadata = require_app("server/metadata");
+var plugins = require_app("server/plugins");
 var view_helper = require_app("client/views/helpers");
 var $ = require("cheerio");
 
@@ -86,27 +87,44 @@ function add_control(control_name, control_label, component, options) {
   return cmp.$el;
 }
 
-function get_view_selector_row() {
+function get_view_selector_row(meta_) {
+
+  var table = context("query_table");
+  var view_plugins = plugins.get_views_for_table(table);
+
+  // how can a config disable plugins?
+  var options = _.extend({
+    "table" : "Table",
+    "time" : "Time Series",
+    "dist" : "Distribution",
+    "samples" : "Samples",
+    "session" : "Timeline",
+    "overview" : "Overview",
+    "" : "--",
+    "bar"  : "Bar Chart",
+    "area" : "Stacked Area",
+    "scatter" : "Scatter Plot",
+    "multidist" : "Grouped Dist.",
+    "graph" : "DiGraph",
+    " " : "--",
+    "drill" : "Impact Attr.",
+    "holtwinters" : "Forecasting",
+    "weco" :        "WECO Alerts",
+  }, view_plugins || {});
+
+  var excluded = plugins.get_excluded_views_for_table(table) || [];
+  var exclusive = plugins.get_solo_views_for_table(table) || {};
+
+  var view_options;
+  if (_.keys(exclusive).length > 0) {
+    view_options = exclusive;
+  } else {
+    view_options = _.omit(options, excluded);
+  }
+
   var view_selector = $C("selector", {
     name: "view",
-    options: {
-      "table" : "Table",
-      "time" : "Time Series",
-      "dist" : "Distribution",
-      "samples" : "Samples",
-      "session" : "Timeline",
-      "overview" : "Overview",
-      "" : "--",
-      "bar"  : "Bar Chart",
-      "area" : "Stacked Area",
-      "scatter" : "Scatter Plot",
-      "multidist" : "Grouped Dist.",
-      "graph" : "DiGraph",
-      " " : "--",
-      "drill" : "Impact Attr.",
-      "holtwinters" : "Forecasting",
-      "weco" :        "WECO Alerts",
-    },
+    options: view_options,
     delegate: {
       "change": "view_changed"
     }
@@ -419,7 +437,7 @@ function get_controls(meta_) {
   table_row.addClass("visible-phone");
   control_box.append(table_row);
 
-  control_box.append(get_view_selector_row());
+  control_box.append(get_view_selector_row(meta_));
 
   control_box.append(get_time_inputs(agg_columns, time_field));
   control_box.append($("<div id='rollup' style='position: relative; top: -40px'>"));

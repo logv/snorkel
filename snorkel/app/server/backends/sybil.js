@@ -110,12 +110,18 @@ function run_query_cmd(arg_string, cb) {
 
   var cmd = get_cmd(BIN_PATH, query_args + arg_string);
   cb = context.wrap(cb);
-  console.log("RUNNING COMMAND", cmd);
+
+  if (config.debug_driver) {
+    console.log("RUNNING COMMAND", cmd);
+  }
+
   child_process.exec(cmd, {
     cwd: DB_DIR,
     maxBuffer: 100000*1024
   }, function(err, stdout, stderr) {
-    console.log(stderr)
+    if (config.debug_driver) {
+      console.log(stderr)
+    }
     var parsed;
     try {
       parsed = JSON.parse(stdout)
@@ -546,7 +552,6 @@ function get_cached_columns(table, cb) {
 
   table = table.table_name || table
   if (_cached_columns[table]) {
-    console.log("Using cached column results for", table);
     var cached_for = (Date.now() - _cached_columns[table].updated) / 1000;
     cb(_cached_columns[table].results);
     cb = function() { };
@@ -574,7 +579,6 @@ function get_columns(table, cb) {
   }
   _pending[table] = [cb];
 
-  console.log("GETTING COLUMNS", table)
   run_query_cmd("-info -json -table " + table, function(err, info) {
     var cols;
     if (err || !info || !info.columns) {
@@ -643,7 +647,9 @@ var flush_queue = _.throttle(function() {
     console.log("QUEUE", table_name, all.length);
 
     var cmd = get_cmd(BIN_PATH, "ingest -table " + table_name);
-    console.log("RUNNING COMMAND", cmd);
+    if (config.debug_driver) {
+      console.log("RUNNING COMMAND", cmd);
+    }
     queue_digest_records(table_name);
     var cp = child_process.exec(cmd, {
       cwd: DB_DIR,

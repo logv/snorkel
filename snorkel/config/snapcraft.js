@@ -1,13 +1,15 @@
 var data_dir = process.env.SNAP_USER_COMMON || ".";
 
+// TODO: add plugin dir
 module.exports = {
   hostname: 'localhost',
   behind_proxy: false,
   config_driver: "linvo",
   data_dir: data_dir,
   config_dir: data_dir,
-  authorized_users: data_dir + "/config/users.htpasswd",
-  authorized_roles: data_dir + "/config/users.rbac",
+  dataset_config_dir: data_dir + "app/plugins/snorkel-dataset-config",
+  authorized_users: "config/users.htpasswd",
+  authorized_roles: "config/users.rbac",
   udp: false,
   http_port: process.env.PORT || 3000,
   frontend: {

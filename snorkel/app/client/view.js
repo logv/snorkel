@@ -81,8 +81,26 @@ function get_control_row(name) {
   return row;
 }
 
+function load_external_view(view, cb) {
+  bootloader.require("app/plugins/" + view, function(mod) {
+    cb(mod);
+  });
+}
+
 function handle_update_view(view) {
   var input_schema = VIEW_INPUTS[view];
+  if (!input_schema) {
+    var self = this;
+    // we will retry after loading the view from plugins dir
+    load_external_view(view, function(mod) {
+      if (VIEW_INPUTS[view]) {
+        handle_update_view.call(self, view);
+      }
+    });
+
+    return;
+  }
+
   var fields = SF.controller().get_fields(this.table);
 
   var custom_controls = input_schema.custom_controls;
@@ -232,10 +250,10 @@ function insert_new_graph(graph_type, data, throbber) {
 
   // TODO: verify the failure path works at some point.
   if (!graph_view) {
-    $C("views/" + graph_type, function(cmp) {
-      console.log("LOADING EXTERNAL VIEW", cmp);
-      create_graph(cmp, data, throbber);
-      GRAPHERS[graph_type] = cmp;
+    load_external_view(graph_type, function(mod) {
+      if (GRAPHERS[graph_type]) {
+        create_graph(GRAPHERS[graph_type], data, throbber);
+      }
     });
   }
 }

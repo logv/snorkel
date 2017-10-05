@@ -28,6 +28,10 @@ module.exports = {
     driver: "mongo"
   },
 
+  config_dir: "app/plugins/snorkel-config/",
+  // this is kept in app/plugins/
+  dataset_config_dir: "app/plugins/snorkel-dataset-config",
+
   // If the data_dir is set, we try to write all our data into this directory.
   // This includes: session store, query results and sybil data
   // The main purpose of this is for SNAP support
@@ -67,6 +71,7 @@ module.exports = {
   upload_csv: false,
   show_tour: false, // display the snorkel tour screens? mostly useful for demo installs
   slog: true,
+  use_cls: true,
   // This is the default max data size of the collection. Each dataset will
   // only grow to this size and no further, ideally
   default_max_dataset_size: 1024 * 1024 * 100 // 100 MB

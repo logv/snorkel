@@ -5,3 +5,8 @@ $(document).on("click", "a[href^='#']", function(event) {
     event.preventDefault();
   }
 });
+
+bootloader.add_stylesheet = function(name) {
+  bootloader.css(name, function() {
+  });
+};

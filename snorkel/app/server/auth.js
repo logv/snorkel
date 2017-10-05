@@ -15,7 +15,7 @@ var USERS = {};
 function read_users() {
   try {
     var users_obj = {}
-    var users = readfile(config.authorized_users);
+    var users = readfile.all(config.authorized_users);
     _.each(users.split("\n"), function(user_line) {
       var user_data = user_line.split(":");
       var passhash = user_data.pop();
