@@ -253,11 +253,19 @@ function marshall_query(form_data) {
         }
       }
 
+      if (config.backend.driver == "sybil") {
+        if (op === "$ne") {
+          op = "$neq";
+        }
+      }
+
       // there is no real support for $eq in mongo, instead using $all. even though
       // its more SFy.
-      if (op === "$eq") {
-        val = [val];
-        op = "$all";
+      if (config.backend.driver == "mongo")  {
+        if (op === "$eq") {
+          val = [val];
+          op = "$all";
+        }
       }
 
       // For $nin and $in, try JSON first, then regular string second
