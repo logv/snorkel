@@ -11,6 +11,20 @@ var globals = require_app("server/globals");
 module.exports = {
   setup_app: function(app) {
     console.log("SETTING UP APP");
+    // Now we need to verify snorkel's version is high enough
+    var semver = require("semver");
+    var super_json = require("superfluous/package.json");
+    var super_version = super_json.version;
+
+    var min_super_version = "0.0.73";
+    if (!semver.gt(super_version, min_super_version)) {
+      console.log("SUPER VERSION IS TOO LOW, NEEDS TO BE", min_super_version)
+      console.log("PLEASE REINSTALL WITH 'npm install superfluous'");
+      process.exit(0);
+    }
+
+
+
     var passport = require('passport');
     app.use(passport.initialize());
     app.use(passport.session());

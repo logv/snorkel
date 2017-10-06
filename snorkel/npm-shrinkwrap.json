@@ -4334,7 +4334,7 @@
       "resolved": "https://registry.npmjs.org/squel/-/squel-1.2.1.tgz"
     },
     "superfluous": {
-      "version": "0.0.74",
+      "version": "0.0.75",
       "dependencies": {
         "async": {
           "version": "2.1.4",
