@@ -42,7 +42,6 @@ if (!path_exists(DB_DIR.trim())) {
 }
 
 // TODO:
-// implement weighting columns
 // implement sort by
 // implement sum/count metrics
 

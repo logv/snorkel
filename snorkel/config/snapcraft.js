@@ -1,6 +1,5 @@
 var data_dir = process.env.SNAP_USER_COMMON || ".";
 
-// TODO: add plugin dir
 module.exports = {
   hostname: 'localhost',
   behind_proxy: false,
