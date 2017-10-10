@@ -96,7 +96,9 @@ function time_prepare(data, options) {
 
       var group_label = dims.join(",");
       var field_label = group_label + " " + field;
+      var field_name = field;
       if (presenter) {
+        field_name = presenter.get_field_name(dataset, field);
         field_label = group_label + " " + presenter.get_field_name(dataset, field);
       }
 
@@ -113,7 +115,9 @@ function time_prepare(data, options) {
         series[field_label] = {
           data: [],
           name: full_label,
-          color: color
+          color: color,
+          group_name: group_label,
+          field_name: field_name
         };
       }
 

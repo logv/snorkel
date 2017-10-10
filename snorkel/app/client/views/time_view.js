@@ -136,6 +136,8 @@ var TimeView = BaseView.extend({
     var table = this.table;
     var self = this;
 
+    var custom_params = this.query.parsed.custom;
+
     options.series = data;
 
     function getValue(item, key) {
@@ -173,22 +175,46 @@ var TimeView = BaseView.extend({
     }
 
     function doDrawGraph() {
-      $C(self.graph_component, {skip_client_init: true}, function(cmp) {
-        // get rid of query contents...
-        $el
-          .append(cmp.$el)
-          .show();
+      var grouped_series = { "" : self.data};
 
-        var annotations = $("<div class='annotations' />");
-        annotations.css({
-          height: "200px"
+      if (custom_params.separate_series == "agg") {
+        grouped_series = _.groupBy(self.data, function(s) {
+          return s.field_name;
+        });
+      }
+
+      if (custom_params.separate_series == "group") {
+        grouped_series = _.groupBy(self.data, function(s) {
+          return s.group_name;
+        });
+      }
+
+
+      _.each(grouped_series, function(series_data, series_name) {
+        $C(self.graph_component, {skip_client_init: true}, function(cmp) {
+          // get rid of query contents...
+          $el
+            .append("<h1>" + series_name + "</h1>")
+            .append(cmp.$el)
+            .show();
+
+          var series_options = _.clone(options);
+          series_options.series = series_data;
+
+          var annotations = $("<div class='annotations' />");
+          annotations.css({
+            height: "200px"
+          });
+
+          $el.append(annotations);
+
+          // There's a little setup cost to highcharts, maybe?
+          cmp.client(series_options);
         });
 
-        $el.append(annotations);
-
-        // There's a little setup cost to highcharts, maybe?
-        cmp.client(options);
       });
+
+
     }
 
     doRSSFeed(function(items) {
@@ -235,6 +261,25 @@ function build_custom_controls() {
   var custom_params = SF.controller().get_custom_params();
 
   $C("selector", {
+    name: "separate_series",
+    options: {
+      "agg" : "By Field",
+      "group" : "By Group",
+      "" : "None"
+    },
+    selected: custom_params.separate_series,
+  }, function(selector) {
+    $C("query_control_row", {
+      label: "Separate Charts",
+      component: selector.toString()
+    }, function(cmp) {
+      custom_controls.append("<div />");
+      custom_controls.append(cmp.$el);
+
+    });
+  });
+
+  $C("selector", {
     name: "fill_missing",
     options: {
       "zero" : "Treat as Zero",
@@ -251,6 +296,7 @@ function build_custom_controls() {
 
     });
   });
+
 
   return custom_controls;
 }
