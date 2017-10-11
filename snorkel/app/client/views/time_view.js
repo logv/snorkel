@@ -297,7 +297,6 @@ function build_custom_controls() {
     });
   });
 
-
   return custom_controls;
 }
 

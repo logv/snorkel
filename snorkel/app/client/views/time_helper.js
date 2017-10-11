@@ -68,7 +68,10 @@ function time_prepare(data, options) {
     _.each(result, function(value, field) {
       if (field === "_id") { return; }
 
-      if (data.parsed.agg === "$count" || data.parsed.agg === "$distinct") {
+      if (data.parsed.agg === "$distinct") {
+        if (field !== "count") { return; }
+      } else if (data.parsed.agg == "$count" &&
+        (data.parsed.custom_fields && !data.parsed.custom_fields.length)) {
         if (field !== "count") { return; }
       } else {
         if (field === "count") { return; }

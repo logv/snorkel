@@ -146,6 +146,7 @@ function handle_update_view(view) {
     var all_inputs = _.uniq(_.flatten(helpers.inputs));
     var exclude = _.difference(all_inputs, input_schema.include);
 
+    var can_custom_fields = true;
     _.each(exclude, function(control_name) {
       var controls = get_control_row(control_name)
         .stop(true)
@@ -162,6 +163,10 @@ function handle_update_view(view) {
         if (control_name === "compare") {
           can_compare = false;
         }
+
+        if (control_name === "custom_fields") {
+          can_custom_fields = false;
+        }
     });
 
     if (can_compare) {
@@ -171,6 +176,12 @@ function handle_update_view(view) {
       $(".compare_filter").slideUp(function() {
         $(this).html("Add comparison filter");
       });
+    }
+
+    if (can_custom_fields) {
+      $(".custom_field_inputs").slideDown();
+    } else {
+      $(".custom_field_inputs").slideUp();
     }
 
     // we toggle the custom time inputs depending on whether they have data in

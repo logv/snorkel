@@ -7,6 +7,12 @@ html, body {
 
 .hidden { display: none; }
 
+#query_sidebar {
+  .hidden {
+    display: none !important;
+  }
+}
+
 #page_header {
   @media (max-width: 767px) {
     display: none;
@@ -380,7 +386,7 @@ html, body {
 .per_grow {
 
   font-weight: bold;
-  
+
   &.maybe {
     color: #fcbba1;
   }
@@ -528,6 +534,4 @@ a {
   .seen {
     display: none;
   }
-
-
 }

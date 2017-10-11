@@ -14,6 +14,63 @@ var COLORS = [
 ];
 
 
+function agg_is(agg, type) {
+  return agg.indexOf(type) != -1;
+}
+
+var col_re = /(.*)\((.*)\)/;
+function extract_field(col) {
+  var match = col_re.exec(col);
+  if (match) {
+    return match[2];
+  }
+
+  return col;
+}
+
+function extract_agg(col) {
+  var match = col_re.exec(col);
+  if (match) {
+    return match[1].replace(/^\$/, "");
+  }
+
+  return "";
+}
+
+function fieldname(a,c) {
+  if (a) {
+    return a.replace(/^\$/, "") + "(" + c + ")";
+  }
+
+  // a hack to grab (count) -> count
+  return c;
+}
+
+function get_col_aggs(dataset, parsed_query) {
+
+  var cols = _.clone(parsed_query.cols);
+
+  // custom aggs is a lookup from field_name -> [agg1, agg2, agg3]
+  var custom_fields = parsed_query.custom_fields;
+
+  var col_aggs = {};
+  var agg = parsed_query.agg;
+  _.each(cols, function(col) {
+
+    var col_agg = agg + "(" + col + ")";
+    col_aggs[col_agg] = col_agg;
+  });
+
+  _.each(custom_fields, function(em) {
+    col_aggs[em] = em;
+  });
+
+  col_aggs = _.keys(col_aggs);
+  return col_aggs;
+}
+
+
+
 function row_key(group_by, result) {
   var row = [];
   _.each(group_by, function(group) {
@@ -239,12 +296,22 @@ module.exports = {
     var col_formatters = [];
     var fields = this.fields;
     _.each(headers, function(col) {
+      var field = presenter.extract_field(col) || col;
+      var agg = presenter.extract_agg(col);
       td = $("<th>");
-      var display_name = presenter.get_field_name(dataset, col);
-      td.attr('data-name', col);
-      td.html(display_name);
+      var display_name = presenter.get_field_name(dataset, field);
+
+      // the data-name is the underlying name of the column, not including
+      // the aggregation
+      td.attr('data-name', field);
+      if (agg) {
+        td.html(agg + "(" + display_name + ")");
+      } else {
+        td.html(display_name);
+      }
+
       row.append(td);
-      col_formatters.push(presenter.get_field_formatter(dataset, col));
+      col_formatters.push(presenter.get_field_formatter(dataset, field));
     });
 
 
@@ -261,7 +328,12 @@ module.exports = {
       _.each(row, function(col, index) {
         td = $("<td />");
         var col_formatter = col_formatters[index];
-        td.html(col_formatter(col));
+
+        if (col && col.indexOf && col.indexOf("->") != -1) {
+          td.html(col);
+        } else {
+          td.html(col_formatter(col));
+        }
         rowEl.append(td);
       });
 
@@ -410,8 +482,6 @@ module.exports = {
     console.log.apply(console, arguments);
   },
 
-  row_key: row_key,
-  result_key: result_key
 
 };
 
@@ -428,7 +498,7 @@ var INPUTS = {
 
   GROUP_BY: [ "group_by"],
 
-  MULTI_AGG: [ "fieldset", "agg" ],
+  MULTI_AGG: [ "fieldset", "agg", "custom_fields" ],
   SINGLE_AGG: [ "field", "agg" ],
 
   STACKING: [ "stacking" ],
@@ -466,3 +536,16 @@ _.extend(module.exports, {
     .concat(INPUTS.HIST_BUCKET)
     .concat(INPUTS.STACKING)
 });
+
+
+var FIELD_HELPERS = {
+  row_key: row_key,
+  result_key: result_key,
+  fieldname: fieldname,
+  extract_agg: extract_agg,
+  extract_field: extract_field,
+  agg_is: agg_is,
+  get_col_aggs: get_col_aggs
+
+};
+_.extend(module.exports, FIELD_HELPERS);

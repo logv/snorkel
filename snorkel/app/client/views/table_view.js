@@ -44,23 +44,32 @@ var TableView = BaseView.extend({
     var that = this;
     var group_by = _.clone(this.data.parsed.dims);
     var cols = _.clone(this.data.parsed.cols);
+    var agg = this.data.parsed.agg;
 
     if (this.data.parsed.agg == "$distinct") {
       group_by = [];
       cols = [];
     }
 
+
+    var col_aggs = presenter.get_col_aggs(this.table, this.data.parsed);
+
     // TODO: something
     cols.unshift("count"); // modifies cols column
+    col_aggs.unshift("count"); // modifies cols column
+
+
 
     if (this.data.parsed.weight_col) {
       cols.unshift("weighted_count");
+      col_aggs.unshift("weighted_count");
     }
+
 
     var col_metadata = SF.controller().get_fields(this.table);
 
     var headers = [];
-    _.each(group_by.concat(cols), function(col) {
+    _.each(group_by.concat(col_aggs), function(col) {
       headers.push(col);
     });
 
@@ -92,11 +101,13 @@ var TableView = BaseView.extend({
 
 
       var compare_result = compare_row_hash[key];
-      _.each(cols, function(col) {
-        var col_value = result[col];
+      _.each(col_aggs, function(col) {
+
+        var col_value = presenter.get_field_value(result, col);
+
         var cell_div;
         if (compare) {
-          var compare_value = (compare_result && compare_result[col]) || 0;
+          var compare_value = presenter.get_field_value(compare_result, col) || 0;
           cell_div = helpers.build_compare_cell(col_value, compare_value);
         } else {
           cell_div = helpers.build_compare_cell(col_value);
@@ -114,7 +125,6 @@ var TableView = BaseView.extend({
 
     this.headers = headers;
     this.rows = rows;
-
 
     this.csv_data = headers.join(",") + "\n" + _.map(csv_data, function(row) {
       return row.join(",");
@@ -181,8 +191,8 @@ var TableView = BaseView.extend({
       }, 200);
 
     var that = this;
-    $C("table_popover", 
-      { type: col_type, name: col_name, row: $td.parents("tr"), cell: $td}, 
+    $C("table_popover",
+      { type: col_type, name: col_name, row: $td.parents("tr"), cell: $td},
       function(cmp) {
         that.popover = cmp;
         div.popover({
@@ -246,6 +256,8 @@ var TableView = BaseView.extend({
       fields = [];
       agg = "$count";
     }
+
+
 
     if (field) {
       SF.controller().trigger("set_control", "field", field);

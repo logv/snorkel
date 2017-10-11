@@ -7,6 +7,10 @@ var child_process = require("child_process");
 var backend = require_app("server/backend");
 var config = require_core("server/config");
 
+var view_helpers = require_app("client/views/helpers");
+var extract_agg = view_helpers.extract_agg;
+var extract_field = view_helpers.extract_field;
+
 var path = require("path")
 var cwd = process.cwd()
 
@@ -135,9 +139,21 @@ function run_query_cmd(arg_string, cb) {
 
 }
 
+function fieldname(a,c) {
+  return a.replace(/^\$/, "") + "(" + c + ")";
+}
+
 function marshall_time_rows(query_spec, time_buckets) {
   var cols = query_spec.opts.cols;
   var dims = query_spec.opts.dims;
+  var agg = query_spec.opts.agg;
+
+  var custom_fields = query_spec.opts.custom_fields;
+
+  if (config.debug_driver) {
+    console.log("EXTRACTING EXTRA METRICS", custom_fields);
+  }
+
   var ret = [];
   _.each(time_buckets, function(rows, time_bucket) {
     _.each(rows, function(r) {
@@ -152,7 +168,16 @@ function marshall_time_rows(query_spec, time_buckets) {
       });
 
       _.each(cols, function(c) {
-        row[c] = extract_val(query_spec, r, c);
+        _.each([agg], function(agg) {
+          row[fieldname(agg,c)] = extract_val(query_spec, r, c, agg);
+        });
+      });
+
+      _.each(custom_fields, function(em) {
+        var a = extract_agg(em);
+        var c = extract_field(em);
+        row[fieldname(a,c)] = extract_val(query_spec, r, c, a);
+
       });
 
       row._id.time_bucket = parseInt(time_bucket, 10);
@@ -169,28 +194,54 @@ function marshall_time_rows(query_spec, time_buckets) {
 
 }
 
-function extract_val(query_spec, r, c) {
+function extract_val(query_spec, r, c, agg) {
 
-  var agg = query_spec.opts.agg;
+  var oa = agg || query_spec.opts.agg;
+
+  agg = oa.replace(/^\$/, "");
   var percentile;
   var sum;
   var count;
   var distinct;
+  var stddev;
 
-  if (agg === "$sum") {
+  if (agg === "sum") {
     sum = true;
-  } else if (agg === "$count") {
+  } else if (agg === "count") {
     count = true;
-  } else if (agg === "$distinct") {
+  } else if (agg === "distinct") {
     distinct = true;
+  } else if (agg === "stddev") {
+    stddev = true;
   }
 
-  if (agg.indexOf("$p") === 0) {
-    percentile = parseInt(agg.substr(2), 10);
+  if (agg.indexOf("p") === 0) {
+    percentile = parseInt(oa.substr(1), 10);
     if (_.isNaN(percentile)) {
       percentile = null;
     }
   }
+
+  var avg;
+  var summed = 0;
+  var total = 0;
+
+  if (r[c]) {
+    if (r[c].avg) {
+      avg = r[c].avg;
+    } else if (_.isNumber(r[c]) || _.isString(r[c])) {
+      avg = parseFloat(r[c], 10);
+    } else if (r[c].buckets) {
+      _.each(r[c].buckets, function(count, val) {
+        total += count;
+        summed += (parseInt(val, 10) * count);
+      });
+
+      avg = r[c].avg = summed / total;
+
+    }
+  }
+
   if (percentile) {
     if (r[c] && r[c].percentiles) {
       return parseFloat(r[c].percentiles[percentile], 10);
@@ -198,13 +249,15 @@ function extract_val(query_spec, r, c) {
       return  "NA";
     }
   } else if (sum) {
-    return r.Count * parseFloat(r[c], 10);
+    return r.Count * avg;
   } else if (count) {
     return  r.Count;
   } else if (distinct) {
     return r.Distinct || r.distinct;
+  } else if (stddev) {
+    return (r[c] && r[c].stddev) || 0;
   } else {
-    return parseFloat(r[c], 10);
+    return parseFloat(avg, 10);
 
   }
 
@@ -213,6 +266,8 @@ function extract_val(query_spec, r, c) {
 function marshall_table_rows(query_spec, rows) {
   var cols = query_spec.opts.cols;
   var dims = query_spec.opts.dims;
+  var agg = query_spec.opts.agg;
+  var custom_fields = query_spec.opts.custom_fields || [];
 
 
   var ret = [];
@@ -224,8 +279,18 @@ function marshall_table_rows(query_spec, rows) {
     });
 
     _.each(cols, function(c) {
-      row[c] = extract_val(query_spec, r, c);
+      _.each([agg], function(agg) {
+        row[fieldname(agg,c)] = extract_val(query_spec, r, c, agg);
+      });
     });
+
+    _.each(custom_fields, function(em) {
+      var a = extract_agg(em);
+      var c = extract_field(em);
+      row[fieldname(a,c)] = extract_val(query_spec, r, c, a);
+
+    });
+
     row.count = r.Samples || r.Count;
     row.distinct = r.Distinct || r.distinct;
     row.weighted_count = r.Count || r.Samples;
@@ -258,11 +323,26 @@ function add_dims_and_cols(query_spec) {
       }
     }
   }
-  if (query_spec.opts.cols.length) {
-    var int_by = query_spec.opts.cols.join(FIELD_SEPARATOR);
-    cmd_args += " -int " + int_by + " ";
 
-    if (query_spec.opts.agg && query_spec.opts.agg.indexOf("$p") === 0) {
+
+  if (query_spec.opts.cols.length || query_spec.opts.custom_fields) {
+    var cols = {};
+    _.each(query_spec.opts.cols, function(c) { cols[c] = 1; });
+    _.each(query_spec.opts.custom_fields, function(em) { cols[extract_field(em)] = 1; });
+
+    var int_by = _.keys(cols).join(FIELD_SEPARATOR);
+    if (int_by) {
+      cmd_args += " -int " + int_by + " ";
+    }
+
+    var use_hist;
+    if (query_spec.opts.custom_fields) {
+      use_hist = true;
+    } else if (query_spec.opts.agg && query_spec.opts.agg.indexOf("$p") === 0) {
+      use_hist = true;
+    }
+
+    if (use_hist) {
       cmd_args += " -op hist ";
     }
 
@@ -621,7 +701,9 @@ var digest_records = _.throttle(function () {
     child_process.exec(BIN_PATH + " digest -table " + table_name, {
       cwd: DB_DIR,
     }, function(err, stdout, stderr) {
-      console.log(stderr);
+      if (config.debug_driver) {
+        console.log(stderr);
+      }
     });
   });
 
@@ -684,7 +766,10 @@ var PCSDriver = _.extend(driver.Base, {
     }
   },
   get_stats: function(table, cb) {
-    console.log("GETTING STATS FOR TABLE", table)
+    if (config.debug_driver) {
+      console.log("GETTING STATS FOR TABLE", table)
+    }
+
     table = table.table_name || table
     // count: 3253,
     // size: 908848,

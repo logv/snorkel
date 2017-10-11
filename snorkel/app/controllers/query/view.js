@@ -1,6 +1,7 @@
 "use strict";
 
 var context = require_core("server/context");
+var config = require_core("server/config");
 var template = require_core("server/template");
 var bridge = require_core("server/bridge");
 var page = require_core("server/page");
@@ -363,8 +364,8 @@ function get_group_by_row(group_columns) {
   return group_by_row;
 }
 
+function get_aggregate_metrics() {
 
-function get_aggregate_row() {
   // AGGREGATE INPUTS
   var options = {
     "$avg" : "Average",
@@ -376,6 +377,16 @@ function get_aggregate_row() {
   if (extra_metrics) {
     _.extend(options, extra_metrics);
   }
+
+  return options;
+
+
+}
+
+
+function get_aggregate_row() {
+  // AGGREGATE INPUTS
+  var options = get_aggregate_metrics();
 
   var agg_selector = $C("selector", {
     name: "agg",
@@ -404,7 +415,41 @@ function get_fieldset_row(agg_columns) {
     name: "fieldset",
     options: agg_names
   });
-  return add_control("fieldset", "Fields", field_selector.toString());
+  var control_box = $("<div>");
+  control_box.append(add_control("fieldset", "Fields", field_selector.toString()));
+
+  if (config.backend.driver == "sybil") {
+    var custom_fields = {};
+    var options = get_aggregate_metrics();
+    _.each(agg_columns, function(col) {
+      _.each(options, function(_, agg) {
+        if (agg == "$count" || agg == "$distinct") {
+          return;
+        }
+
+        custom_fields[view_helper.fieldname(agg, col.name)] =
+          view_helper.fieldname(agg, col.display_name || col.name);
+      });
+
+    });
+
+    var custom_field_selector = $C("multiselect", {
+      name: "custom_fields",
+      options: custom_fields
+
+    });
+
+    var custom_field_box = add_control("custom_fields", "Fields", custom_field_selector.toString());
+
+    var custom_toggler = $("<small class='rfloat' style='margin-right: 30px'><a href='#' class='custom_field_inputs mrl'>loading...</a></small>");
+
+    control_box.append(custom_field_box);
+    control_box.append(custom_toggler);
+
+    custom_field_box.find('.control-group').addClass("hidden");
+  }
+
+  return control_box;
 }
 
 function get_view_custom_inputs() {

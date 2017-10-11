@@ -13,10 +13,12 @@ var BarView = BaseView.extend({
     var group_by = _.clone(this.data.parsed.dims);
 
     var cols = _.clone(this.data.parsed.cols);
+    var col_aggs = presenter.get_col_aggs(this.table, this.data.parsed);
 
     if (!cols || !cols.length) {
       cols = ['count'];
       this.data.parsed.agg = '$count';
+      col_aggs = ['count'];
     }
 
     var stacking = this.data.parsed.stacking === "stacked";
@@ -29,7 +31,7 @@ var BarView = BaseView.extend({
     var compare_data = this.compare_data;
     var dataset = this.table;
 
-    _.each(cols, function(col) {
+    _.each(col_aggs, function(col) {
       serieses[col] = {
         data: [],
         name: presenter.get_field_name(dataset, col),
@@ -56,8 +58,9 @@ var BarView = BaseView.extend({
     _.each(this.data.results, function(result) {
       var key = row_key(group_by, result);
       categories.push(key);
-      _.each(cols, function(col) {
-        if (metric === '$count') {
+      _.each(col_aggs, function(col) {
+        var agg = presenter.extract_agg(col) || metric;
+        if (agg === '$count') {
           serieses[col].data.push(
             {
               y: result.count,
@@ -66,7 +69,7 @@ var BarView = BaseView.extend({
             });
         } else {
           serieses[col].data.push({
-            y: result[col],
+            y: presenter.get_field_value(result, col),
             samples: result.count
           });
         }
@@ -78,8 +81,9 @@ var BarView = BaseView.extend({
       _.each(compare_data.results, function(result) {
         var key = row_key(group_by, result);
         categories.push(key);
-        _.each(cols, function(col) {
-          if (metric === '$count') {
+        _.each(col_aggs, function(col) {
+          var agg = presenter.extract_agg(col) || metric;
+          if (agg === '$count') {
             compare_series[col].data.push({
               samples: result.count,
               y: result.count
@@ -87,7 +91,7 @@ var BarView = BaseView.extend({
           } else {
             compare_series[col].data.push({
               samples: result.count,
-              y: result[col]
+              y: presenter.get_field_value(result, col)
             });
           }
         });
@@ -97,7 +101,7 @@ var BarView = BaseView.extend({
 
     var datas = [];
     var compare_datas = [];
-    _.each(cols, function(col) {
+    _.each(col_aggs, function(col) {
       if (!serieses[col]) {
         return;
       }
@@ -106,7 +110,6 @@ var BarView = BaseView.extend({
       compare_datas.push(compare_series[col]);
     });
 
-    this.cols = cols;
     this.serieses = datas;
     this.compare_serieses = compare_datas;
     this.categories = categories;

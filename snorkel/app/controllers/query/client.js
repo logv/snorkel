@@ -486,7 +486,8 @@ module.exports = {
     "click .logout" : "handle_logout",
     "click .compare_filter" : "handle_compare_toggle",
     "click .show_user_dialog" : "handle_user_history",
-    "click .custom_time_inputs" : "handle_custom_time_inputs"
+    "click .custom_time_inputs" : "handle_custom_time_inputs",
+    "click .custom_field_inputs" : "handle_custom_fields_input"
   },
 
   delegates: {
@@ -539,6 +540,7 @@ module.exports = {
     formEl
       .find("[data-disabled=true]")
       .attr("disabled", false);
+
 
     // a hook for views to use to inject their own input values, in the *VERY* rare
     // case that they need it
@@ -643,11 +645,20 @@ module.exports = {
     // them or not.
     var custom_start = views.get_control("custom_start");
     var custom_end = views.get_control("custom_start");
+    var custom_fields = views.get_control("custom_fields");
+
     // both time inputs need to be filled out. right?
     if (custom_start || custom_end) {
       this.show_custom_time_inputs();
     } else {
       this.hide_custom_time_inputs();
+    }
+
+    if (query.custom_fields || custom_fields && custom_fields.length ) {
+      this.show_custom_fields_input();
+    } else {
+      this.hide_custom_fields_input();
+
     }
 
     // deserialization for multiselects. grr.
@@ -870,6 +881,13 @@ module.exports = {
     });
   },
 
+  get_metrics: function() {
+    var metricEl = views.get_control_row("agg");
+    var options = {};
+    _.each(metricEl.find('option'), function(v) { options[$(v).val()] = 1; });
+
+    return _.keys(options);
+  },
   get_fields: function() {
     return this.fields;
   },
@@ -902,6 +920,9 @@ module.exports = {
     var customStartRow = views.get_control_row("custom_start");
     var customEndRow = views.get_control_row("custom_end");
 
+    customStartRow.removeClass("hidden");
+    customEndRow.removeClass("hidden");
+
     startControl.slideUp();
     endControl.slideUp();
 
@@ -910,8 +931,6 @@ module.exports = {
 
     startControl.addClass('hidden');
     endControl.addClass('hidden');
-    customStartRow.removeClass("hidden");
-    customEndRow.removeClass("hidden");
 
     this.$el.find(".custom_time_inputs").text("quick select time");
 
@@ -928,6 +947,9 @@ module.exports = {
     views.set_control("custom_start", "");
     views.set_control("custom_end", "");
 
+    startControl.removeClass('hidden');
+    endControl.removeClass('hidden');
+
     customStartRow.slideUp();
     customEndRow.slideUp();
     startControl.slideDown();
@@ -935,8 +957,6 @@ module.exports = {
 
     customStartRow.addClass("hidden");
     customEndRow.addClass("hidden");
-    startControl.removeClass('hidden');
-    endControl.removeClass('hidden');
 
     this.$el.find(".custom_time_inputs").text("use custom time");
   },
@@ -946,6 +966,51 @@ module.exports = {
       this.show_custom_time_inputs();
     } else if (views.get_control_row("custom_start").is(":visible")) {
       this.hide_custom_time_inputs();
+    }
+  },
+
+  show_custom_fields_input: function() {
+    var fieldsControl = views.get_control_row("fieldset");
+    var aggControl = views.get_control_row("agg");
+
+    var customFieldsRow = views.get_control_row("custom_fields");
+
+    customFieldsRow.removeClass("hidden");
+    fieldsControl.finish().slideUp();
+    aggControl.finish().slideUp();
+    customFieldsRow.finish().slideDown();
+    customFieldsRow.find("select").attr("data-disabled", false);
+    fieldsControl.find("select").attr("data-disabled", true);
+
+    fieldsControl.addClass('hidden');
+    aggControl.addClass('hidden');
+
+    this.$el.find(".custom_field_inputs").text("quick select fields");
+  },
+  hide_custom_fields_input: function() {
+    var fieldsControl = views.get_control_row("fieldset");
+    var aggControl = views.get_control_row("agg");
+    var customFieldsRow = views.get_control_row("custom_fields");
+
+    fieldsControl.removeClass('hidden');
+    aggControl.removeClass('hidden');
+
+    customFieldsRow.finish().slideUp();
+    customFieldsRow.find("select").attr("data-disabled", true);
+    fieldsControl.find("select").attr("data-disabled", false);
+    fieldsControl.finish().slideDown();
+    aggControl.finish().slideDown();
+
+    customFieldsRow.addClass("hidden");
+
+    this.$el.find(".custom_field_inputs").text("use custom fields");
+  },
+
+  handle_custom_fields_input: function() {
+    if (views.get_control_row("fieldset").is(":visible")) {
+      this.show_custom_fields_input();
+    } else if (views.get_control_row("custom_fields").is(":visible")) {
+      this.hide_custom_fields_input();
     }
   },
 

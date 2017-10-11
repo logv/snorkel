@@ -86,14 +86,16 @@ function marshall_query(form_data) {
   query_data.baseview = value_of(form_data, 'baseview', query_data.view);
   query_data.time_field = value_of(form_data, 'time_field');
 
+  var custom_fields = array_of(form_data, 'custom_fields', []);
+  query_data.custom_fields = custom_fields;
+
   var custom = value_of(form_data, 'custom', '{}');
   var custom_data = {};
   try {
     custom_data = JSON.parse(custom);
-  } catch(e) {
-
-  }
+  } catch(e) { }
   query_data.custom = custom;
+
 
   var limit = 100;
   if (query_data.view === 'samples') {
@@ -587,16 +589,15 @@ function get_query(cb, no_saved_queries) {
 
 function get_grafana() {
   var res = context("res");
+  var helpers = require_app("client/views/helpers");
   get_query(function(data, meta) {
     var query = data.query;
     if (query) {
-      var ret = []
       var series = {};
 
-      var cols = query.parsed.cols;
-      if (!cols || !cols.length) {
-        cols = [ "count" ];
-      }
+
+      var col_aggs = helpers.get_col_aggs(data.table, query.parsed);
+      if (!col_aggs || !col_aggs.length) { col_aggs = [ "count" ]; }
 
       var formatters = { };
 
@@ -612,8 +613,13 @@ function get_grafana() {
           });
         }
 
-        _.each(cols, function(col) {
-          var key = groupby+"."+col;
+        _.each(col_aggs, function(col) {
+          var field = helpers.extract_field(col);
+          var agg = helpers.extract_agg(col);
+
+          col = helpers.fieldname(agg, field);
+
+          var key = groupby+"."+field;
           var datapoints = series[key];
           if (!datapoints) {
             datapoints = {
@@ -624,20 +630,20 @@ function get_grafana() {
           }
 
           var metadata = meta.metadata;
-          var formatter_js = metadata.columns[col] && metadata.columns[col].formatter;
-          if (formatter_js && !formatters[col]) {
-            var args = [ "value", col, formatter_js ];
+          var formatter_js = metadata.columns[field] && metadata.columns[field].formatter;
+          if (formatter_js && !formatters[field]) {
+            var args = [ "value", field, formatter_js ];
             var func = Function.apply(null, args);
-            formatters[col] = function(value) {
+            formatters[field] = function(value) {
               var val = func.apply(null, [value, value]);
               return val;
             };
 
           }
 
-          if (formatters[col]) {
+          if (formatters[field]) {
             try {
-              result[col] = formatters[col](result[col]);
+              result[col] = formatters[field](result[col]);
             } catch(e) {
             }
 
@@ -942,7 +948,6 @@ function load_annotations(table, cb) {
 
   db.toArray(cur, context.wrap(function(err, arr) {
     annotations.items = arr;
-    console.log(arr);
     after();
   }));
 

@@ -1,6 +1,18 @@
 "use strict";
 
 var helpers = require("app/client/views/helpers");
+var extract_field = helpers.extract_field;
+var extract_agg = helpers.extract_agg;
+var fieldname = helpers.fieldname;
+
+function fieldname(a,c) {
+  if (a) {
+    return a.replace(/^\$/, "") + "(" + c + ")";
+  }
+
+  // a hack to grab (count) -> count
+  return c;
+}
 
 module.exports = {
   set_fields: function(table, fields) {
@@ -29,19 +41,51 @@ module.exports = {
   },
 
   get_field_name: function(dataset, col) {
-    return this.get_col_attr(dataset, col, 'display_name', col);
+    var field = extract_field(col);
+    var agg = extract_agg(col);
+    if (agg) {
+      return agg + "(" + this.get_col_attr(dataset, field, 'display_name', field) + ")";
+    }
+
+    return this.get_col_attr(dataset, field, 'display_name', field);
   },
 
+  get_field_value: function(result, col) {
+    if (!result) {
+      return null;
+    }
+
+
+    var agg = extract_agg(col);
+    var field = extract_field(col);
+
+    var ret = null;
+    var pos = [fieldname(agg, field), col, field];
+    for (var c in pos) {
+      if (result[pos[c]] !== null) {
+        ret = result[pos[c]];
+        break;
+      }
+    }
+
+
+    return ret;
+  },
+
+
   get_field_type: function(dataset, col) {
+    col = extract_field(col);
     return this.get_col_attr(dataset, col, 'final_type', 'unknown');
 
   },
 
   get_field_axis: function(dataset, col) {
+    col = extract_field(col);
     return this.get_col_attr(dataset, col, 'axis');
   },
 
   get_field_number_formatter: function(dataset, col) {
+    col = extract_field(col);
     var self = this;
     var formatter = function(val) {
       if (self.inner_formatters[dataset]) {
@@ -59,6 +103,7 @@ module.exports = {
   },
 
   get_field_formatter: function(dataset, col) {
+    col = extract_field(col);
     if (!this.formatters[dataset])  {
       this.formatters[dataset] = {};
       this.inner_formatters[dataset] = {};
@@ -111,6 +156,11 @@ module.exports = {
   },
 
   get_field_description: function(dataset, col) {
+    col = extract_field(col);
     return this.get_col_attr(dataset, col, 'description');
-  }
+  },
+
+  get_col_aggs: helpers.get_col_aggs,
+  extract_field: extract_field,
+  extract_agg: extract_agg
 };
