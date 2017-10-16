@@ -1,3 +1,14 @@
+snorkel (0.4.0-1) unstable; urgency=low
+
+  * add new input for selection multiple aggregate metrics per column
+  * add support for sybil's nested histograms
+  * fix table popover related bugs
+  * add regex escaping to table popover based filters
+  * updating dist view with focus charts (zoomable line charts)
+  * add initial plugin support for views, dataset presenters and snorkel config
+
+ -- okay <okay.zed@gmail.com> Mon Oct 16 9:20:00 2017 -0700
+
 snorkel (0.1.1-1) unstable; urgency=low
 
   * quick select custom time filters from time series graphs
