@@ -139,6 +139,18 @@ module.exports = {
   get_stats: driver.get_stats,
   clear_cache: driver.clear_cache,
   get_tables: driver.get_tables,
+  default_bucket: function() {
+    if (_.isFunction(driver.default_bucket)) {
+      return driver.default_bucket();
+    }
+
+    if (_.isObject(driver.default_bucket)) {
+      return driver.default_bucket;
+    }
+
+    return "auto";
+
+  },
   extra_buckets: function() {
     if (_.isFunction(driver.extra_buckets)) {
       return driver.extra_buckets();

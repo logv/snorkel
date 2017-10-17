@@ -336,8 +336,12 @@ function add_dims_and_cols(query_spec) {
     }
 
     var use_hist;
-    if (query_spec.opts.custom_fields) {
+    var log_hist;
+    var custom_fields = query_spec.opts.custom_fields || [];
+    if (custom_fields.length) {
       use_hist = true;
+      log_hist = true;
+
     } else if (query_spec.opts.agg && query_spec.opts.agg.indexOf("$p") === 0) {
       use_hist = true;
     }
@@ -351,7 +355,7 @@ function add_dims_and_cols(query_spec) {
 
     }
 
-    if (query_spec.opts.hist_bucket_str == "log_hist") {
+    if (query_spec.opts.hist_bucket_str == "log_hist" || log_hist) {
       cmd_args += " -op hist -loghist ";
 
     }
@@ -359,6 +363,7 @@ function add_dims_and_cols(query_spec) {
     if (query_spec.opts.hist_bucket_str == "hdr_hist") {
       cmd_args += " -op hist -hdr ";
     }
+
 
 
   }
@@ -793,6 +798,9 @@ var PCSDriver = _.extend(driver.Base, {
   get_columns: get_cached_columns,
   clear_cache: function(table, cb) {},
   drop_dataset: function(table, cb) {},
+  default_bucket: function() {
+    return "auto";
+  },
   extra_buckets: function() {
 
     var ret = {};

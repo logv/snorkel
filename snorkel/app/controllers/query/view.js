@@ -322,10 +322,12 @@ function get_hist_bucket_row() {
   var opts = {};
   _.each(hist_bucket_opts, function(o) { opts[o] = o; });
   var extra_buckets = backend.extra_buckets();
+  var default_bucket = backend.default_bucket();
   if (extra_buckets) {
     _.extend(opts, extra_buckets);
+
   }
-  var max_results_input = $C("selector", { name: "hist_bucket", options: opts, selected: "auto", order:  hist_bucket_opts.concat(_.keys(extra_buckets))});
+  var max_results_input = $C("selector", { name: "hist_bucket", options: opts, selected: default_bucket, order:  hist_bucket_opts.concat(_.keys(extra_buckets))});
   return add_control("hist_bucket", "Bucket", max_results_input.toString());
 }
 
