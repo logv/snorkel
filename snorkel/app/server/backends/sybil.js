@@ -182,8 +182,9 @@ function marshall_time_rows(query_spec, time_buckets) {
 
       row._id.time_bucket = parseInt(time_bucket, 10);
 
-      row.count = r.Samples || r.Count;
+      row.count = r.Count || r.Samples;
       row.weighted_count = r.Count || r.Samples;
+      row.distinct = r.Distinct;
 
       ret.push(row);
     });
