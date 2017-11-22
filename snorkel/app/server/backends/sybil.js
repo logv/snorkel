@@ -11,6 +11,9 @@ var view_helpers = require_app("client/views/helpers");
 var extract_agg = view_helpers.extract_agg;
 var extract_field = view_helpers.extract_field;
 
+var shell_quote = require("shell-quote");
+
+
 var path = require("path")
 var cwd = process.cwd()
 
@@ -58,7 +61,7 @@ function get_cmd_info(cb) {
   var query_args = " version -json";
   var cmd = get_cmd(BIN_PATH, query_args);
   cb = context.wrap(cb);
-  child_process.exec(cmd, {
+  safe_exec_cmd(cmd, {
     cwd: DB_DIR,
   }, function(err, stdout, stderr) {
     var parsed;
@@ -72,6 +75,15 @@ function get_cmd_info(cb) {
 
     cb(err, parsed);
   });
+}
+
+//  try to be safer than using safe_exec_cmd
+function safe_exec_cmd(cmd_string, options, cb) {
+  var cmd_args = shell_quote.parse(cmd_string);
+  var cmd = cmd_args.shift()
+
+
+  return child_process.execFile(cmd, cmd_args, options, cb);
 }
 
 
@@ -118,7 +130,7 @@ function run_query_cmd(arg_string, cb) {
     console.log("RUNNING COMMAND", cmd);
   }
 
-  child_process.exec(cmd, {
+  safe_exec_cmd(cmd, {
     cwd: DB_DIR,
     maxBuffer: 100000*1024
   }, function(err, stdout, stderr) {
@@ -704,7 +716,7 @@ function queue_digest_records(table_name) {
 
 var digest_records = _.throttle(function () {
   _.each(DIGESTIONS, function(val, table_name) {
-    child_process.exec(BIN_PATH + " digest -table " + table_name, {
+    safe_exec_cmd(BIN_PATH + " digest -table " + table_name, {
       cwd: DB_DIR,
     }, function(err, stdout, stderr) {
       if (config.debug_driver) {
@@ -738,7 +750,7 @@ var flush_queue = _.throttle(function() {
       console.log("RUNNING COMMAND", cmd);
     }
     queue_digest_records(table_name);
-    var cp = child_process.exec(cmd, {
+    var cp = safe_exec_cmd(cmd, {
       cwd: DB_DIR,
     });
 
