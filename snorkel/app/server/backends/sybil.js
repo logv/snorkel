@@ -6,6 +6,7 @@ var context = require_core("server/context");
 var child_process = require("child_process");
 var backend = require_app("server/backend");
 var config = require_core("server/config");
+var readfile = require_core("server/readfile");
 
 var view_helpers = require_app("client/views/helpers");
 var extract_agg = view_helpers.extract_agg;
@@ -25,6 +26,27 @@ var CUSTOM_SEPARATORS = false;
 var HAS_HDR_HIST = false;
 var HAS_LOG_HIST = false;
 var HAS_QUERY_CACHE = false;
+
+
+// NOTES FOR MULTI-READER SYBIL
+// if the sybil driver specifies multiple hosts for sybil,
+// then we will use "multi-reader" mode for snorkel, meaning
+// that we will call into msybil and supply hosts on stdin.
+// this will void all non-query commands (ingest, digest, etc),
+// putting snorkel into "read-only" mode for data (but it will still
+// record the queries and favorites, etc)
+// The host format for sybil is one line per host:
+//  host working_dir binpath
+// ex:
+//  logv.org ~/snorkel/snorkel/ ~/snorkel/snorkel/bin/sybil
+var MULTI_HOST_MODE=false;
+if (config.backend.hostfile) {
+  console.log("USING HOSTS FROM FILE", config.backend.hostfile);
+  console.log("SWITCHING TO MSYBIL MODE (DISTRIBUTED QUERIES)");
+  MULTI_HOST_MODE = true;
+  BIN_PATH = "app/server/backends/msybil";
+}
+
 
 function path_exists(path) {
   var fs = require('fs');
@@ -130,7 +152,7 @@ function run_query_cmd(arg_string, cb) {
     console.log("RUNNING COMMAND", cmd);
   }
 
-  safe_exec_cmd(cmd, {
+  var cp = safe_exec_cmd(cmd, {
     cwd: DB_DIR,
     maxBuffer: 100000*1024
   }, function(err, stdout, stderr) {
@@ -147,7 +169,13 @@ function run_query_cmd(arg_string, cb) {
     }
 
     cb(err, parsed)
-  })
+  });
+
+  if (MULTI_HOST_MODE) {
+    var hosts = readfile(config.backend.hostfile);
+    cp.stdin.write(hosts);
+    cp.stdin.destroy();
+  }
 
 }
 
@@ -348,7 +376,8 @@ function add_dims_and_cols(query_spec) {
       cmd_args += " -int " + int_by + " ";
     }
 
-    var use_hist;
+    // we have to use histogram aggregations across hosts
+    var use_hist = MULTI_HOST_MODE;
     var log_hist;
     var custom_fields = query_spec.opts.custom_fields || [];
     if (custom_fields.length) {
