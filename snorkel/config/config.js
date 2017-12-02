@@ -31,8 +31,7 @@ module.exports = {
 
   backend: {
     // can be mongo, mongo_raw, postgres, postgres_raw or sybil
-    driver: "mongo",
-
+    driver: "sybil"
   },
 
   config_dir: "app/plugins/snorkel-config/",
