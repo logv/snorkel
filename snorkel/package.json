@@ -1,7 +1,7 @@
 {
   "name": "snorkel",
   "description": "node.js realtime analytics explorer",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "private": true,
   "dependencies": {
     "Faker": "x",
