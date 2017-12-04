@@ -15,14 +15,18 @@ BASEDIR=None
 def debug(*args, **kwargs):
     print(*args, file=sys.stderr, **kwargs)
 
-def run_subprocess(cmd, stdin=None):
+
+def run_subprocess(cmd, stdin=None, wait=True):
     import subprocess
     import shlex
 
     # if we are pushing cmd through the shell, we quote it
     process = subprocess.Popen(shlex.split(cmd), stdout=subprocess.PIPE, stdin=subprocess.PIPE, stderr=subprocess.PIPE)
-    stdout,stderr = process.communicate(stdin)
-    return stdout.strip(), stderr
+    if wait:
+        stdout,stderr = process.communicate(stdin)
+        return stdout.strip(), stderr
+    else:
+        return "", ""
 
 def cleanup():
     if KEEP_RESULTS:
@@ -71,7 +75,31 @@ def run_local_commands(cmd):
     print(out)
 
 
+def check_connection(host):
+    full_cmd = "ssh -O check %s " % (host)
+    out, err = run_subprocess(full_cmd)
+    if err.find("running") != -1:
+        return
+
+    run_subprocess("ssh -O exit %s " % (host))
+    debug("NO MASTER RUNNING FOR HOST %s, STARTING MASTER" % host)
+    run_subprocess("ssh -C -N -n %s #master process" % host, wait=False)
+
+    import time
+    # when we check our connection, we'll wait up to a second while
+    # establishing it
+    incr = 0.1
+    steps = int(1 / incr)
+    for _ in xrange(steps):
+        time.sleep(incr)
+        out, err = run_subprocess(full_cmd)
+        if err.find("running") != -1:
+            break
+
+
 def run_command_on_host(host, working_dir, bin):
+    check_connection(host)
+
     query_flag_file = os.path.join(BASEDIR, "query_flags.gob")
     with open(query_flag_file) as f:
         query_flag_data = f.read()
