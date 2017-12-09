@@ -1,0 +1,7 @@
+{
+  "main" : "datamaps",
+  "helpers": [ "vendor/topojson", "vendor/datamaps.all.min" ],
+  "style": "datamaps.css",
+  "styles": [],
+  "template": "datamaps.html.erb"
+}

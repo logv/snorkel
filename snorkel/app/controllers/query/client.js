@@ -686,6 +686,8 @@ module.exports = {
       });
 
     }
+
+    this.update_view(view || "table");
   },
 
   show_graph: function() {

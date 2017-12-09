@@ -107,11 +107,18 @@ function get_view_selector_row(meta_) {
     "scatter" : "Scatter Plot",
     "multidist" : "Grouped Dist.",
     "graph" : "DiGraph",
+    "datamap" : "Map View",
     " " : "--",
     "drill" : "Impact Attr.",
     "holtwinters" : "Forecasting",
     "weco" :        "WECO Alerts",
   }, view_plugins || {});
+
+  try {
+    require("geoip-lite");
+  } catch(e) {
+    delete options["datamap"];
+  }
 
   var excluded = plugins.get_excluded_views_for_table(table) || [];
   var exclusive = plugins.get_solo_views_for_table(table) || {};

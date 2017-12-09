@@ -59,6 +59,7 @@ var AreaView = require("app/client/views/area_view");
 var WecoView = require("app/client/views/weco_view");
 var HWView = require("app/client/views/holtwinters_view");
 var BarView = require("app/client/views/bar_view");
+var MapView = require("app/client/views/datamap_view");
 var DrillView = require("app/client/views/drill_view");
 var GraphView = require("app/client/views/graph_view");
 

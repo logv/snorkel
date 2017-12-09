@@ -933,6 +933,26 @@ function load_rss(table, cb) {
   });
 }
 
+function load_geoip(ips, cb) {
+  var gl = require("geoip-lite");
+
+  var lookups = {};
+  var ip_arr;
+  if (_.isArray(ips)) {
+    ip_arr = ips;
+
+  } else {
+    ip_arr = _.keys(ips);
+  }
+
+
+  _.each(ip_arr, function(ip) {
+    lookups[ip] = gl.lookup(ip);
+  });
+
+  cb(lookups);
+}
+
 function load_annotations(table, cb) {
   var collection = db.get("dataset", "annotations");
 
@@ -1039,6 +1059,8 @@ module.exports = {
 
     socket.on("load_rss", load_rss);
     socket.on("load_annotations", load_annotations);
+
+    socket.on("load_geoips", load_geoip)
 
     socket.on("new_query", function(form_data) {
       var now = parseInt(Date.now() / 1000, 10);

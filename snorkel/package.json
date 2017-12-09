@@ -8,6 +8,7 @@
     "amqp": "x",
     "connect-sqlite3": "x",
     "express": "x",
+    "geoip-lite": "^1.2.1",
     "hashids": "x",
     "htpasswd": "x",
     "json-stable-stringify": "x",

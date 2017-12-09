@@ -156,6 +156,10 @@ module.exports = {
     content: "default content"
   },
   client: function(highcharts_options) {
+    if (!highcharts_options) {
+      return
+    }
+
     console.log("INITIALIZING NVD3 WITH DATA", highcharts_options);
     var self = this;
     var chartType = highcharts_options.chart.type;
