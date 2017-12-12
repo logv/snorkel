@@ -72,6 +72,17 @@ function get_query_from_db(hashid, cb) {
   });
 }
 
+function cleaned_queries(ret) {
+  var cleaned_ret = [];
+  _.each(ret, function(a) {
+    var obj = JSON.parse(JSON.stringify(a).replace(/#DOT#/g, "."));
+    cleaned_ret.push(obj);
+  });
+
+  return cleaned_ret;
+
+}
+
 function get_saved_queries(conditions, options, cb) {
   var visited = {};
   var collection = db.get("query", "results");
@@ -116,7 +127,8 @@ function get_saved_queries(conditions, options, cb) {
       ret = arr;
     }
 
-    if (cb) { cb(ret); }
+
+    if (cb) { cb(cleaned_queries(ret)); }
   });
 
 
@@ -194,7 +206,7 @@ function get_saved_query(conditions, cb) {
   cur.limit(1);
   db.toArray(cur, function(err, arr) {
     if (arr && arr.length) {
-      cb(null, arr[0]);
+      cb(null, cleaned_queries(arr)[0]);
     } else {
       cb(err);
     }
