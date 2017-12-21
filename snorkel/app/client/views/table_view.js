@@ -126,8 +126,14 @@ var TableView = BaseView.extend({
     this.headers = headers;
     this.rows = rows;
 
-    this.csv_data = headers.join(",") + "\n" + _.map(csv_data, function(row) {
-      return row.join(",");
+    function quote_fields(fs) {
+      return _.map(fs, function(f) {
+        return '"' + f + '"';
+      }).join(",");
+    }
+
+    this.csv_data = quote_fields(headers) + "\n" + _.map(csv_data, function(row) {
+      return quote_fields(row);
     }).join("\n");
 
   },
