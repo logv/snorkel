@@ -12,12 +12,15 @@ module.exports = {
   max_https_sockets: 1000,
   // SSL is only necessary if you want snorkel to serve HTTPS
   // usually you can put snorkel behind NGINX to avoid this
+  // by default, these keys don't exist so snorkel will not have
+  // SSL mode enabled
   ssl: {
     key: "config/certs/server.key",
     certificate: "config/certs/server.crt"
   },
-  // if you turn off in-box ssl support, turn off require_https, too
-  require_https: true,
+  // if you turn on in-box ssl support, turn on require_https, too,
+  // to make sure query endpoints are served with HTTPS
+  require_https: false,
   // setting separate services to false will disable data ingestion
   // in the web server
   separate_services: false,
@@ -89,10 +92,6 @@ module.exports = {
 
   // do we turn on the tour page? only useful for demo installs
   show_tour: false,
-
-  // This is the default max data size of the collection. Each dataset will
-  // only grow to this size and no further, ideally
-  default_max_dataset_size: 1024 * 1024 * 100, // 100 MB
 
   // turn on continuation local storage. this is a per request context
   // for storing variables.
