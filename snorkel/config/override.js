@@ -3,6 +3,4 @@
 // and after the config/config.js
 
 module.exports = {
-  behind_proxy: true,
-  require_https: false,
 };
