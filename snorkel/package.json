@@ -23,6 +23,7 @@
     "socket.io": "x",
     "squel": "x",
     "superfluous": ">=0.0.74",
-    "trust-proxy": "x"
+    "trust-proxy": "x",
+    "uws": "^0.14.4"
   }
 }

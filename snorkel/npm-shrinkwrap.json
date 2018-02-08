@@ -5820,6 +5820,11 @@
       "resolved": "https://registry.npmjs.org/util-deprecate/-/util-deprecate-1.0.2.tgz",
       "optional": true
     },
+    "uws": {
+      "version": "0.14.4",
+      "from": "uws@0.14.4",
+      "resolved": "https://registry.npmjs.org/uws/-/uws-0.14.4.tgz"
+    },
     "wrappy": {
       "version": "1.0.2",
       "from": "wrappy@>=1.0.0 <2.0.0",
