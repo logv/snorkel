@@ -28,6 +28,16 @@ module.exports = {
         title: "Table View"
       },
       {
+        src: "images/screens/gif/table_to_time2.gif",
+        caption: "",
+        title: "Table -> Time"
+      },
+      {
+        src: "images/screens/gif/time_to_table.gif",
+        caption: "",
+        title: "Time -> Table"
+      },
+      {
         src: "images/screens/Screenshot_2016-08-31_07-30-50.png",
         caption: "",
         title: "Distribution View (Moments)"
@@ -36,6 +46,11 @@ module.exports = {
         src: "images/screens/Screenshot_2016-08-31_11-53-01.png",
         caption: "",
         title: "Distribution View (Graphs)"
+      },
+      {
+        src: "images/screens/gif/table_to_dist2.gif",
+        caption: "",
+        title: "Table -> Grouped Dist View"
       },
       {
         src: "images/screens/Screenshot_2016-04-30_18-50-20.png",
@@ -58,7 +73,7 @@ module.exports = {
         title: "Stacked Time Series"
       },
       {
-        src: "images/screens/Screenshot_2016-08-31_07-26-25.png",
+        src: "images/screens/gif/forecasting2.gif",
         caption: "",
         title: "Time series forecasting"
       },
