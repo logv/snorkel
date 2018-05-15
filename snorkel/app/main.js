@@ -16,8 +16,8 @@ module.exports = {
     var super_json = require("superfluous/package.json");
     var super_version = super_json.version;
 
-    var min_super_version = "0.0.73";
-    if (!semver.gt(super_version, min_super_version)) {
+    var min_super_version = "0.1.0";
+    if (!semver.gte(super_version, min_super_version)) {
       console.log("SUPER VERSION IS TOO LOW, NEEDS TO BE", min_super_version)
       console.log("PLEASE REINSTALL WITH 'npm install superfluous'");
       process.exit(0);
@@ -28,15 +28,18 @@ module.exports = {
     var passport = require('passport');
     app.use(passport.initialize());
     app.use(passport.session());
-    app.use(express.bodyParser());
+
+    var bodyParser = require("body-parser");
+    app.use(bodyParser());
 
   },
   insteadof_store: function() {
-    var connect  = main.connect;
     var session_store_module = config.session_store || "connect-sqlite3";
     var session_dir = config.data_dir || "./";
 
-    var SessionStore = require(session_store_module)(connect);
+    var express_sess = require("express-session");
+
+    var SessionStore = require(session_store_module)(express_sess);
     var options = {
       dir: session_dir
     };

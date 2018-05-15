@@ -1065,7 +1065,7 @@ module.exports = {
     socket.on("new_query", function(form_data) {
       var now = parseInt(Date.now() / 1000, 10);
       var query_id = user_id + "/" + __id + "/" + now;
-      var hashed_id = hashids.encrypt(user_id, __id, now);
+      var hashed_id = hashids.encode(user_id, __id, now);
 
       var query_data = marshall_query(form_data);
       socket.emit("query_ack", {
