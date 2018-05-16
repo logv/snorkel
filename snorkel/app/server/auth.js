@@ -8,7 +8,8 @@ var htpasswd = require("htpasswd");
 var passport = require('passport');
 var LocalStrategy = require('passport-local').Strategy;
 var session = require_core("server/session");
-var parseCookie = require("express").cookieParser(session.secret());
+var cookieParser = require("cookie-parser");
+var parseCookie = cookieParser(session.secret());
 
 var USERS = {};
 
