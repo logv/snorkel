@@ -9,3 +9,4 @@ snorkel/config/local/
 snorkel/config/users.htpasswd
 output
 .DS_Store
+/data_dir/
