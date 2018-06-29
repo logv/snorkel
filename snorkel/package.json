@@ -28,5 +28,8 @@
     "superfluous": "^0.1.4",
     "trust-proxy": "x",
     "uws": "^0.14.4"
+  },
+  "devDependencies": {
+    "typescript": "^2.9.2"
   }
 }
