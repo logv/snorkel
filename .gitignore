@@ -3,6 +3,7 @@ snorkel/node_modules
 .*.sw?
 sync.sh
 sync_package.sh
+snorkel/build/
 snorkel/config/override.js
 snorkel/config/certs/
 snorkel/config/local/
