@@ -1,4 +1,6 @@
-"use strict";
+import _ from "underscore";
+
+import * as snorkel from "snorkel";
 
 function not_implemented(func) {
   return function() {
@@ -11,7 +13,7 @@ function validate() {
 }
 
 // This is meant for predicting data from samples of the form { integer: { }, string: {}, set: {} }
-function predict_column_types(data) {
+function predict_column_types(data: snorkel.ColumnSamples) {
   var schema = {};
   var values = {};
   _.each(data, function(sample) {
@@ -50,7 +52,7 @@ function predict_column_types(data) {
       }
     });
 
-    var col_meta = {
+    var col_meta: snorkel.ColumnMeta = {
       name: field,
       type_str: predicted_type};
 
@@ -59,8 +61,8 @@ function predict_column_types(data) {
       var int_values = values[field].integer;
       int_values.sort(function(a, b) { return a - b; });
 
-      var high_p = parseInt(0.975 * int_values.length, 10);
-      var low_p = parseInt(0.025 * int_values.length, 10);
+      var high_p = parseInt(`${0.975 * int_values.length}`, 10);
+      var low_p = parseInt(`${0.025 * int_values.length}`, 10);
 
       if (int_values.length > 100) {
         col_meta.max_value = int_values[high_p];
@@ -74,38 +76,33 @@ function predict_column_types(data) {
   return cols;
 }
 
-
-
-var driver = {
-  run: function(dataset, query_spec, unweight_columns, cb) {
+class driver implements snorkel.Driver {
+  run(dataset, query_spec: snorkel.QuerySpec, unweight_columns, cb) {
     not_implemented("run");
-  },
-  get_stats: function(dataset, cb) {
+  }
+  get_stats(dataset, cb) {
     not_implemented("get_stats");
-  },
-  get_datasets: function(cb) {
+  }
+  get_datasets(cb) {
     not_implemented("get_datasets");
-  },
-  get_columns: function(dataset, cb) {
+  }
+  get_columns(dataset, cb) {
     not_implemented("get_columns");
-  },
-  clear_cache: function(dataset, cb) {
+  }
+  clear_cache(dataset, cb) {
     not_implemented("clear_cache");
-  },
-  drop_dataset: function(dataset, cb) {
+  }
+  drop_dataset(dataset, cb) {
     not_implemented("drop_dataset");
-  },
-  add_samples: function(dataset, subset, samples, cb) {
+  }
+  add_samples(dataset, subset, samples, cb) {
     not_implemented("add_samples");
-  },
-  supports_percentiles: function() {
+  }
+  supports_percentiles() {
     not_implemented("supported_metrics");
-  },
-  validate: validate,
-  predict_column_types: predict_column_types
-};
+  }
+  validate = validate;
+  predict_column_types = predict_column_types;
+}
 
-module.exports = {
-  Base: driver,
-  predict_column_types: predict_column_types
-};
+export default { Base: driver, predict_column_types };

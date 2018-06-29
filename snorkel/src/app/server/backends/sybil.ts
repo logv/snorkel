@@ -1,6 +1,8 @@
-"use strict";
+/// <reference types="superfluous" />
+import _ from "underscore";
+import driver from "./driver";
+import snorkel from "snorkel";
 
-var driver = require_app("server/backends/driver");
 var context = require_core("server/context");
 
 var child_process = require("child_process");
@@ -19,7 +21,7 @@ var path = require("path")
 var cwd = process.cwd()
 
 var BIN_PATH = config.backend.bin_path || path.join(cwd, "./bin/sybil ");
-var DATASET_SEPARATOR = "@"
+var DATASET_SEPARATOR = "@";
 var FIELD_SEPARATOR = ",";
 var RECORD_SEPARATOR = ":";
 var CUSTOM_SEPARATORS = false;
@@ -100,7 +102,7 @@ function get_cmd_info(cb) {
 }
 
 //  try to be safer than using safe_exec_cmd
-function safe_exec_cmd(cmd_string, options, cb) {
+function safe_exec_cmd(cmd_string, options, cb?) {
   var cmd_args = shell_quote.parse(cmd_string);
   var cmd = cmd_args.shift()
 
@@ -183,7 +185,7 @@ function fieldname(a,c) {
   return a.replace(/^\$/, "") + "(" + c + ")";
 }
 
-function marshall_time_rows(query_spec, time_buckets) {
+function marshall_time_rows(query_spec: snorkel.QuerySpec, time_buckets) {
   var cols = query_spec.opts.cols;
   var dims = query_spec.opts.dims;
   var agg = query_spec.opts.agg;
@@ -201,7 +203,7 @@ function marshall_time_rows(query_spec, time_buckets) {
         return;
       }
 
-      var row = {};
+      var row: snorkel.Row = {};
       row._id = {};
       _.each(dims, function(d) {
         row._id[d] = r[d];
@@ -235,7 +237,7 @@ function marshall_time_rows(query_spec, time_buckets) {
 
 }
 
-function extract_val(query_spec, r, c, agg) {
+function extract_val(query_spec: snorkel.QuerySpec, r, c, agg) {
 
   var oa = agg || query_spec.opts.agg;
 
@@ -271,7 +273,7 @@ function extract_val(query_spec, r, c, agg) {
     if (r[c].avg) {
       avg = r[c].avg;
     } else if (_.isNumber(r[c]) || _.isString(r[c])) {
-      avg = parseFloat(r[c], 10);
+      avg = parseFloat(r[c]);
     } else if (r[c].buckets) {
       _.each(r[c].buckets, function(count, val) {
         total += count;
@@ -285,7 +287,7 @@ function extract_val(query_spec, r, c, agg) {
 
   if (percentile) {
     if (r[c] && r[c].percentiles) {
-      return parseFloat(r[c].percentiles[percentile], 10);
+      return parseFloat(r[c].percentiles[percentile]);
     } else {
       return  "NA";
     }
@@ -298,13 +300,13 @@ function extract_val(query_spec, r, c, agg) {
   } else if (stddev) {
     return (r[c] && r[c].stddev) || 0;
   } else {
-    return parseFloat(avg, 10);
+    return parseFloat(avg);
 
   }
 
 }
 
-function marshall_table_rows(query_spec, rows) {
+function marshall_table_rows(query_spec: snorkel.QuerySpec, rows) {
   var cols = query_spec.opts.cols;
   var dims = query_spec.opts.dims;
   var agg = query_spec.opts.agg;
@@ -313,7 +315,7 @@ function marshall_table_rows(query_spec, rows) {
 
   var ret = [];
   _.each(rows, function(r) {
-    var row = {};
+    var row: snorkel.Row = {};
     row._id = {};
     _.each(dims, function(d) {
       row._id[d] = r[d];
@@ -346,7 +348,7 @@ function marshall_table_rows(query_spec, rows) {
   return ret;
 }
 
-function add_dims_and_cols(query_spec) {
+function add_dims_and_cols(query_spec: snorkel.QuerySpec) {
   var cmd_args = "";
   if (!query_spec || !query_spec.opts || !query_spec.opts.dims) {
     return "";
@@ -418,7 +420,7 @@ function add_dims_and_cols(query_spec) {
   return cmd_args;
 }
 
-function add_limit(query_spec) {
+function add_limit(query_spec: snorkel.QuerySpec) {
 
   if (query_spec.opts.limit) {
     return "-limit " + query_spec.opts.limit + " "
@@ -427,7 +429,7 @@ function add_limit(query_spec) {
   return ""
 }
 
-function add_weight(query_spec) {
+function add_weight(query_spec: snorkel.QuerySpec) {
 
   if (query_spec.opts.weight_col) {
     return "-weight-col " + query_spec.opts.weight_col + " ";
@@ -436,7 +438,7 @@ function add_weight(query_spec) {
   return "";
 }
 
-function get_args_for_spec(query_spec) {
+function get_args_for_spec(query_spec: snorkel.QuerySpec) {
   var cmd_args = "";
   if (!query_spec || !query_spec.opts) {
     return cmd_args;
@@ -451,12 +453,12 @@ function get_args_for_spec(query_spec) {
   return cmd_args;
 }
 
-function marshall_dist_rows(query_spec, rows) {
+function marshall_dist_rows(query_spec: snorkel.QuerySpec, rows: snorkel.Row[]) {
   var cols = query_spec.opts.cols;
   var dims = query_spec.opts.dims;
   var ret = [];
   _.each(rows, function(r) {
-    var row = {};
+    var row: snorkel.Row = {};
     row._id = {};
     _.each(dims, function(d) {
       row._id[d] = r[d];
@@ -481,7 +483,7 @@ function marshall_dist_rows(query_spec, rows) {
 }
 
 
-function run_hist_query(table, query_spec, cb) {
+function run_hist_query(table, query_spec: snorkel.QuerySpec, cb) {
   var cmd_args = "-print -json -op hist";
   cmd_args += get_args_for_spec(query_spec);
   console.log("RUNNING DIST QUERY");
@@ -492,7 +494,7 @@ function run_hist_query(table, query_spec, cb) {
   })
 }
 
-function run_time_query(table, query_spec, cb) {
+function run_time_query(table, query_spec: snorkel.QuerySpec, cb) {
   var cmd_args = "-print -json -time ";
 
   cmd_args += "-time-bucket " + query_spec.opts.time_bucket;
@@ -512,7 +514,7 @@ function run_time_query(table, query_spec, cb) {
 
 }
 
-function run_table_query(table, query_spec, cb) {
+function run_table_query(table, query_spec: snorkel.QuerySpec, cb) {
   var cmd_args = "-print -json"
   cmd_args += get_args_for_spec(query_spec)
 
@@ -523,7 +525,7 @@ function run_table_query(table, query_spec, cb) {
   })
 }
 
-function add_int_and_time_filters(query_spec) {
+function add_int_and_time_filters(query_spec: snorkel.QuerySpec) {
   if (!query_spec || !query_spec.opts) {
     return "";
   }
@@ -549,11 +551,13 @@ function add_int_and_time_filters(query_spec) {
   var tf = query_spec.meta.metadata.time_col || df;
 
   if (query_spec.opts.start_ms) {
-    filters.push(tf + RECORD_SEPARATOR + "gt" + RECORD_SEPARATOR + parseInt(query_spec.opts.start_ms / 1000, 10));
+    var startMs = parseInt((query_spec.opts.start_ms / 1000).toString(), 10);
+    filters.push(tf + RECORD_SEPARATOR + "gt" + RECORD_SEPARATOR + startMs);
   }
 
   if (query_spec.opts.end_ms) {
-    filters.push(tf + RECORD_SEPARATOR + "lt" + RECORD_SEPARATOR + parseInt(query_spec.opts.end_ms / 1000, 10));
+    var endMs = parseInt((query_spec.opts.end_ms / 1000).toString(), 10);
+    filters.push(tf + RECORD_SEPARATOR + "lt" + RECORD_SEPARATOR + endMs);
   }
 
   _.each(query_spec.opts.filters, function(f) {
@@ -581,7 +585,7 @@ function add_int_and_time_filters(query_spec) {
   return " -int-filter \"" + filters.join(FIELD_SEPARATOR) + "\" " + args;
 }
 
-function add_str_filters(query_spec) {
+function add_str_filters(query_spec: snorkel.QuerySpec) {
   if (!query_spec || !query_spec.opts) {
     return "";
   }
@@ -616,7 +620,7 @@ function add_str_filters(query_spec) {
   return "-str-filter \"" + filters.join(FIELD_SEPARATOR) + "\" ";
 }
 
-function run_samples_query(table, query_spec, cb) {
+function run_samples_query(table, query_spec: snorkel.QuerySpec, cb) {
   if (!table) {
     return cb("No TABLE!", table)
   }
@@ -711,7 +715,7 @@ function get_columns(table, cb) {
       cols = {};
     } else {
 
-      var cols = []
+      var cols: any = [];
       var PREFIX_RE = /^(integer_|string_|set_)/;
       _.each(info.columns.ints, function(col) {
         cols.push({name: col, type_str: 'integer', display_name: col.replace(PREFIX_RE, '')});
@@ -790,8 +794,8 @@ var flush_queue = _.throttle(function() {
   });
 }, 3000);
 
-var PCSDriver = _.extend(driver.Base, {
-  run: function(table, query_spec, unweight, cb) {
+class PCSDriver extends driver.Base {
+  run(table, query_spec: snorkel.QuerySpec, unweight, cb) {
     console.log("RUNNING QUERY", table, query_spec);
     if (!table) {
       return cb("Error TABLE", table, "is undefined")
@@ -811,8 +815,8 @@ var PCSDriver = _.extend(driver.Base, {
     if (query_spec.view === 'hist') {
       run_hist_query(table, query_spec, cb);
     }
-  },
-  get_stats: function(table, cb) {
+  }
+  get_stats(table, cb) {
     if (config.debug_driver) {
       console.log("GETTING STATS FOR TABLE", table)
     }
@@ -825,8 +829,8 @@ var PCSDriver = _.extend(driver.Base, {
     run_query_cmd("-json -info -table " + table, function(err, info) {
       cb(info);
     });
-  },
-  get_tables: function(cb) {
+  }
+  get_tables(cb) {
     run_query_cmd("-tables -json",
       function(err, info) {
         var tables = [];
@@ -836,14 +840,16 @@ var PCSDriver = _.extend(driver.Base, {
 
         cb(tables);
       });
-  },
-  get_columns: get_cached_columns,
-  clear_cache: function(table, cb) {},
-  drop_dataset: function(table, cb) {},
-  default_bucket: function() {
+  }
+  get_columns(dataset, cb) {
+    return get_cached_columns(dataset, cb);
+  }
+  clear_cache(table, cb) {}
+  drop_dataset(table, cb) {}
+  default_bucket() {
     return "auto";
-  },
-  extra_buckets: function() {
+  }
+  extra_buckets() {
 
     var ret = {};
     if (HAS_LOG_HIST) {
@@ -856,8 +862,8 @@ var PCSDriver = _.extend(driver.Base, {
     }
 
     return ret;
-  },
-  extra_metrics: function() {
+  }
+  extra_metrics() {
 
     return {
       "$p5" : "P5",
@@ -868,9 +874,9 @@ var PCSDriver = _.extend(driver.Base, {
       "$p95" : "P95",
       "$distinct" : "Distinct"
     };
-  },
-  default_table: "snorkel_test_data",
-  add_samples: function(dataset, subset, samples, cb) {
+  }
+  default_table: "snorkel_test_data";
+  add_samples(dataset, subset, samples, cb) {
     if (!samples || !samples.length) {
       return;
     }
@@ -883,8 +889,8 @@ var PCSDriver = _.extend(driver.Base, {
 
     flush_queue();
 
-  },
-  SEPARATOR: DATASET_SEPARATOR
-});
+  }
+  SEPARATOR = DATASET_SEPARATOR;
+}
 
-module.exports = PCSDriver;
+export default PCSDriver;
