@@ -1,8 +1,8 @@
 import _ from "underscore";
 
-import * as snorkel from "snorkel";
+import * as snorkel from "../../../types";
 
-function not_implemented(func) {
+function not_implemented(func: string) {
   return function() {
     throw new Error("Driver does not implement required function:" + func);
   };
@@ -13,10 +13,10 @@ function validate() {
 }
 
 // This is meant for predicting data from samples of the form { integer: { }, string: {}, set: {} }
-function predict_column_types(data: snorkel.ColumnSamples) {
-  var schema = {};
-  var values = {};
-  _.each(data, function(sample) {
+function predict_column_types(data: snorkel.ColumnSample[]) {
+  var schema: { [K: string]: { [key in snorkel.ColumnSampleKey]?: number } } = {};
+  var values: { [K: string]: { [key in snorkel.ColumnSampleKey]?: any[] } }  = {};
+  _.each(data, function(sample: snorkel.ColumnSample) {
     _.each(sample, function(fields, field_type) {
       if (_.isObject(fields)) {
         _.each(fields, function(value, field) {
@@ -77,7 +77,7 @@ function predict_column_types(data: snorkel.ColumnSamples) {
 }
 
 class driver implements snorkel.Driver {
-  run(dataset, query_spec: snorkel.QuerySpec, unweight_columns, cb) {
+  run(dataset: string, query_spec: snorkel.QuerySpec, unweight_columns, cb) {
     not_implemented("run");
   }
   get_stats(dataset, cb) {

@@ -30,11 +30,13 @@
     "uws": "^0.14.4"
   },
   "devDependencies": {
+    "@types/jquery": "^3.3.4",
+    "@types/node": "^10.5.1",
+    "@types/underscore": "^1.8.8",
     "typescript": "^2.9.2"
   },
   "scripts": {
     "compile": "tsc -p .",
-    "copy-assets": "cd ./src; find . -type f,l ! \\( -name '*.js' -or -name '*.ts' \\) -exec cp -d --parents {} ../build \\;; rsync -qaP ./app/static/vendor/ ../build/app/static/vendor/",
     "copy-assets": "cd ./src; find . -type f,l ! \\( -name '*.js' -or -name '*.ts' \\) -exec cp -d --parents {} ../build \\;; cd ..; rsync -qaP ./src./app/static/vendor/ ./build/app/static/vendor/; cp package.json build/",
     "prepare": "npm run compile; npm run copy-assets"
   }

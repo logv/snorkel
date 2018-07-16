@@ -1,8 +1,9 @@
 /// <reference types="superfluous" />
+import * as snorkel from "../../../types";
+"use strict";
 import _ from "underscore";
-import driver from "./driver";
-import snorkel from "snorkel";
 
+var driver = require_app("server/backends/driver");
 var context = require_core("server/context");
 
 var child_process = require("child_process");
@@ -16,12 +17,11 @@ var extract_field = view_helpers.extract_field;
 
 var shell_quote = require("shell-quote");
 
-
 var path = require("path")
 var cwd = process.cwd()
 
 var BIN_PATH = config.backend.bin_path || path.join(cwd, "./bin/sybil ");
-var DATASET_SEPARATOR = "@";
+var DATASET_SEPARATOR = "@"
 var FIELD_SEPARATOR = ",";
 var RECORD_SEPARATOR = ":";
 var CUSTOM_SEPARATORS = false;
@@ -30,27 +30,13 @@ var HAS_LOG_HIST = false;
 var HAS_QUERY_CACHE = false;
 
 
-// NOTES FOR MULTI-READER SYBIL
-// if the sybil driver specifies multiple hosts for sybil,
-// then we will use "multi-reader" mode for snorkel, meaning
-// that we will call into msybil and supply hosts on stdin.
-// this will void all non-query commands (ingest, digest, etc),
-// putting snorkel into "read-only" mode for data (but it will still
-// record the queries and favorites, etc)
-// The host format for sybil is one line per host:
-//  host working_dir binpath
-// ex:
-//  logv.org ~/snorkel/snorkel/ ~/snorkel/snorkel/bin/sybil
-var MULTI_HOST_MODE=false;
-if (config.backend.hostfile) {
-  console.log("USING HOSTS FROM FILE", config.backend.hostfile);
-  console.log("SWITCHING TO MSYBIL MODE (DISTRIBUTED QUERIES)");
-  MULTI_HOST_MODE = true;
-  BIN_PATH = "app/server/backends/msybil";
+var DIAL_ADDR = "";
+if (config.backend.dial) {
+  console.log("USING SYBILD WITH DIAL:", config.backend.dial);
+  DIAL_ADDR = config.backend.dial;
 }
 
-
-function path_exists(path) {
+function path_exists(path: string) {
   var fs = require('fs');
   try {
       fs.statSync(path);
@@ -77,23 +63,30 @@ if (!path_exists(DB_DIR.trim())) {
 // implement sum/count metrics
 
 
-function get_cmd(bin, arg_string) {
+function get_cmd(bin: string, arg_string: string) {
   return bin + " " + arg_string
 }
 
-function get_cmd_info(cb) {
+type Info = {
+  field_separator: boolean,
+  hdr_hist: boolean,
+  log_hist: boolean,
+  query_cache: boolean,
+}
+
+function get_cmd_info(cb:(err:string, info?: Info)=>void) {
   var query_args = " version -json";
   var cmd = get_cmd(BIN_PATH, query_args);
   cb = context.wrap(cb);
   safe_exec_cmd(cmd, {
     cwd: DB_DIR,
-  }, function(err, stdout, stderr) {
+  }, function(err: string, stdout: string, stderr: string) {
     var parsed;
     try {
       parsed = JSON.parse(stdout);
     } catch(e) {
 
-      cb("Error Parsing JSON", null);
+      cb("Error Parsing JSON");
       return;
     }
 
@@ -101,9 +94,15 @@ function get_cmd_info(cb) {
   });
 }
 
+type execCb = (error: string, stdout: string, stderr: string)=>void;
 //  try to be safer than using safe_exec_cmd
-function safe_exec_cmd(cmd_string, options, cb?) {
-  var cmd_args = shell_quote.parse(cmd_string);
+function safe_exec_cmd(cmd_string: string, options:{}, cb: execCb, skipDial=false) {
+  var s = cmd_string;
+  if (DIAL_ADDR && skipDial !== false) {
+    console.warn("with dial", DIAL_ADDR);
+    s += " -dial " + DIAL_ADDR;
+  }
+  var cmd_args = shell_quote.parse(s);
   var cmd = cmd_args.shift()
 
 
@@ -117,6 +116,9 @@ get_cmd_info(function(err, info) {
   }
 
   console.log("GOT CMD INFO", info);
+  if (!info) {
+    return;
+  }
   if (info.field_separator) {
     CUSTOM_SEPARATORS = true;
     RECORD_SEPARATOR = String.fromCharCode(30);
@@ -136,7 +138,7 @@ get_cmd_info(function(err, info) {
   }
 });
 
-function run_query_cmd(arg_string, cb) {
+function run_query_cmd(arg_string: string, cb: (err:string, a?: Object) => void) {
   var query_args = " query -read-log ";
 
   if (HAS_QUERY_CACHE) {
@@ -153,6 +155,7 @@ function run_query_cmd(arg_string, cb) {
   if (config.debug_driver) {
     console.log("RUNNING COMMAND", cmd);
   }
+  console.log("RUNNING COMMAND", cmd);
 
   var cp = safe_exec_cmd(cmd, {
     cwd: DB_DIR,
@@ -160,32 +163,70 @@ function run_query_cmd(arg_string, cb) {
   }, function(err, stdout, stderr) {
     if (config.debug_driver) {
       console.log(stderr)
+      console.log(stdout)
     }
-    var parsed;
+  }, false);
+  var cp = safe_exec_cmd(cmd, {
+    cwd: DB_DIR,
+    maxBuffer: 100000*1024
+  }, function(err, stdout, stderr) {
+    if (config.debug_driver) {
+      console.log(stderr)
+      console.log(stdout)
+    }
+    var parsed: Object;
     try {
       parsed = JSON.parse(stdout)
     } catch(e) {
 
-      cb("Error Parsing JSON", null)
+      cb("Error Parsing JSON")
       return
     }
 
     cb(err, parsed)
   });
 
-  if (MULTI_HOST_MODE) {
-    var hosts = readfile(config.backend.hostfile);
-    cp.stdin.write(hosts);
-    cp.stdin.destroy();
-  }
-
 }
 
-function fieldname(a,c) {
+function fieldname(a: string, c: string) {
   return a.replace(/^\$/, "") + "(" + c + ")";
 }
 
-function marshall_time_rows(query_spec: snorkel.QuerySpec, time_buckets) {
+type SybilSimpleValue = number | string;
+type SybilAvgValue = {
+  avg: number
+  buckets?: undefined,
+  percentiles?: undefined,
+}
+type SybilHistValue = {
+  buckets: { [k: string]: number },
+  percentiles: number[],
+  stddev: number,
+  avg?: number,
+} 
+type SybilValue = SybilHistValue | SybilAvgValue | SybilSimpleValue;
+type SybilRow = {
+  Count: number,
+  Samples: number,
+  Distinct: number,
+} & {
+  [key: string]: SybilValue,
+};
+type SybilTimeResults = { [time: string]: SybilRow[] };
+type SybilSample = { [K: string]: any };
+
+type SybilColumnType = "ints" | "sets" | "strs";
+type SybilTable = {
+  avgObjSize: number,
+  columns: {
+    [key in SybilColumnType]: string[];
+  },
+  count: number,
+  size: number,
+  storageSize: number,
+}
+
+function marshall_time_rows(query_spec: snorkel.QuerySpec, time_buckets: SybilTimeResults): snorkel.Row[] {
   var cols = query_spec.opts.cols;
   var dims = query_spec.opts.dims;
   var agg = query_spec.opts.agg;
@@ -196,16 +237,19 @@ function marshall_time_rows(query_spec: snorkel.QuerySpec, time_buckets) {
     console.log("EXTRACTING EXTRA METRICS", custom_fields);
   }
 
-  var ret = [];
-  _.each(time_buckets, function(rows, time_bucket) {
-    _.each(rows, function(r) {
+  var ret: snorkel.Row[] = [];
+  _.each(time_buckets, function(rows: SybilRow[], time_bucket: string) {
+    console.log(rows);
+    _.each(rows, function(r: SybilRow) {
       if (!r) {
         return;
       }
 
-      var row: snorkel.Row = {};
+      var row: snorkel.Row = {
+      };
       row._id = {};
       _.each(dims, function(d) {
+        if (!row._id) { row._id = {} }
         row._id[d] = r[d];
       });
 
@@ -237,7 +281,7 @@ function marshall_time_rows(query_spec: snorkel.QuerySpec, time_buckets) {
 
 }
 
-function extract_val(query_spec: snorkel.QuerySpec, r, c, agg) {
+function extract_val(query_spec: snorkel.QuerySpec, r: SybilRow, c: string, agg: string) {
 
   var oa = agg || query_spec.opts.agg;
 
@@ -269,25 +313,26 @@ function extract_val(query_spec: snorkel.QuerySpec, r, c, agg) {
   var summed = 0;
   var total = 0;
 
-  if (r[c]) {
-    if (r[c].avg) {
-      avg = r[c].avg;
-    } else if (_.isNumber(r[c]) || _.isString(r[c])) {
-      avg = parseFloat(r[c]);
-    } else if (r[c].buckets) {
-      _.each(r[c].buckets, function(count, val) {
+  let v = r[c];
+  if (v) {
+    if (_.isNumber(v) || _.isString(v)) {
+      avg = parseFloat(v.toString());
+    } else if (v.buckets) {
+      _.each(v.buckets, function(count, val) {
         total += count;
         summed += (parseInt(val, 10) * count);
       });
 
-      avg = r[c].avg = summed / total;
+      avg = (<SybilHistValue>v).avg = summed / total;
 
+    } else if (v.avg) {
+      avg = v.avg;
     }
   }
 
   if (percentile) {
-    if (r[c] && r[c].percentiles) {
-      return parseFloat(r[c].percentiles[percentile]);
+    if ((<SybilHistValue>v).percentiles) {
+      return (<SybilHistValue>v).percentiles[percentile];
     } else {
       return  "NA";
     }
@@ -298,7 +343,7 @@ function extract_val(query_spec: snorkel.QuerySpec, r, c, agg) {
   } else if (distinct) {
     return r.Distinct || r.distinct;
   } else if (stddev) {
-    return (r[c] && r[c].stddev) || 0;
+    return ((<SybilHistValue>v) && (<SybilHistValue>v).stddev) || 0;
   } else {
     return parseFloat(avg);
 
@@ -306,7 +351,7 @@ function extract_val(query_spec: snorkel.QuerySpec, r, c, agg) {
 
 }
 
-function marshall_table_rows(query_spec: snorkel.QuerySpec, rows) {
+function marshall_table_rows(query_spec: snorkel.QuerySpec, rows: SybilRow[]) {
   var cols = query_spec.opts.cols;
   var dims = query_spec.opts.dims;
   var agg = query_spec.opts.agg;
@@ -315,7 +360,7 @@ function marshall_table_rows(query_spec: snorkel.QuerySpec, rows) {
 
   var ret = [];
   _.each(rows, function(r) {
-    var row: snorkel.Row = {};
+    var row:any = {};
     row._id = {};
     _.each(dims, function(d) {
       row._id[d] = r[d];
@@ -379,7 +424,7 @@ function add_dims_and_cols(query_spec: snorkel.QuerySpec) {
     }
 
     // we have to use histogram aggregations across hosts
-    var use_hist = MULTI_HOST_MODE;
+    var use_hist = true;
     var log_hist;
     var custom_fields = query_spec.opts.custom_fields || [];
     if (custom_fields.length) {
@@ -453,7 +498,7 @@ function get_args_for_spec(query_spec: snorkel.QuerySpec) {
   return cmd_args;
 }
 
-function marshall_dist_rows(query_spec: snorkel.QuerySpec, rows: snorkel.Row[]) {
+function marshall_dist_rows(query_spec: snorkel.QuerySpec, rows: SybilRow[]) {
   var cols = query_spec.opts.cols;
   var dims = query_spec.opts.dims;
   var ret = [];
@@ -465,10 +510,11 @@ function marshall_dist_rows(query_spec: snorkel.QuerySpec, rows: snorkel.Row[]) 
     });
 
     var col = cols[0];
-    _.each(r[col].buckets, function(count, bucket) {
+    var v = r[col];
+    _.each((<SybilHistValue>v).buckets, function(count, bucket) {
       var copy = _.clone(row);
       copy._id = _.clone(row._id);
-      var val = parseInt(bucket, 10);
+      var val = parseInt(bucket.toString(), 10);
       copy._id[col] = val;
       copy[col] = val;
       copy.count = count;
@@ -488,20 +534,20 @@ function run_hist_query(table, query_spec: snorkel.QuerySpec, cb) {
   cmd_args += get_args_for_spec(query_spec);
   console.log("RUNNING DIST QUERY");
 
-  run_query_cmd(cmd_args + " -table " + table, function(err, results) {
+  run_query_cmd(cmd_args + " -table " + table, function(err, results: SybilRow[]) {
     var marshalled = marshall_dist_rows(query_spec, results);
     cb(null, marshalled)
   })
 }
 
-function run_time_query(table, query_spec: snorkel.QuerySpec, cb) {
+function run_time_query(table, query_spec: snorkel.QuerySpec, cb: (error: string, rows?: snorkel.Row[]) => void) {
   var cmd_args = "-print -json -time ";
 
   cmd_args += "-time-bucket " + query_spec.opts.time_bucket;
 
   cmd_args += get_args_for_spec(query_spec);
 
-  run_query_cmd(cmd_args + " -table " + table, function(err, results) {
+  run_query_cmd(cmd_args + " -table " + table, function(err, results: SybilTimeResults) {
     if (err) {
       return cb("Error parsing JSON");
     }
@@ -518,7 +564,7 @@ function run_table_query(table, query_spec: snorkel.QuerySpec, cb) {
   var cmd_args = "-print -json"
   cmd_args += get_args_for_spec(query_spec)
 
-  run_query_cmd(cmd_args + " -table " + table, function(err, results) {
+  run_query_cmd(cmd_args + " -table " + table, function(err, results: SybilRow[]) {
     var marshalled = marshall_table_rows(query_spec, results);
     cb(null, marshalled)
 
@@ -631,7 +677,7 @@ function run_samples_query(table, query_spec: snorkel.QuerySpec, cb) {
 
   var meta = query_spec.meta.metadata;
   var col_info = meta.columns;
-  run_query_cmd(args + " -samples -json -table " + table_name, function(err, samples) {
+  run_query_cmd(args + " -samples -json -table " + table_name, function(err, samples: SybilSample[]) {
     var results = [];
 
     _.each(samples, function(sample) {
@@ -694,8 +740,10 @@ function get_cached_columns(table, cb) {
 }
 
 
-var _pending = {};
-function get_columns(table, cb) {
+type ColumnCB = (columns?: snorkel.ColumnMeta[]) => void;
+
+var _pending: { [K: string]: ColumnCB[] } = {};
+function get_columns(table, cb: ColumnCB) {
   if (!table) {
     return cb();
   }
@@ -709,13 +757,11 @@ function get_columns(table, cb) {
   }
   _pending[table] = [cb];
 
-  run_query_cmd("-info -json -table " + table, function(err, info) {
-    var cols;
+  run_query_cmd("-info -json -table " + table, function(err, info: SybilTable) {
+    var cols: snorkel.ColumnMeta[];
     if (err || !info || !info.columns) {
-      cols = {};
+      cols = [];
     } else {
-
-      var cols: any = [];
       var PREFIX_RE = /^(integer_|string_|set_)/;
       _.each(info.columns.ints, function(col) {
         cols.push({name: col, type_str: 'integer', display_name: col.replace(PREFIX_RE, '')});
@@ -730,7 +776,6 @@ function get_columns(table, cb) {
         updated: Date.now()
       };
     }
-
 
     _.each(_pending[table], function(_cb) {
       _cb(cols);
@@ -762,7 +807,7 @@ var digest_records = _.throttle(function () {
 }, 60 * 5 * 1000 /* 5 minute digestions */, { leading: false });
 
 
-var QUEUES = {};
+var QUEUES: { [K: string]: SybilSample[] } = {};
 
 var flush_queue = _.throttle(function() {
   _.each(QUEUES, function(queue, table_name) {
@@ -785,7 +830,7 @@ var flush_queue = _.throttle(function() {
     queue_digest_records(table_name);
     var cp = safe_exec_cmd(cmd, {
       cwd: DB_DIR,
-    });
+    }, null);
 
     _.each(all, function(s) {
       cp.stdin.write(JSON.stringify(s) + "\n");
@@ -795,10 +840,10 @@ var flush_queue = _.throttle(function() {
 }, 3000);
 
 class PCSDriver extends driver.Base {
-  run(table, query_spec: snorkel.QuerySpec, unweight, cb) {
+  run(table, query_spec: snorkel.QuerySpec, unweight, cb: (error: string, rows?: snorkel.Row[]) => void) {
     console.log("RUNNING QUERY", table, query_spec);
     if (!table) {
-      return cb("Error TABLE", table, "is undefined")
+      return cb(`Error TABLE ${table} is undefined`)
     }
 
     if (backend.SAMPLE_VIEWS[query_spec.view]) {
@@ -820,30 +865,29 @@ class PCSDriver extends driver.Base {
     if (config.debug_driver) {
       console.log("GETTING STATS FOR TABLE", table)
     }
+    console.log("GETTING STATS FOR TABLE", table)
 
     table = table.table_name || table
     // count: 3253,
     // size: 908848,
     // avgObjSize: 279.3876421764525,
     // storageSize: 1740800,
-    run_query_cmd("-json -info -table " + table, function(err, info) {
+    run_query_cmd("-json -info -table " + table, function(err, info: SybilTable) {
       cb(info);
     });
   }
-  get_tables(cb) {
+  get_tables(cb: (tables:Array<{ table_name: string}>) => void) {
     run_query_cmd("-tables -json",
-      function(err, info) {
-        var tables = [];
-        _.each(info, function(table) {
+      function(err, result: string[]) {
+        var tables: Array<{ table_name: string }> = [];
+        _.each(result, function(table) {
           tables.push({ table_name: table });
         });
 
         cb(tables);
       });
   }
-  get_columns(dataset, cb) {
-    return get_cached_columns(dataset, cb);
-  }
+  get_columns = get_cached_columns
   clear_cache(table, cb) {}
   drop_dataset(table, cb) {}
   default_bucket() {
@@ -875,7 +919,7 @@ class PCSDriver extends driver.Base {
       "$distinct" : "Distinct"
     };
   }
-  default_table: "snorkel_test_data";
+  default_table = "snorkel_test_data";
   add_samples(dataset, subset, samples, cb) {
     if (!samples || !samples.length) {
       return;
@@ -890,7 +934,7 @@ class PCSDriver extends driver.Base {
     flush_queue();
 
   }
-  SEPARATOR = DATASET_SEPARATOR;
-}
+  SEPARATOR = DATASET_SEPARATOR
+};
 
-export default PCSDriver;
+module.exports = PCSDriver;
