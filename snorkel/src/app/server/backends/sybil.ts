@@ -1,6 +1,4 @@
-/// <reference types="superfluous" />
 import * as snorkel from "../../../types";
-"use strict";
 import _ from "underscore";
 
 var driver = require_app("server/backends/driver");

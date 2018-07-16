@@ -1,6 +1,7 @@
 export interface Driver {
   run: (dataset: string, query_spec: QuerySpec, unweight_columns: boolean, cb: (err:string, results: any)=> void) => void,
   get_stats: (dataset: string, cb: ()=>void) => void,
+  get_tables: (cb: ()=>void) => void,
   get_datasets: (cb: ()=>void) => void,
   get_columns: (dataset: string, cb: ()=>void) => void,
   clear_cache: (dataset: string, cb: ()=>void) => void,
@@ -9,6 +10,11 @@ export interface Driver {
   supports_percentiles: () => void,
   validate: () => void,
   predict_column_types: (a: ColumnSample[]) => ColumnMeta[],
+  default_bucket?: () => string | Object | string;
+  extra_buckets?: () => string | Object | string;
+  extra_metrics?: () => string | Object | string;
+  default_table?: string,
+  SEPARATOR?: string,
 }
 export interface ColumnMeta {
   name: string,

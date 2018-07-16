@@ -86,6 +86,9 @@ class driver implements snorkel.Driver {
   get_datasets(cb) {
     not_implemented("get_datasets");
   }
+  get_tables(cb) {
+    not_implemented("get_tables");
+  }
   get_columns(dataset, cb) {
     not_implemented("get_columns");
   }

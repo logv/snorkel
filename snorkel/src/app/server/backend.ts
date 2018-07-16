@@ -1,4 +1,5 @@
-"use strict";
+import * as snorkel from "../../types";
+import _ from "underscore";
 
 var context = require_core("server/context");
 var config = require_core("server/config");
@@ -16,7 +17,7 @@ module.exports = {
 };
 
 var driver_name = config.backend.driver;
-var driver = require_app("server/backends/" + driver_name);
+var driver: snorkel.Driver = require_app("server/backends/" + driver_name);
 
 try {
   driver.validate();
@@ -24,7 +25,7 @@ try {
   throw new Error("Couldn't validate backend driver");
 }
 
-function validate_pipeline_query(query_spec, ret) {
+function validate_pipeline_query(query_spec: snorkel.QuerySpec, ret) {
   if (!ret) {
     console.log("TODO: driver needs to return its handled params");
     return;
@@ -43,7 +44,7 @@ function validate_pipeline_query(query_spec, ret) {
   console.log("TODO: validate query params were handled (false = unhandled)", ret);
 }
 
-function validate_pipeline_results(query_spec, results, cb) {
+function validate_pipeline_results(query_spec: snorkel.QuerySpec, results, cb) {
   if (SAMPLE_VIEWS[query_spec.view]) {
     if (!_.isArray(results)) {
       return cb("Results was not like an array");
@@ -127,7 +128,7 @@ function prep_pipeline(params, meta) {
 
 }
 
-module.exports = {
+export default {
   // Query builders
   samples: query_builder("samples"),
   time_series: query_builder("time"),
@@ -189,4 +190,3 @@ module.exports = {
   SAMPLE_VIEWS: SAMPLE_VIEWS,
   SEPARATOR: driver.SEPARATOR || "/"
 };
-
