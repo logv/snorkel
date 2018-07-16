@@ -1,7 +1,7 @@
-import * as snorkel from "../../../types";
-import _ from "underscore";
+import * as snorkel from "types";
+import * as _ from "underscore";
 
-var driver = require_app("server/backends/driver");
+import * as driver from "app/server/backends/driver";
 var context = require_core("server/context");
 
 var child_process = require("child_process");
@@ -343,7 +343,7 @@ function extract_val(query_spec: snorkel.QuerySpec, r: SybilRow, c: string, agg:
   } else if (stddev) {
     return ((<SybilHistValue>v) && (<SybilHistValue>v).stddev) || 0;
   } else {
-    return parseFloat(avg);
+    return parseFloat(avg.toString());
 
   }
 
@@ -837,7 +837,7 @@ var flush_queue = _.throttle(function() {
   });
 }, 3000);
 
-class PCSDriver extends driver.Base {
+class SybilDriver extends driver.Base {
   run(table, query_spec: snorkel.QuerySpec, unweight, cb: (error: string, rows?: snorkel.Row[]) => void) {
     console.log("RUNNING QUERY", table, query_spec);
     if (!table) {
@@ -874,7 +874,7 @@ class PCSDriver extends driver.Base {
       cb(info);
     });
   }
-  get_tables(cb: (tables:Array<{ table_name: string}>) => void) {
+  get_tables(cb: (tables: snorkel.TableMeta[]) => void) {
     run_query_cmd("-tables -json",
       function(err, result: string[]) {
         var tables: Array<{ table_name: string }> = [];
@@ -885,7 +885,9 @@ class PCSDriver extends driver.Base {
         cb(tables);
       });
   }
-  get_columns = get_cached_columns
+  get_columns(table, cb) {
+    return get_cached_columns(table, cb)
+  }
   clear_cache(table, cb) {}
   drop_dataset(table, cb) {}
   default_bucket() {
@@ -935,4 +937,4 @@ class PCSDriver extends driver.Base {
   SEPARATOR = DATASET_SEPARATOR
 };
 
-module.exports = PCSDriver;
+export = new SybilDriver();

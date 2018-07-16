@@ -1,15 +1,17 @@
-"use strict";
+import _ from "underscore";
+import * as snorkel from "../../types";
 
-var _ = require_vendor("underscore");
-var db = require_app("server/db");
-var backend = require_app("server/backend");
-var context = require_core("server/context");
+import db from "../server/db";
+import backend from "../server/backend";
+import context from "superfluous/core/server/context";
 
 var metadata_master = {
   metadata: {
     name: '',
     description: '',
-    columns: {}
+    columns: {},
+    time_col: undefined,
+    col_types: {},
   },
   table: ''
 };
@@ -33,11 +35,12 @@ module.exports = {
       }
 
       backend.get_columns(table, function(cols) {
-        var columns = _.groupBy(cols, function(col) {
+        var columns: { [K: string]: snorkel.ColumnMeta} = {};
+        var gcolumns = _.groupBy(cols, function(col) {
           return col.name;
         });
 
-        _.each(columns, function(col, key) {
+        _.each(gcolumns, function(col, key) {
           columns[key] = col[0];
         });
 
@@ -131,17 +134,18 @@ module.exports = {
 
     var collection = db.get("dataset", "metadata");
     var cur = collection.find({});
-    db.toArray(cur, function(err, docs) {
+    db.toArray(cur, function(err, docs: [{ table: string, [K: string]: Object }]) {
       if (err) {
         cb([]);
         return;
       }
 
-      var grouped = _.groupBy(docs, function(d) {
+      var ggrouped = _.groupBy(docs, function(d) {
         return d.table;
       });
 
-      _.each(grouped, function(configs, key) {
+      var grouped: { [K: string]: Object } = {};
+      _.each(ggrouped, function(configs, key) {
         grouped[key] = configs[0];
       });
 

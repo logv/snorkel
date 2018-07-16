@@ -1,5 +1,5 @@
-import * as snorkel from "../../types";
-import _ from "underscore";
+import * as snorkel from "types";
+import * as _ from "underscore";
 
 var context = require_core("server/context");
 var config = require_core("server/config");
@@ -20,9 +20,11 @@ var driver_name = config.backend.driver;
 var driver: snorkel.Driver = require_app("server/backends/" + driver_name);
 
 try {
+  console.log(driver);
+  debugger;
   driver.validate();
 } catch(e) {
-  throw new Error("Couldn't validate backend driver");
+  throw new Error(`Couldn't validate backend driver: ${e}`);
 }
 
 function validate_pipeline_query(query_spec: snorkel.QuerySpec, ret) {
@@ -101,14 +103,16 @@ function query_builder(query) {
   };
 }
 
-var QUERIES = {
+type Queries = { [K in snorkel.QueryView]: (a: any, b: any) => snorkel.QueryPipeline };
+
+var QUERIES: Queries = {
   dist: query_builder("hist"),
   table: query_builder("table"),
   samples: query_builder("samples"),
   time: query_builder("time")
 };
 
-function prep_pipeline(params, meta) {
+function prep_pipeline(params: snorkel.QueryParams, meta) {
   var query = QUERIES[params.view];
 
   if (!query) {
@@ -128,7 +132,7 @@ function prep_pipeline(params, meta) {
 
 }
 
-export default {
+const backend = {
   // Query builders
   samples: query_builder("samples"),
   time_series: query_builder("time"),
@@ -190,3 +194,5 @@ export default {
   SAMPLE_VIEWS: SAMPLE_VIEWS,
   SEPARATOR: driver.SEPARATOR || "/"
 };
+export = backend;
+

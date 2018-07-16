@@ -3,7 +3,8 @@
     "allowSyntheticDefaultImports": true,
     "allowJs": true,
     "outDir": "build",
-    "target": "es5"
+    "target": "es5",
+    "baseUrl": "src"
   },
   "include": [
     "src/*js",

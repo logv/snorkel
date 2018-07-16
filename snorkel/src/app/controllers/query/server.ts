@@ -1,5 +1,5 @@
-"use strict";
-
+import * as snorkel from "types";
+import * as _ from "underscore";
 
 var querystring = require("querystring");
 var http = require("http");
@@ -20,7 +20,7 @@ var template = require_core("server/template");
 
 var rbac = require_app("server/rbac");
 var auth = require_app("server/auth");
-var backend = require_app("server/backend");
+import * as backend from "app/server/backend";
 var metadata = require_app("server/metadata");
 var Sample = require_app("server/sample");
 var view = require_app("controllers/query/view");
@@ -37,7 +37,7 @@ var value_of = controller.value_of,
 
 
 
-function fuzzy_time(time_str, now, delta) {
+function fuzzy_time(time_str, now, delta?: boolean) {
   now = now || Date.now();
   var pm = time_str.match("pm");
   time_str = time_str.replace(/(am|pm)/, "");
@@ -79,7 +79,7 @@ function estimate_time_buckets(query_interval, buckets) {
 }
 
 function marshall_query(form_data) {
-  var query_data = {};
+  var query_data: snorkel.QueryParams;
 
   query_data.dims = array_of(form_data, 'group_by', ["browser"]);
   query_data.view = value_of(form_data, 'view', 'table');
@@ -90,7 +90,7 @@ function marshall_query(form_data) {
   query_data.custom_fields = custom_fields;
 
   var custom = value_of(form_data, 'custom', '{}');
-  var custom_data = {};
+  var custom_data: { [K: string]: string };
   try {
     custom_data = JSON.parse(custom);
   } catch(e) { }
@@ -206,7 +206,7 @@ function marshall_query(form_data) {
     agg = "$count";
   }
 
-  _.each(use_fields, function(field) {
+  _.each(use_fields, function(field: string) {
     query_data.cols.push(field);
 
     aggs.push({
@@ -221,7 +221,7 @@ function marshall_query(form_data) {
     var filters = {};
     var now = Date.now();
     // I don't know the field types over here. Oops.
-    _.each(form_filters, function(filter) {
+    _.each(form_filters, function(filter: [string, string, any]) {
       var field = filter.shift();
       var op = filter.shift();
       var val = filter.shift();
@@ -977,7 +977,7 @@ function load_annotations(table, cb) {
   });
 }
 
-module.exports = {
+const server = {
   routes: {
     "" : "index",
     "/saved": "saved",
@@ -1169,4 +1169,5 @@ module.exports = {
   bounce: post_bounce,
   load_rss: load_rss,
   load_annotations: load_annotations
-};
+}
+export = server;

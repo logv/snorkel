@@ -1,4 +1,4 @@
-import _ from "underscore";
+import * as _ from "underscore";
 
 import * as snorkel from "../../../types";
 
@@ -8,23 +8,20 @@ function not_implemented(func: string) {
   };
 }
 
-function validate() {
-  console.log("Validating backend driver");
-}
-
 // This is meant for predicting data from samples of the form { integer: { }, string: {}, set: {} }
-function predict_column_types(data: snorkel.ColumnSample[]) {
+export function predict_column_types(data: snorkel.ColumnSample[]) {
   var schema: { [K: string]: { [key in snorkel.ColumnSampleKey]?: number } } = {};
   var values: { [K: string]: { [key in snorkel.ColumnSampleKey]?: any[] } }  = {};
   _.each(data, function(sample: snorkel.ColumnSample) {
-    _.each(sample, function(fields, field_type) {
+    _.each(sample, function(fields, field_type: snorkel.ColumnSampleKey) {
       if (_.isObject(fields)) {
         _.each(fields, function(value, field) {
           if (!schema[field]) {
             schema[field] = {};
             values[field] = {};
           }
-          if (!schema[field][field_type]) {
+          let v = schema[field];
+          if (!v[field_type]) {
             schema[field][field_type] = 0;
             values[field][field_type] = [];
           }
@@ -35,7 +32,7 @@ function predict_column_types(data: snorkel.ColumnSample[]) {
     });
   });
 
-  var cols = [];
+  var cols: snorkel.ColumnMeta[] = [];
   _.each(schema, function(field_types, field) {
     if (field === "_bsontype") { // Skip that bad boy
       return;
@@ -76,36 +73,38 @@ function predict_column_types(data: snorkel.ColumnSample[]) {
   return cols;
 }
 
-class driver implements snorkel.Driver {
-  run(dataset: string, query_spec: snorkel.QuerySpec, unweight_columns, cb) {
+export class Base implements snorkel.Driver {
+  run(dataset: string, query_spec: snorkel.QuerySpec, unweight_columns: boolean, cb: (err:string, results: any)=> void) {
     not_implemented("run");
   }
-  get_stats(dataset, cb) {
+  get_stats(dataset: string, cb: ()=>void) {
     not_implemented("get_stats");
   }
-  get_datasets(cb) {
+  get_datasets(cb: ()=>void) {
     not_implemented("get_datasets");
   }
-  get_tables(cb) {
+  get_tables(cb: (tables: snorkel.TableMeta[])=>void) {
     not_implemented("get_tables");
   }
-  get_columns(dataset, cb) {
+  get_columns(dataset: string, cb: ()=>void) {
     not_implemented("get_columns");
   }
-  clear_cache(dataset, cb) {
+  clear_cache(dataset: string, cb: ()=>void) {
     not_implemented("clear_cache");
   }
-  drop_dataset(dataset, cb) {
+  drop_dataset(dataset: string, cb: ()=>void) {
     not_implemented("drop_dataset");
   }
-  add_samples(dataset, subset, samples, cb) {
+  add_samples(dataset: string, subset: string, samples: Object[], cb: ()=>void) {
     not_implemented("add_samples");
   }
   supports_percentiles() {
     not_implemented("supported_metrics");
   }
-  validate = validate;
-  predict_column_types = predict_column_types;
+  validate() {
+    console.log("Validating backend driver");
+  }
+  predict_column_types(data: snorkel.ColumnSample[]) {
+    return predict_column_types(data);
+  }
 }
-
-export default { Base: driver, predict_column_types };
