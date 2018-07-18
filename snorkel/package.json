@@ -25,7 +25,7 @@
     "socket.io": "x",
     "sqlite3": "^4.0.0",
     "squel": "x",
-    "superfluous": ">=0.1.0",
+    "superfluous": "^0.1.4",
     "trust-proxy": "x",
     "uws": "^0.14.4"
   }
