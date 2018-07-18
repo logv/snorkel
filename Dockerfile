@@ -9,7 +9,7 @@ RUN go get -v github.com/logv/sybil # built-after:2018-05-15
 
 WORKDIR /snorkel
 COPY snorkel/package.json /snorkel/
-COPY snorkel/npm-shrinkwrap.json /snorkel/
+COPY snorkel/package-lock.json /snorkel/
 RUN npm install sqlite3 --build-from-source
 RUN npm install
 
