@@ -22,6 +22,8 @@ RUN rsync -Ap /tmp/sqlite3/ ./node_modules/sqlite3/
 
 COPY snorkel /snorkel
 
+WORKDIR /snorkel/build
+
 EXPOSE 3000
 EXPOSE 59036/udp
 
