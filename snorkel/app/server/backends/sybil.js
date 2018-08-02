@@ -48,6 +48,16 @@ if (config.backend.hostfile) {
 }
 
 
+// NOTES FOR GRPC SYBIL
+// when grpc_host is specified in config.backend.grpc_host,
+// we use the --dial flag to make queries via grpc
+// to start a sybil grpc server, use `sybil serve`
+var GRPC_HOST=null;
+if (config.backend.grpc_host) {
+  GRPC_HOST= config.backend.grpc_host;
+}
+
+
 function path_exists(path) {
   var fs = require('fs');
   try {
@@ -137,6 +147,10 @@ get_cmd_info(function(err, info) {
 function run_query_cmd(arg_string, cb) {
   var query_args = " query -read-log ";
 
+  if (GRPC_HOST) {
+    query_args += " --dial " + GRPC_HOST + " ";
+  }
+
   if (HAS_QUERY_CACHE) {
     query_args += " -cache-queries ";
   }
@@ -194,8 +208,17 @@ function marshall_time_rows(query_spec, time_buckets) {
     console.log("EXTRACTING EXTRA METRICS", custom_fields);
   }
 
+  if (GRPC_HOST && time_buckets.time_results) {
+    var tt = {};
+    _.each(time_buckets.time_results, function(row, key) {
+      tt[key] = marshall_from_grpc(row.results);
+    });
+
+    time_buckets = tt;
+  }
   var ret = [];
   _.each(time_buckets, function(rows, time_bucket) {
+
     _.each(rows, function(r) {
       if (!r) {
         return;
@@ -304,12 +327,44 @@ function extract_val(query_spec, r, c, agg) {
 
 }
 
+function marshall_from_grpc(rows) {
+  var marshalled_rows = [];
+  _.each(rows, function(row) {
+    var this_row = {};
+    _.each(row.values, function(val, name) {
+      if (val.hist) {
+        _.each(val.hist.buckets, function(v, k) {
+          val.hist.buckets[k] = parseInt(v);
+        });
+
+      }
+      this_row[name] = val.str || val.avg || val.hist;
+    });
+
+    this_row.Distinct = parseInt(row.distinct);
+    this_row.Count = parseInt(row.count);
+    this_row.Samples = parseInt(row.samples);
+
+    marshalled_rows.push(this_row);
+
+  });
+
+  return marshalled_rows;
+
+
+
+}
+
 function marshall_table_rows(query_spec, rows) {
   var cols = query_spec.opts.cols;
   var dims = query_spec.opts.dims;
   var agg = query_spec.opts.agg;
   var custom_fields = query_spec.opts.custom_fields || [];
 
+  if (GRPC_HOST && rows.results) { // row.results exist in the grpc API
+    rows = marshall_from_grpc(rows.results);
+
+  }
 
   var ret = [];
   _.each(rows, function(r) {
@@ -411,7 +466,7 @@ function add_dims_and_cols(query_spec) {
   }
 
   if (query_spec.opts.agg && query_spec.opts.agg === "$distinct") {
-    cmd_args += "-op distinct ";
+		cmd_args = cmd_args.replace("-group", "-distinct");
   }
 
 
@@ -455,6 +510,11 @@ function marshall_dist_rows(query_spec, rows) {
   var cols = query_spec.opts.cols;
   var dims = query_spec.opts.dims;
   var ret = [];
+
+  if (GRPC_HOST && rows.results) {
+    rows = marshall_from_grpc(rows.results);
+  }
+
   _.each(rows, function(r) {
     var row = {};
     row._id = {};
@@ -630,6 +690,10 @@ function run_samples_query(table, query_spec, cb) {
   run_query_cmd(args + " -samples -json -table " + table_name, function(err, samples) {
     var results = [];
 
+    if (GRPC_HOST && samples.samples) {
+      samples = samples.samples;
+    }
+
     _.each(samples, function(sample) {
       var result = {
         integer: {},
@@ -707,9 +771,16 @@ function get_columns(table, cb) {
 
   run_query_cmd("-info -json -table " + table, function(err, info) {
     var cols;
-    if (err || !info || !info.columns) {
+    if (err || !info) {
       cols = {};
     } else {
+
+      if (GRPC_HOST && !info.columns) {
+        info.columns = info.columns || {};
+        info.columns.ints = info.columns.ints || info.int_columns;
+        info.columns.strs = info.columns.strs || info.str_columns;
+        info.columns.sets = info.columns.sets || info.set_columns;
+      }
 
       var cols = []
       var PREFIX_RE = /^(integer_|string_|set_)/;
@@ -775,6 +846,9 @@ var flush_queue = _.throttle(function() {
     console.log("QUEUE", table_name, all.length);
 
     var cmd = get_cmd(BIN_PATH, "ingest -table " + table_name);
+    if (GRPC_HOST) {
+      cmd += " --dial " + GRPC_HOST + " ";
+    }
     if (config.debug_driver) {
       console.log("RUNNING COMMAND", cmd);
     }
@@ -830,9 +904,12 @@ var PCSDriver = _.extend(driver.Base, {
     run_query_cmd("-tables -json",
       function(err, info) {
         var tables = [];
-        _.each(info, function(table) {
-          tables.push({ table_name: table });
-        });
+        if (info) {
+          var tt = info.tables || info;
+          _.each(tt, function(table) {
+            tables.push({ table_name: table });
+          });
+        }
 
         cb(tables);
       });
