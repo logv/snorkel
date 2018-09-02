@@ -866,6 +866,7 @@ var PCSDriver = _.extend(driver.Base, {
       "$p75" : "P75",
       "$p90" : "P90",
       "$p95" : "P95",
+      "$p99" : "P99",
       "$distinct" : "Distinct"
     };
   },
