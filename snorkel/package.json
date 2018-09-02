@@ -34,6 +34,7 @@
   },
   "scripts": {
     "compile": "tsc -p .",
+    "compile:watch": "tsc -w -p .",
     "copy-assets": "cd ./src; find . -type f,l ! \\( -name '*.js' -or -name '*.ts' \\) -exec cp -d --parents {} ../build \\;; cd ..; rsync -qaP ./src./app/static/vendor/ ./build/app/static/vendor/; cp package.json build/",
     "prepare": "npm run compile; npm run copy-assets"
   }
