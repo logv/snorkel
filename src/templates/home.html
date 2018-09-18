@@ -1,0 +1,13 @@
+{% extends "layout.html" %}
+
+{% block body %} 
+<div>
+  {% for t in tables %}
+    <div>
+      <a href='{{ url_for('get_view', table=t, view="table") }}'>
+        {{ t }}
+      </a>
+    </div>
+  {% endfor %}
+</div>
+{% endblock %}

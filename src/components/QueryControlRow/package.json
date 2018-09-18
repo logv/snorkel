@@ -1,0 +1,7 @@
+{
+  "main" : "query_control_row",
+  "helpers": [],
+  "style": "query_control_row.css",
+  "styles": [],
+  "template": "query_control_row.html.erb"
+}
