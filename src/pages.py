@@ -16,11 +16,13 @@ class QueryPage(pudgy.FlaskPage):
         table = self.context.table
         view = self.context.view
 
+        presenter = DatasetPresenter(table=table)
+
         bs = backend.SybilBackend()
         table_info = bs.get_table_info(table)
 
         view = TableView()
-        view.context.update(info=table_info)
+        view.context.update(info=table_info, presenter=presenter)
 
         qs = QuerySidebar(info=table_info, view=view)
 
@@ -29,4 +31,5 @@ class QueryPage(pudgy.FlaskPage):
             info=table_info,
             table=table,
             sidebar=qs,
+            presenter=presenter,
             view=view)
