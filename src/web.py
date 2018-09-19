@@ -19,6 +19,8 @@ def get_view(table, view):
     return QueryPage(template="query.html", table=table, view=view).render()
 
 
+app.after_request(pudgy.compress_request)
+
 if __name__ == "__main__":
     app.run(port=2333)
 

@@ -2,6 +2,8 @@ import pudgy
 import dotmap
 
 from .components import *
+from .view import TableView, DatasetPresenter
+
 from . import backend
 
 class HomePage(pudgy.FlaskPage):

@@ -13,7 +13,7 @@ module.exports = {
   initialize: function() {
     console.log("THIS EL", this.$el);
     var chosen_opts = {
-      width: '140px'
+      width: '148px'
     };
 
     // TODO: touch the width so chosen gets the right width
