@@ -1,3 +1,5 @@
+var $ = window.jQuery;
+
 module.exports = {
   initialize: function() {
   },
@@ -7,24 +9,33 @@ module.exports = {
 
   },
   handle_go_clicked: function() {
-    console.log("RUNNING QUERY");
     var query = this.get_query();
-  },
-  get_query: function() {
-    var formEl = this.$el.find("form");
-    var formParams = formEl.serializeArray();
-    console.log("GETTING QUERY FROM UNDER HERE", formParams);
-
     this
       .rpc
-      .run_query(formParams)
+      .run_query()
+      .kwargs({
+        query: query
+      })
       .done(function(res, err) {
         console.log("RES",res);
 
       });
   },
-  handle_view_changed: function() {
-    console.log("VIEW CHANGED");
+  get_query: function() {
+    var formEl = this.$el.find("form");
+    var formParams = formEl.serializeArray();
+    console.log("GETTING QUERY FROM UNDER HERE", formParams);
+    return formParams;
+
+  },
+  handle_view_changed: function(evt) {
+    var view = $(evt.target).val();
+    var table = "hostest";
+
+    this
+      .rpc
+      .update_controls()
+      .kwargs({ view: view, table: table });
 
   }
 

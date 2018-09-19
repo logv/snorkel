@@ -11,7 +11,6 @@ module.exports = {
     options: {}
   },
   initialize: function() {
-    console.log("THIS EL", this.$el);
     var chosen_opts = {
       width: '148px'
     };

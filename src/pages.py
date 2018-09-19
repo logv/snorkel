@@ -2,7 +2,7 @@ import pudgy
 import dotmap
 
 from .components import *
-from .view import TableView, DatasetPresenter
+from .view import TableView, DatasetPresenter, QuerySidebar
 
 from . import backend
 

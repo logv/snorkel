@@ -20,7 +20,7 @@ class Selector(pudgy.MustacheComponent):
         for option in options:
             name = option
             value = option
-            if len(option) == 2:
+            if len(option) == 2 and type(option) != str:
                 name, value = option
 
             self.context.options.append({
@@ -29,19 +29,10 @@ class Selector(pudgy.MustacheComponent):
                 "selected": "selected" if value == kwargs.get('selected') else ""
             })
 
+
+# TODO: add selected
 class MultiSelect(pudgy.JinjaComponent, pudgy.BackboneComponent):
     pass
-
-
-
-class QuerySidebar(pudgy.BackboneComponent, pudgy.JinjaComponent, pudgy.SassComponent, pudgy.ServerBridge):
-    def __prepare__(self):
-        self.context.controls = self.context.view.get_controls()
-
-@QuerySidebar.api
-def run_query(cls, *query_params):
-    # this is a name/value encoded array, unfortunately
-    print "RUNNING QUERY", query_params
 
 class ControlRow(pudgy.MustacheComponent):
     def __init__(self, name, label, control):
@@ -49,4 +40,3 @@ class ControlRow(pudgy.MustacheComponent):
         self.context.name = name
         self.context.label = label
         self.context.control = control.__html__
-

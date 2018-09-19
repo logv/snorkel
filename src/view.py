@@ -1,6 +1,10 @@
 import pudgy
 from .components import *
 
+import backend
+import dotmap
+import werkzeug
+
 def make_dict(arr):
     return dict([(w,w) for w in arr])
 
@@ -33,6 +37,7 @@ END_TIME_OPTIONS = [
 ]
 
 AGAINST_TIME_OPTIONS = [
+    "",
     "-1 hour",
     "-3 hours",
     "-6 hours",
@@ -41,6 +46,19 @@ AGAINST_TIME_OPTIONS = [
     "-3 days",
     "-1 week",
     "-2 weeks",
+]
+
+TIME_SLICE_OPTIONS = [
+    "auto",
+    ("1 min", 60),
+    ("5 min", 60 * 5),
+    ("10 min", 60 * 10),
+    ("30 min", 60 * 30),
+    ("1 hour", 60 * 60),
+    ("3 hours", 60 * 60 * 3),
+    ("6 hours", 60 * 60 * 6),
+    ("12 hours", 60 * 60 * 12),
+    ("daily", 60 * 60 * 24),
 ]
 
 
@@ -73,6 +91,9 @@ class DatasetPresenter(object):
     def get_metrics(self):
         return METRIC_OPTIONS
 
+class QuerySpec(dotmap.DotMap):
+    pass
+
 # a virtual component has no assets,
 # but its descendants might
 @pudgy.Virtual
@@ -98,10 +119,11 @@ class ViewBase(pudgy.BackboneComponent):
         controls.append(ControlRow("against", "Against", against_time))
 
     def add_view_selector(self, controls):
+        print "VIEW IS", self.context.query.view
         view_selector = Selector(
             name="view",
             options=self.context.presenter.get_views(),
-            selected=self.context.query.table)
+            selected=self.context.query.view)
 
         controls.append(ControlRow("view", "View", view_selector))
 
@@ -169,6 +191,42 @@ class TimeView(ViewBase, pudgy.JSComponent):
     NAME="time"
     BASE="time"
 
+
+    def add_time_series_controls(self, controls):
+        time_slice = Selector(
+            name="time_bucket",
+            options=TIME_SLICE_OPTIONS,
+            selected=self.context.query.time_bucket)
+
+        controls.append(ControlRow("time_bucket", "Time Slice", time_slice))
+
+        normalize = Selector(
+            name="time_normalize",
+            options=[ "", "hour", "minute" ],
+            selected=self.context.query.time_normalize)
+        controls.append(ControlRow("time_normalize", "Normalize", normalize))
+
+
+
+    def get_controls(self):
+        controls = []
+
+        self.add_go_button(controls)
+        self.add_view_selector(controls)
+        self.add_time_controls(controls)
+
+        self.add_time_series_controls(controls)
+
+        self.add_groupby_selector(controls)
+        self.add_limit_selector(controls)
+
+        self.add_metric_selector(controls)
+        self.add_fields_selector(controls)
+        self.add_go_button(controls)
+
+        return controls
+
+
 class DistView(ViewBase, pudgy.JSComponent):
     NAME="dist"
     BASE="dist"
@@ -176,3 +234,62 @@ class DistView(ViewBase, pudgy.JSComponent):
 class SamplesView(ViewBase, pudgy.JSComponent):
     NAME="samples"
     BASE="samples"
+
+    def get_controls(self):
+        controls = []
+
+        self.add_go_button(controls)
+        self.add_view_selector(controls)
+        self.add_time_controls(controls)
+
+        self.add_limit_selector(controls)
+
+        self.add_go_button(controls)
+
+        return controls
+
+
+def get_view_by_name(name):
+    for cls in pudgy.util.inheritors(ViewBase):
+        if cls.NAME.lower() == name.lower():
+            return cls
+
+class QuerySidebar(pudgy.BackboneComponent, pudgy.JinjaComponent, pudgy.SassComponent, pudgy.ServerBridge):
+    def __prepare__(self):
+        self.context.controls = self.context.view.get_controls()
+
+@QuerySidebar.api
+def run_query(cls, query=None, viewarea=None):
+    # this is a name/value encoded array, unfortunately
+    md = werkzeug.MultiDict()
+    for q in query:
+        if type(q) == dict:
+            md[q['name']] = q['value']
+
+        elif type(q) == list or type(q) == tuple:
+            md[q[0]] = q[1]
+
+    metric = md.get('metric')
+    print "RUNNING QUERY", md, metric
+
+    if viewarea:
+        viewarea.replace_html(md)
+
+    return md
+
+@QuerySidebar.api
+def update_controls(cls, table=None, view=None):
+    p = DatasetPresenter(table=table)
+
+    bs = backend.SybilBackend()
+    ti = bs.get_table_info(table)
+
+    query = QuerySpec(view=view)
+
+    VwClass = get_view_by_name(view)
+
+    v = VwClass(query=query)
+    v.context.update(info=ti, presenter=p)
+
+    qs = QuerySidebar(view=v, presenter=p)
+    cls.replace_html(qs.render())
