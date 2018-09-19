@@ -12,17 +12,16 @@ module.exports = {
   },
   handle_go_clicked: function() {
     console.log("HANDLING GO CLICKED");
-    var query = this.get_query();
     this
       .rpc
       .run_query()
       .kwargs({
-        query: query,
+        query: this.get_query(),
         table: this.table
       })
       .done(function(res, err) {
         console.log("RES IS", res);
-        $(".results").text(JSON.stringify(res));
+        $(".results").text(JSON.stringify(res, null, 2));
       });
   },
   get_query: function() {
@@ -40,10 +39,10 @@ module.exports = {
     this
       .rpc
       .update_controls()
-      .kwargs({ view: view, table: table })
+      .kwargs({ view: view, table: table, query: this.get_query() })
       .done(function(res, err) {
         // we are being replaced?
-//        self.undelegateEvents();
+        self.undelegateEvents();
 
       });
 

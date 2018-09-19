@@ -90,9 +90,15 @@ class DatasetPresenter(object):
     def get_metrics(self):
         return METRIC_OPTIONS
 
-class QuerySpec(dotmap.DotMap):
-    pass
+def QuerySpec(query):
+    md = werkzeug.MultiDict()
+    for q in query:
+        if type(q) == dict:
+            md.add(q['name'], q['value'].strip())
+        elif type(q) == list or type(q) == tuple:
+            md.add(q[0], q[1].strip())
 
+    return md
 # a virtual component has no assets,
 # but its descendants might
 @pudgy.Virtual
@@ -112,34 +118,36 @@ class ViewBase(pudgy.BackboneComponent):
         start_time = Selector(
             name="start",
             options=START_TIME_OPTIONS,
-            selected=self.context.query.start)
+            selected=self.context.query.get('start'))
 
         end_time = Selector(
             name="end",
             options=END_TIME_OPTIONS,
-            selected=self.context.query.end)
+            selected=self.context.query.get('end'))
 
         against_time = Selector(
             name="against",
             options=AGAINST_TIME_OPTIONS,
-            selected=self.context.query.against)
+            selected=self.context.query.get('against'))
 
         controls.append(ControlRow("start", "Start", start_time))
         controls.append(ControlRow("end", "End", end_time))
         controls.append(ControlRow("against", "Against", against_time))
 
     def add_view_selector(self, controls):
+        print self.context.query.get("view")
         view_selector = Selector(
             name="view",
             options=self.context.presenter.get_views(),
-            selected=self.context.query.view)
+            selected=self.context.query.get('view'))
 
         controls.append(ControlRow("view", "View", view_selector))
 
     def add_limit_selector(self, controls):
+        print "LIMIT", self.context.query.get("limit")
         limit_selector = TextInput(
             name="limit",
-            value=self.context.query.limit)
+            value=self.context.query.get('limit', 10))
 
         controls.append(ControlRow("limit", "Limit", limit_selector))
 
@@ -148,14 +156,15 @@ class ViewBase(pudgy.BackboneComponent):
         groupby = MultiSelect(
             name="groupby[]",
             options=groups,
-            selected=self.context.query.groupby)
+            selected=self.context.query.getlist('groupby[]'))
+
         controls.append(ControlRow("groupby[]", "Group By", groupby))
 
     def add_metric_selector(self, controls):
         metric_selector = Selector(
             name="metric",
             options=self.context.presenter.get_metrics(),
-            selected=self.context.query.table)
+            selected=self.context.query.get('metric'))
 
         controls.append(ControlRow("metric", "Metric", metric_selector))
 
@@ -165,7 +174,7 @@ class ViewBase(pudgy.BackboneComponent):
         fields = Selector(
             name="field",
             options=fields,
-            selected=self.context.query.field)
+            selected=self.context.query.get('field'))
         controls.append(ControlRow("field", "Field", fields))
 
     def add_fields_selector(self, controls):
@@ -173,7 +182,7 @@ class ViewBase(pudgy.BackboneComponent):
         fields = MultiSelect(
             name="fields[]",
             options=fields,
-            selected=self.context.query.fields)
+            selected=self.context.query.getlist('fields[]'))
         controls.append(ControlRow("fields[]", "Fields", fields))
 
     def add_go_button(self, controls):
@@ -215,14 +224,14 @@ class TimeView(ViewBase, pudgy.JSComponent):
         time_slice = Selector(
             name="time_bucket",
             options=TIME_SLICE_OPTIONS,
-            selected=self.context.query.time_bucket)
+            selected=self.context.query.get("time_bucket"))
 
         controls.append(ControlRow("time_bucket", "Time Slice", time_slice))
 
         normalize = Selector(
             name="time_normalize",
             options=[ "", "hour", "minute" ],
-            selected=self.context.query.time_normalize)
+            selected=self.context.query.get("time_normalize"))
         controls.append(ControlRow("time_normalize", "Normalize", normalize))
 
 
@@ -257,9 +266,6 @@ class DistView(ViewBase, pudgy.JSComponent):
         self.add_go_button(controls)
         self.add_view_selector(controls)
         self.add_time_controls(controls)
-
-        self.add_groupby_selector(controls)
-        self.add_limit_selector(controls)
 
         self.add_field_selector(controls)
         self.add_go_button(controls)
@@ -299,37 +305,29 @@ class QuerySidebar(pudgy.BackboneComponent, pudgy.JinjaComponent, pudgy.SassComp
 @QuerySidebar.api
 def run_query(cls, table=None, query=None, viewarea=None):
     # this is a name/value encoded array, unfortunately
-    md = werkzeug.MultiDict()
-    print "QUERY IS", query
-    for q in query:
-        if type(q) == dict:
-            md.add(q['name'], q['value'].strip())
-        elif type(q) == list or type(q) == tuple:
-            md.add(q[0], q[1].strip())
-
-    metric = md.get('metric')
+    qs = QuerySpec(query)
 
     bs = backend.SybilBackend()
-    res = bs.run_query(table, md)
+    res = bs.run_query(table, qs)
 
     return {
-        "query" : md.to_dict(flat=False),
+        "query" : qs.to_dict(flat=False),
         "results" : res }
 
 @QuerySidebar.api
-def update_controls(cls, table=None, view=None):
+def update_controls(cls, table=None, view=None, query=None):
     p = DatasetPresenter(table=table)
 
     bs = backend.SybilBackend()
     ti = bs.get_table_info(table)
 
-    query = QuerySpec(view=view)
+    query = QuerySpec(query)
 
     VwClass = get_view_by_name(view)
 
-    v = VwClass(query=query)
-    v.context.update(info=ti, presenter=p)
+    v = VwClass()
+    v.context.update(info=ti, presenter=p, query=query)
 
-    qs = QuerySidebar(view=v, presenter=p)
+    qs = QuerySidebar(view=v, presenter=p, query=query)
     qs.marshal(table=table)
     cls.replace_html(qs.render())

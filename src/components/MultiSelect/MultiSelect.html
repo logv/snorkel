@@ -1,7 +1,7 @@
 <div class="hidden multiselect-container mtm">
   <select class="chzn-select" name="{{ name }}" class="span2" multiple="multiple" data-placeholder=" ">
     {% for label in options %}
-        <option value="{{ options[label] }} ">
+        <option value="{{ options[label] }}" {{ "selected" if label in selected }}>
           {{ label }}
         </option>
     {% endfor %}

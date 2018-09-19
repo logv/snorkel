@@ -6,6 +6,8 @@ from .view import TableView, DatasetPresenter, QuerySidebar
 
 from . import backend
 
+import werkzeug
+
 class HomePage(pudgy.FlaskPage):
     def __prepare__(self):
         bs = backend.SybilBackend()
@@ -23,10 +25,13 @@ class QueryPage(pudgy.FlaskPage):
         bs = backend.SybilBackend()
         table_info = bs.get_table_info(table)
 
-        view = TableView()
-        view.context.update(info=table_info, presenter=presenter)
+        query = werkzeug.MultiDict({})
 
-        qs = QuerySidebar(info=table_info, view=view)
+        view = TableView()
+        view.context.update(info=table_info, presenter=presenter, query=query)
+
+
+        qs = QuerySidebar(info=table_info, view=view, query=query)
         qs.marshal(table=table)
 
 
