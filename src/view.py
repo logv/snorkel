@@ -62,12 +62,7 @@ TIME_SLICE_OPTIONS = [
 ]
 
 
-VIEW_OPTIONS = [
-   ("Table", "table"),
-   "time",
-   "dist",
-   "samples",
-]
+VIEW_OPTIONS = []
 
 METRIC_OPTIONS = [
     "Avg",
@@ -86,7 +81,11 @@ class DatasetPresenter(object):
         self.table = kwargs['table']
 
     def get_views(self):
-        return VIEW_OPTIONS
+        ret = []
+        for view in VIEW_OPTIONS:
+            ret.append((view.get_display_name(), view.get_name()))
+
+        return ret
 
     def get_metrics(self):
         return METRIC_OPTIONS
@@ -98,6 +97,17 @@ class QuerySpec(dotmap.DotMap):
 # but its descendants might
 @pudgy.Virtual
 class ViewBase(pudgy.BackboneComponent):
+    DISPLAY_NAME=""
+    NAME="ViewBase"
+
+    @classmethod
+    def get_display_name(self):
+        return self.DISPLAY_NAME or self.NAME
+
+    @classmethod
+    def get_name(self):
+        return self.NAME
+
     def add_time_controls(self, controls):
         start_time = Selector(
             name="start",
@@ -119,7 +129,6 @@ class ViewBase(pudgy.BackboneComponent):
         controls.append(ControlRow("against", "Against", against_time))
 
     def add_view_selector(self, controls):
-        print "VIEW IS", self.context.query.view
         view_selector = Selector(
             name="view",
             options=self.context.presenter.get_views(),
@@ -150,6 +159,14 @@ class ViewBase(pudgy.BackboneComponent):
 
         controls.append(ControlRow("metric", "Metric", metric_selector))
 
+
+    def add_field_selector(self, controls):
+        fields = make_dict(self.context.info["columns"]["ints"])
+        fields = Selector(
+            name="field",
+            options=fields,
+            selected=self.context.query.field)
+        controls.append(ControlRow("field", "Field", fields))
 
     def add_fields_selector(self, controls):
         fields = make_dict(self.context.info["columns"]["ints"])
@@ -183,6 +200,7 @@ class ViewBase(pudgy.BackboneComponent):
 class TableView(ViewBase, pudgy.JSComponent, pudgy.MustacheComponent):
     NAME="table"
     BASE="table"
+    DISPLAY_NAME="Table View"
 
     def __prepare__(self):
         pass
@@ -190,6 +208,7 @@ class TableView(ViewBase, pudgy.JSComponent, pudgy.MustacheComponent):
 class TimeView(ViewBase, pudgy.JSComponent):
     NAME="time"
     BASE="time"
+    DISPLAY_NAME="Time View"
 
 
     def add_time_series_controls(self, controls):
@@ -230,10 +249,28 @@ class TimeView(ViewBase, pudgy.JSComponent):
 class DistView(ViewBase, pudgy.JSComponent):
     NAME="dist"
     BASE="dist"
+    DISPLAY_NAME="Dist View"
+
+    def get_controls(self):
+        controls = []
+
+        self.add_go_button(controls)
+        self.add_view_selector(controls)
+        self.add_time_controls(controls)
+
+        self.add_groupby_selector(controls)
+        self.add_limit_selector(controls)
+
+        self.add_field_selector(controls)
+        self.add_go_button(controls)
+
+        return controls
+
 
 class SamplesView(ViewBase, pudgy.JSComponent):
     NAME="samples"
     BASE="samples"
+    DISPLAY_NAME="Samples View"
 
     def get_controls(self):
         controls = []
@@ -249,6 +286,7 @@ class SamplesView(ViewBase, pudgy.JSComponent):
         return controls
 
 
+VIEW_OPTIONS = [ TableView, TimeView, DistView, SamplesView ]
 def get_view_by_name(name):
     for cls in pudgy.util.inheritors(ViewBase):
         if cls.NAME.lower() == name.lower():
@@ -259,23 +297,24 @@ class QuerySidebar(pudgy.BackboneComponent, pudgy.JinjaComponent, pudgy.SassComp
         self.context.controls = self.context.view.get_controls()
 
 @QuerySidebar.api
-def run_query(cls, query=None, viewarea=None):
+def run_query(cls, table=None, query=None, viewarea=None):
     # this is a name/value encoded array, unfortunately
     md = werkzeug.MultiDict()
+    print "QUERY IS", query
     for q in query:
         if type(q) == dict:
-            md[q['name']] = q['value']
-
+            md.add(q['name'], q['value'].strip())
         elif type(q) == list or type(q) == tuple:
-            md[q[0]] = q[1]
+            md.add(q[0], q[1].strip())
 
     metric = md.get('metric')
-    print "RUNNING QUERY", md, metric
 
-    if viewarea:
-        viewarea.replace_html(md)
+    bs = backend.SybilBackend()
+    res = bs.run_query(table, md)
 
-    return md
+    return {
+        "query" : md.to_dict(flat=False),
+        "results" : res }
 
 @QuerySidebar.api
 def update_controls(cls, table=None, view=None):
@@ -292,4 +331,5 @@ def update_controls(cls, table=None, view=None):
     v.context.update(info=ti, presenter=p)
 
     qs = QuerySidebar(view=v, presenter=p)
+    qs.marshal(table=table)
     cls.replace_html(qs.render())

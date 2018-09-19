@@ -1,7 +1,9 @@
 var $ = window.jQuery;
 
 module.exports = {
-  initialize: function() {
+  initialize: function(ctx) {
+    console.log("CREATING QUERY SIDEBAR", ctx);
+    this.table = ctx.table;
   },
   events: {
     "change .selector[name='view']" : "handle_view_changed",
@@ -9,16 +11,18 @@ module.exports = {
 
   },
   handle_go_clicked: function() {
+    console.log("HANDLING GO CLICKED");
     var query = this.get_query();
     this
       .rpc
       .run_query()
       .kwargs({
-        query: query
+        query: query,
+        table: this.table
       })
       .done(function(res, err) {
-        console.log("RES",res);
-
+        console.log("RES IS", res);
+        $(".results").text(JSON.stringify(res));
       });
   },
   get_query: function() {
@@ -30,12 +34,18 @@ module.exports = {
   },
   handle_view_changed: function(evt) {
     var view = $(evt.target).val();
-    var table = "hostest";
+    var table = this.table;
+    var self = this;
 
     this
       .rpc
       .update_controls()
-      .kwargs({ view: view, table: table });
+      .kwargs({ view: view, table: table })
+      .done(function(res, err) {
+        // we are being replaced?
+//        self.undelegateEvents();
+
+      });
 
   }
 

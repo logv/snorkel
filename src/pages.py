@@ -27,6 +27,7 @@ class QueryPage(pudgy.FlaskPage):
         view.context.update(info=table_info, presenter=presenter)
 
         qs = QuerySidebar(info=table_info, view=view)
+        qs.marshal(table=table)
 
 
         self.context.update(
