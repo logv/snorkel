@@ -82,6 +82,11 @@ class SybilBackend(Backend):
             cmd_args.append("-int")
             cmd_args.append(FIELD_SEPARATOR.join(fields))
 
+        field = query_spec.get("field")
+        if field:
+            cmd_args.append("-int")
+            cmd_args.append(field)
+
     def add_filters(self, query_spec, cmd_args):
         # add time filters
         start = query_spec.get('start', "-1 week")
@@ -117,11 +122,6 @@ class SybilBackend(Backend):
             cmd_args.extend(["-str-filter", FIELD_SEPARATOR.join(map(str, filter_strs))])
 
 
-
-
-
-
-
     def run_table_query(self, table, query_spec):
         cmd_args = [ "-table", table ]
 
@@ -134,7 +134,17 @@ class SybilBackend(Backend):
         return run_query_command(cmd_args)
 
 
+    def run_dist_query(self, table, query_spec):
+        cmd_args = [ "-table", table, "-op", "hist" ]
 
+        self.add_group_by(query_spec, cmd_args)
+        self.add_fields(query_spec, cmd_args)
+        self.add_filters(query_spec, cmd_args)
+#        self.add_hist_buckets(query_spec, cmd_args)
+
+        # TODO: pull metric off query and determine whether to build hist or not
+
+        return run_query_command(cmd_args)
     def run_time_query(self, table, query_spec):
 
         time_col = "time"

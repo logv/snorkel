@@ -3,7 +3,9 @@
 {% block body %}
 
   <div class='header'>
-    <h3 class='lfloat'>snorkelite</h3> {{ table_selector }}
+    <h3 class='lfloat'><a href='{{ url_for('get_index') }}'>snorkelite</a></h3>
+
+    {{ table_selector }}
   </div>
 
   <div class='container-fluid'>
