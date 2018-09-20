@@ -125,17 +125,18 @@ class ViewBase(pudgy.BackboneComponent):
             options=END_TIME_OPTIONS,
             selected=self.context.query.get('end'))
 
+        controls.append(ControlRow("start", "Start", start_time))
+        controls.append(ControlRow("end", "End", end_time))
+
+    def add_time_comparison(self, controls):
         against_time = Selector(
             name="against",
             options=AGAINST_TIME_OPTIONS,
             selected=self.context.query.get('against'))
 
-        controls.append(ControlRow("start", "Start", start_time))
-        controls.append(ControlRow("end", "End", end_time))
         controls.append(ControlRow("against", "Against", against_time))
 
     def add_view_selector(self, controls):
-        print self.context.query.get("view")
         view_selector = Selector(
             name="view",
             options=self.context.presenter.get_views(),
@@ -144,7 +145,6 @@ class ViewBase(pudgy.BackboneComponent):
         controls.append(ControlRow("view", "View", view_selector))
 
     def add_limit_selector(self, controls):
-        print "LIMIT", self.context.query.get("limit")
         limit_selector = TextInput(
             name="limit",
             value=self.context.query.get('limit', 10))
@@ -196,6 +196,7 @@ class ViewBase(pudgy.BackboneComponent):
         self.add_go_button(controls)
         self.add_view_selector(controls)
         self.add_time_controls(controls)
+        self.add_time_comparison(controls)
 
         self.add_groupby_selector(controls)
         self.add_limit_selector(controls)
@@ -212,7 +213,15 @@ class TableView(ViewBase, pudgy.JSComponent, pudgy.MustacheComponent):
     DISPLAY_NAME="Table View"
 
     def __prepare__(self):
-        pass
+        table = []
+        for r in self.context.results:
+            row = []
+            for c in r:
+                row.append(r[c])
+
+            table.append(row)
+
+        self.context.table = table
 
 class TimeView(ViewBase, pudgy.JSComponent):
     NAME="time"
@@ -242,6 +251,7 @@ class TimeView(ViewBase, pudgy.JSComponent):
         self.add_go_button(controls)
         self.add_view_selector(controls)
         self.add_time_controls(controls)
+        self.add_time_comparison(controls)
 
         self.add_time_series_controls(controls)
 
@@ -266,6 +276,7 @@ class DistView(ViewBase, pudgy.JSComponent):
         self.add_go_button(controls)
         self.add_view_selector(controls)
         self.add_time_controls(controls)
+        self.add_time_comparison(controls)
 
         self.add_field_selector(controls)
         self.add_go_button(controls)
@@ -306,16 +317,22 @@ class QuerySidebar(pudgy.BackboneComponent, pudgy.JinjaComponent, pudgy.SassComp
 def run_query(cls, table=None, query=None, viewarea=None):
     # this is a name/value encoded array, unfortunately
     qs = QuerySpec(query)
+    view = qs.get('view')
 
     bs = backend.SybilBackend()
     res = bs.run_query(table, qs)
 
-    return {
-        "query" : qs.to_dict(flat=False),
-        "results" : res }
+    r =  { "query" : qs.to_dict(flat=False), "results" : res }
+
+    VwClass = get_view_by_name(view)
+    v = VwClass()
+    v.context.update(query=query, results=res)
+
+    if viewarea:
+        viewarea.replace_html(v.render())
 
 @QuerySidebar.api
-def update_controls(cls, table=None, view=None, query=None):
+def update_controls(cls, table=None, view=None, query=None, viewarea=None):
     p = DatasetPresenter(table=table)
 
     bs = backend.SybilBackend()
@@ -329,5 +346,9 @@ def update_controls(cls, table=None, view=None, query=None):
     v.context.update(info=ti, presenter=p, query=query)
 
     qs = QuerySidebar(view=v, presenter=p, query=query)
-    qs.marshal(table=table)
+    qs.marshal(table=table, viewarea=viewarea)
+
+    # we undelegate our events because we are about to replace ourself
+    # with the same component
+    cls.call("undelegateEvents")
     cls.replace_html(qs.render())

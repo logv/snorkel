@@ -2,8 +2,8 @@ var $ = window.jQuery;
 
 module.exports = {
   initialize: function(ctx) {
-    console.log("CREATING QUERY SIDEBAR", ctx);
     this.table = ctx.table;
+    this.viewarea = ctx.viewarea;
   },
   events: {
     "change .selector[name='view']" : "handle_view_changed",
@@ -11,25 +11,19 @@ module.exports = {
 
   },
   handle_go_clicked: function() {
-    console.log("HANDLING GO CLICKED");
     this
       .rpc
       .run_query()
       .kwargs({
         query: this.get_query(),
-        table: this.table
-      })
-      .done(function(res, err) {
-        console.log("RES IS", res);
-        $(".results").text(JSON.stringify(res, null, 2));
+        table: this.table,
+        viewarea: this.viewarea,
       });
   },
   get_query: function() {
     var formEl = this.$el.find("form");
     var formParams = formEl.serializeArray();
-    console.log("GETTING QUERY FROM UNDER HERE", formParams);
     return formParams;
-
   },
   handle_view_changed: function(evt) {
     var view = $(evt.target).val();
@@ -39,7 +33,7 @@ module.exports = {
     this
       .rpc
       .update_controls()
-      .kwargs({ view: view, table: table, query: this.get_query() })
+      .kwargs({ view: view, table: table, query: this.get_query(), viewarea: this.viewarea })
       .done(function(res, err) {
         // we are being replaced?
         self.undelegateEvents();

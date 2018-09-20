@@ -8,6 +8,9 @@ from . import backend
 
 import werkzeug
 
+class ViewArea(pudgy.JinjaComponent, pudgy.BackboneComponent):
+    pass
+
 class HomePage(pudgy.FlaskPage):
     def __prepare__(self):
         bs = backend.SybilBackend()
@@ -30,14 +33,9 @@ class QueryPage(pudgy.FlaskPage):
         view = TableView()
         view.context.update(info=table_info, presenter=presenter, query=query)
 
-
-        qs = QuerySidebar(info=table_info, view=view, query=query)
-        qs.marshal(table=table)
+        viewarea = ViewArea()
 
 
-        self.context.update(
-            info=table_info,
-            table=table,
-            sidebar=qs,
-            presenter=presenter,
-            view=view)
+        qs = QuerySidebar(info=table_info, view=view)
+        qs.marshal(table=table, viewarea=viewarea)
+        self.context.update(table=table, sidebar=qs, viewarea=viewarea)

@@ -1,0 +1,20 @@
+<div>
+  <h3>Table View</h3>
+
+  <table>
+  <th>
+    {{ #headers }}
+      <td>{{ . }}</td>
+    {{ /headers }}
+  </th>
+
+  {{ #table }}
+    <tr>
+      {{ #. }}
+        <td>{{ . }}</td>
+      {{ /. }}
+    </tr>
+  {{ /table }}
+  </table>
+
+</div>

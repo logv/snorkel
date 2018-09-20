@@ -7,7 +7,7 @@ class Button(pudgy.MustacheComponent):
 class TextInput(pudgy.MustacheComponent):
     pass
 
-class Selector(pudgy.MustacheComponent):
+class Selector(pudgy.MustacheComponent, pudgy.SassComponent):
     def __init__(self, *args, **kwargs):
         super(Selector, self).__init__(*args, **kwargs)
 
