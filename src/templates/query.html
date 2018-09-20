@@ -3,17 +3,17 @@
 {% block body %}
 
   <div class='header'>
-    {{ table_selector }}
+    <h3 class='lfloat'>snorkelite</h3> {{ table_selector }}
   </div>
 
   <div class='container-fluid'>
 
     <div class='row'>
-      <div class='col-lg-2 col-sm-4'>
+      <div class='sidebar_pane'>
           {{ sidebar }}
       </div>
 
-      <div class='col-lg-10 col-sm-8'>
+      <div class='results_pane'>
           <div class='results'>
             {{ viewarea }}
           </div>

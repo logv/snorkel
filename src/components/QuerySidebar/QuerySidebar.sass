@@ -1,13 +1,23 @@
+& {
+  margin-left: 0px;
+  padding-top: 20px;
+
+  display: block;
+  width: 350px;
+}
+
 .go.btn {
-  padding: 5px;  
+  padding: 5px;
   text-align: center;
-  margin: 5px 0px;
+  margin-right: 20px;
   display: inline-block;
-  width: 148px;
+  float: right;
+  width: 50px;
   border: 1px solid lightgreen;
+  background-color: lightgreen;
   cursor: pointer;
   &:hover {
-    background-color: lightgreen;
+    background-color: green;
   }
 }
 
@@ -17,13 +27,23 @@
 }
 
 .control-row label {
-  width: 100px;
+  width: 80px;
+  text-align: right;
+  margin-right: 5px;
   font-size: 80%;
   color: gray;
   margin-top: 5px;
+  display: inline-block;
+}
+
+.control-row .control-input {
+  display: inline-block;
 }
 
 .control-input {
+  select, input {
+    padding: 5px;
+  }
   select, input, .multiselect-container {
     width: 148px;
     min-height: 30px;

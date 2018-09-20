@@ -8,7 +8,7 @@ from .presenter import DatasetPresenter
 from . import views
 
 
-class QuerySidebar(pudgy.BackboneComponent, pudgy.JinjaComponent, pudgy.SassComponent, pudgy.ServerBridge):
+class QuerySidebar(pudgy.BackboneComponent, pudgy.JinjaComponent, pudgy.SassComponent, pudgy.ServerBridge, pudgy.Pagelet):
     def __prepare__(self):
         self.context.controls = self.context.view.get_controls()
 
@@ -28,7 +28,7 @@ def run_query(cls, table=None, query=None, viewarea=None):
     v.context.update(query=query, results=res)
 
     if viewarea:
-        viewarea.replace_html(v.render())
+        viewarea.html(v.render())
 
 @QuerySidebar.api
 def update_controls(cls, table=None, view=None, query=None, viewarea=None):

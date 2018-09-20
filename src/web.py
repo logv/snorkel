@@ -16,7 +16,7 @@ def get_index():
 
 @app.route('/query/<table>/<view>')
 def get_view(table, view):
-    return QueryPage(template="query.html", table=table, view=view).render()
+    return QueryPage(template="query.html", table=table, view=view).pipeline()
 
 
 app.after_request(pudgy.compress_request)

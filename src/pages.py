@@ -43,6 +43,7 @@ class QueryPage(pudgy.FlaskPage, pudgy.SassComponent, pudgy.BackboneComponent):
         viewarea = ViewArea()
 
         qs = QuerySidebar(info=table_info, view=view)
+        qs.async()
         qs.marshal(table=table, viewarea=viewarea)
 
         self.marshal(sidebar=qs)
