@@ -5,6 +5,7 @@ from .. import backend
 import dotmap
 import werkzeug
 import os
+import jinja2
 
 def make_dict(arr):
     return dict([(w,w) for w in arr])
@@ -50,6 +51,10 @@ AGAINST_TIME_OPTIONS = [
 ]
 
 VIEW_OPTIONS = []
+
+class QueryFilter(UIComponent, pudgy.BackboneComponent,
+    pudgy.JinjaComponent, pudgy.SassComponent):
+    pass
 
 @pudgy.Virtual
 class ViewBase(pudgy.BackboneComponent):
@@ -103,7 +108,7 @@ class ViewBase(pudgy.BackboneComponent):
         controls.append(ControlRow("limit", "Limit", limit_selector))
 
     def add_groupby_selector(self, controls):
-        groups = make_dict(self.context.info["columns"]["strs"])
+        groups = make_dict(self.context.metadata["columns"]["strs"])
         groupby = MultiSelect(
             name="groupby[]",
             options=groups,
@@ -121,7 +126,7 @@ class ViewBase(pudgy.BackboneComponent):
 
 
     def add_field_selector(self, controls):
-        fields = make_dict(self.context.info["columns"]["ints"])
+        fields = make_dict(self.context.metadata["columns"]["ints"])
         fields = Selector(
             name="field",
             options=fields,
@@ -129,7 +134,7 @@ class ViewBase(pudgy.BackboneComponent):
         controls.append(ControlRow("field", "Field", fields))
 
     def add_fields_selector(self, controls):
-        fields = make_dict(self.context.info["columns"]["ints"])
+        fields = make_dict(self.context.metadata["columns"]["ints"])
         fields = MultiSelect(
             name="fields[]",
             options=fields,
@@ -139,6 +144,28 @@ class ViewBase(pudgy.BackboneComponent):
     def add_go_button(self, controls):
         button = Button(name='go', className='go')
         controls.append(button)
+
+    def get_filters(self):
+        controls = []
+        fields = {}
+        md = self.context.metadata
+
+        types = {}
+
+        for field in md['columns']['strs']:
+            fields[field] = field
+            types[field] = 'string'
+
+        for field in md['columns']['ints']:
+            fields[field] = field
+            types[field] = 'integer'
+
+
+        filter = QueryFilter(fields=fields)
+        filter.marshal(types=types)
+        controls.append(filter)
+
+        return controls
 
 
     def get_controls(self):
@@ -157,6 +184,9 @@ class ViewBase(pudgy.BackboneComponent):
         self.add_go_button(controls)
 
         return controls
+
+    def get_stats(self):
+        pass
 
 
 def get_view_by_name(name):

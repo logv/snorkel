@@ -9,10 +9,10 @@ from .components import UIComponent
 from . import views
 import flask
 
-
 class QuerySidebar(UIComponent, pudgy.BackboneComponent, pudgy.JinjaComponent, pudgy.SassComponent, pudgy.ServerBridge, pudgy.Pagelet):
     def __prepare__(self):
         self.context.controls = self.context.view.get_controls()
+        self.context.filters = self.context.view.get_filters()
 
 @QuerySidebar.api
 def run_query(cls, table=None, query=None, viewarea=None):
@@ -50,7 +50,7 @@ def update_controls(cls, table=None, view=None, query=None, viewarea=None):
     VwClass = views.get_view_by_name(view)
 
     v = VwClass()
-    v.context.update(info=ti, presenter=p, query=query)
+    v.context.update(metadata=ti, presenter=p, query=query)
 
     qs = QuerySidebar(view=v, presenter=p, query=query)
     qs.marshal(table=table, viewarea=viewarea)

@@ -43,9 +43,10 @@ class QueryPage(Page, pudgy.SassComponent, pudgy.BackboneComponent):
         table_selector = Selector(name="table", selected=table, options=tables)
 
         view = TableView()
-        view.context.update(info=table_info, presenter=presenter, query=query)
+        view.context.update(metadata=table_info, presenter=presenter, query=query)
 
         viewarea = ViewArea()
+
 
         qs = QuerySidebar(info=table_info, view=view)
         qs.async()

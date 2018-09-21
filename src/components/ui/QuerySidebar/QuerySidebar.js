@@ -8,7 +8,7 @@ module.exports = {
   initialize: function(ctx) {
     this.table = ctx.table;
     this.viewarea = ctx.viewarea;
-    this.$el.slideDown();
+    this.$el.fadeIn();
   },
   events: {
     "change .selector[name='view']" : "handle_view_changed",
@@ -41,7 +41,8 @@ module.exports = {
     var view = $(evt.target).val();
     var table = this.table;
     var self = this;
-    this.$el.slideUp();
+
+    this.$el.fadeOut();
 
     this
       .rpc
