@@ -4,6 +4,7 @@ from .. import backend
 
 import dotmap
 import werkzeug
+import os
 
 def make_dict(arr):
     return dict([(w,w) for w in arr])
@@ -52,6 +53,7 @@ VIEW_OPTIONS = []
 
 @pudgy.Virtual
 class ViewBase(pudgy.BackboneComponent):
+    BASE_DIR = os.path.join(pudgy.Component.BASE_DIR, "views")
     DISPLAY_NAME=""
     NAME="ViewBase"
 

@@ -7,19 +7,24 @@ from .query_sidebar import QuerySidebar
 from .presenter import DatasetPresenter
 
 from . import backend
+from .components import UIComponent
 
 import werkzeug
+import os
 
-class ViewArea(pudgy.JinjaComponent, pudgy.BackboneComponent):
+class ViewArea(UIComponent, pudgy.JinjaComponent, pudgy.BackboneComponent):
     pass
 
-class HomePage(pudgy.FlaskPage):
+class Page(pudgy.FlaskPage):
+    BASE_DIR = os.path.join(pudgy.Component.BASE_DIR, "pages")
+
+class HomePage(Page):
     def __prepare__(self):
         bs = backend.SybilBackend()
         self.context.tables = bs.list_tables()
 
 
-class QueryPage(pudgy.FlaskPage, pudgy.SassComponent, pudgy.BackboneComponent):
+class QueryPage(Page, pudgy.SassComponent, pudgy.BackboneComponent):
     def __prepare__(self):
         # locate the potential views
         query = flask.request.args

@@ -4,12 +4,13 @@ from .query_spec import QuerySpec
 from . import backend
 
 from .presenter import DatasetPresenter
+from .components import UIComponent
 
 from . import views
 import flask
 
 
-class QuerySidebar(pudgy.BackboneComponent, pudgy.JinjaComponent, pudgy.SassComponent, pudgy.ServerBridge, pudgy.Pagelet):
+class QuerySidebar(UIComponent, pudgy.BackboneComponent, pudgy.JinjaComponent, pudgy.SassComponent, pudgy.ServerBridge, pudgy.Pagelet):
     def __prepare__(self):
         self.context.controls = self.context.view.get_controls()
 

@@ -1,13 +1,18 @@
 import pudgy
 import dotmap
 
-class Button(pudgy.MustacheComponent):
+import os
+
+class UIComponent(pudgy.Component):
+    BASE_DIR = os.path.join(pudgy.Component.BASE_DIR, "ui")
+
+class Button(UIComponent, pudgy.MustacheComponent):
     pass
 
-class TextInput(pudgy.MustacheComponent):
+class TextInput(UIComponent, pudgy.MustacheComponent):
     pass
 
-class Selector(pudgy.MustacheComponent, pudgy.SassComponent):
+class Selector(UIComponent, pudgy.MustacheComponent, pudgy.SassComponent):
     def __init__(self, *args, **kwargs):
         super(Selector, self).__init__(*args, **kwargs)
 
@@ -30,11 +35,15 @@ class Selector(pudgy.MustacheComponent, pudgy.SassComponent):
             })
 
 
-# TODO: add selected
-class MultiSelect(pudgy.JinjaComponent, pudgy.BackboneComponent):
+class LineGraph(UIComponent, pudgy.JSComponent):
+    NAMESPACE="grapher"
     pass
 
-class ControlRow(pudgy.MustacheComponent):
+# TODO: add selected
+class MultiSelect(UIComponent, pudgy.JinjaComponent, pudgy.BackboneComponent):
+    pass
+
+class ControlRow(UIComponent, pudgy.MustacheComponent):
     def __init__(self, name, label, control):
         super(ControlRow, self).__init__(name, label, control)
         self.context.name = name
