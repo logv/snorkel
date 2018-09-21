@@ -9,7 +9,7 @@ module.exports = {
   },
   handle_table_changed: function(e) {
     var table = $(e.target).val();
-    window.location = '/query/' + table + '/' + (this.sidebar.view || "table");
+    window.location = '/query?view=table&table=' + table;
   }
 
 }

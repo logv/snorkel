@@ -6,6 +6,7 @@ from . import backend
 from .presenter import DatasetPresenter
 
 from . import views
+import flask
 
 
 class QuerySidebar(pudgy.BackboneComponent, pudgy.JinjaComponent, pudgy.SassComponent, pudgy.ServerBridge, pudgy.Pagelet):
@@ -15,20 +16,26 @@ class QuerySidebar(pudgy.BackboneComponent, pudgy.JinjaComponent, pudgy.SassComp
 @QuerySidebar.api
 def run_query(cls, table=None, query=None, viewarea=None):
     # this is a name/value encoded array, unfortunately
-    qs = QuerySpec(query)
-    view = qs.get('view')
+    query = QuerySpec(query)
+    query.add('table', table)
+
+    view = query.get('view')
 
     bs = backend.SybilBackend()
-    res = bs.run_query(table, qs)
-
-    r =  { "query" : qs.to_dict(flat=False), "results" : res }
+    ti = bs.get_table_info(table)
+    res = bs.run_query(table, query)
 
     VwClass = views.get_view_by_name(view)
     v = VwClass()
-    v.context.update(query=query, results=res)
+    v.context.update(query=query, results=res, metadata=ti)
 
     if viewarea:
         viewarea.html(v.render())
+
+    print query
+    return {
+        "queryUrl": flask.url_for('get_view', **query)
+    }
 
 @QuerySidebar.api
 def update_controls(cls, table=None, view=None, query=None, viewarea=None):

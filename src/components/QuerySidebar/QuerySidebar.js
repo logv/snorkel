@@ -1,5 +1,9 @@
 var $ = window.jQuery;
 
+function swapUrl(url) {
+  history.pushState({}, "", url);
+}
+
 module.exports = {
   initialize: function(ctx) {
     this.table = ctx.table;
@@ -12,6 +16,7 @@ module.exports = {
 
   },
   handle_go_clicked: function() {
+    var queryUrl
     this
       .rpc
       .run_query()
@@ -19,6 +24,12 @@ module.exports = {
         query: this.get_query(),
         table: this.table,
         viewarea: this.viewarea,
+      })
+      .done(function(res, err) {
+        if (!err) {
+          swapUrl(res.queryUrl);
+        }
+
       });
   },
   get_query: function() {

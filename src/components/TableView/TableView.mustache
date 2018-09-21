@@ -1,12 +1,12 @@
 <div>
   <h3>Table View</h3>
 
-  <table>
-  <th>
+  <table class='table table-striped'>
+  <thead>
     {{ #headers }}
-      <td>{{ . }}</td>
+      <th>{{ . }}</th>
     {{ /headers }}
-  </th>
+  </thead>
 
   {{ #table }}
     <tr>

@@ -14,8 +14,13 @@ def get_index():
     return HomePage(template="home.html").render()
 
 
-@app.route('/query/<table>/<view>')
-def get_view(table, view):
+@app.route('/query')
+def get_view():
+    query = flask.request.args
+
+    table = query.get('table')
+    view = query.get('view', 'table')
+
     return QueryPage(template="query.html", table=table, view=view).pipeline()
 
 
