@@ -3,6 +3,10 @@ import dotmap
 
 import os
 
+@pudgy.Virtual
+class OldSnorkelComponent(pudgy.SuperfluousComponent):
+    BASE_DIR = os.path.join(pudgy.Component.BASE_DIR, "sf")
+
 class UIComponent(pudgy.Component):
     BASE_DIR = os.path.join(pudgy.Component.BASE_DIR, "ui")
 

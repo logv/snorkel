@@ -122,12 +122,19 @@ class SybilBackend(Backend):
             cmd_args.extend(["-str-filter", FIELD_SEPARATOR.join(map(str, filter_strs))])
 
 
+    def add_metrics(self, query_spec, cmd_args):
+        if query_spec.get('metric', 'Avg')[0] == 'p' or query_spec.get('view') == 'dist':
+            cmd_args.extend(["-op", "hist"])
+
+
+
     def run_table_query(self, table, query_spec):
         cmd_args = [ "-table", table ]
 
         self.add_group_by(query_spec, cmd_args)
         self.add_fields(query_spec, cmd_args)
         self.add_filters(query_spec, cmd_args)
+        self.add_metrics(query_spec, cmd_args)
 
         # TODO: pull metric off query and determine whether to build hist or not
 
@@ -141,10 +148,12 @@ class SybilBackend(Backend):
         self.add_fields(query_spec, cmd_args)
         self.add_filters(query_spec, cmd_args)
 #        self.add_hist_buckets(query_spec, cmd_args)
+        self.add_metrics(query_spec, cmd_args)
 
         # TODO: pull metric off query and determine whether to build hist or not
 
         return run_query_command(cmd_args)
+
     def run_time_query(self, table, query_spec):
 
         time_col = "time"
@@ -157,6 +166,7 @@ class SybilBackend(Backend):
         self.add_group_by(query_spec, cmd_args)
         self.add_fields(query_spec, cmd_args)
         self.add_filters(query_spec, cmd_args)
+        self.add_metrics(query_spec, cmd_args)
 
         return run_query_command(cmd_args)
 

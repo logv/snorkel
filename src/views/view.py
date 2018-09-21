@@ -2,6 +2,8 @@ import pudgy
 from ..components import *
 from .. import backend
 
+from ..components import OldSnorkelComponent
+
 import dotmap
 import werkzeug
 import os
@@ -52,9 +54,24 @@ AGAINST_TIME_OPTIONS = [
 
 VIEW_OPTIONS = []
 
-class QueryFilter(UIComponent, pudgy.BackboneComponent,
-    pudgy.JinjaComponent, pudgy.SassComponent):
+class filter_row(OldSnorkelComponent):
     pass
+
+FilterRow = filter_row
+
+def get_column_types(md):
+    types = {}
+    fields = {}
+
+    for field in md['columns']['strs']:
+        fields[field] = field
+        types[field] = 'string'
+
+    for field in md['columns']['ints']:
+        fields[field] = field
+        types[field] = 'integer'
+
+    return fields, types
 
 @pudgy.Virtual
 class ViewBase(pudgy.BackboneComponent):
@@ -147,21 +164,11 @@ class ViewBase(pudgy.BackboneComponent):
 
     def get_filters(self):
         controls = []
-        fields = {}
         md = self.context.metadata
 
-        types = {}
+        fields, types = get_column_types(md)
 
-        for field in md['columns']['strs']:
-            fields[field] = field
-            types[field] = 'string'
-
-        for field in md['columns']['ints']:
-            fields[field] = field
-            types[field] = 'integer'
-
-
-        filter = QueryFilter(fields=fields)
+        filter = FilterRow(fields=fields)
         filter.marshal(types=types)
         controls.append(filter)
 

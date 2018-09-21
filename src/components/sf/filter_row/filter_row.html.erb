@@ -1,0 +1,62 @@
+<% set_default("fields", ["test one", "test two"]) %>
+<% set_default("selected", null) %>
+<% set_default("op", "$eq") %>
+<% set_default("value", "") %>
+
+<%
+
+var OPS = [
+  ["$eq", "integer", "=="],
+  ["$ne", "integer", "!="],
+  ["$lt", "integer", "&lt;"],
+  ["$gt", "integer", "&gt;"],
+  ["$regex", "string", "~="],
+  ["$regexv", "string", "!="],
+  ["$in", "set", "in"],
+  ["$all", "set", "all"],
+  ["$nin", "set", "nin"]
+];
+
+set_default("ops", OPS);
+%>
+
+<div class="clearfix filter_row no-select">
+  <div>
+    <div style="margin-top: 5px; float: right;">
+      <a class="addFilter btn btn-mini">&nbsp;<i class="icon-plus"></i></a>
+      <a class="removeFilter btn btn-mini">&nbsp;<i class="icon-minus"></i></a>
+    </div>
+
+    <div>
+      <select class="span2 filter_field" data-id="1">
+        <% _.each(fields, function(label, name) { %>
+          <option value="<%= name %>"
+                  <%= name === selected ? "selected" : ""%> >
+              <%= label %>
+          </option>
+        <% }); %>
+      </select>
+
+      <select class="span1 filter_op" data-id="1">
+
+      <% _.each(ops, function(packed) {
+        var _op = packed[0],
+            _type = packed[1],
+            _label = packed[2];
+      %>
+        <option <%= (_op === op) ? "selected" : "" %>
+          value="<%= _op %>" data-type="<%= _type %>">
+            <%= _label %>
+        </option>
+      <% }); %>
+      </select>
+    </div>
+  </div>
+
+  <div>
+    <input type="text" value="" class="filter_value span2" data-provide="typeahead">
+      <%= value %>
+    </input>
+  </div>
+
+</div>

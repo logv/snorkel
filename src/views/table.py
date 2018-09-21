@@ -1,5 +1,5 @@
 import pudgy
-from .view import ViewBase
+from .view import ViewBase, get_column_types
 
 class TableView(ViewBase, pudgy.JSComponent,
     pudgy.MustacheComponent, pudgy.SassComponent):
@@ -21,13 +21,35 @@ class TableView(ViewBase, pudgy.JSComponent,
         for s in query.getlist("fields[]"):
             headers.append(s)
 
+        fields, types = get_column_types(md)
 
+
+        agg = query.get("metric")
 
         table = []
         for r in self.context.results:
             row = []
             for h in headers:
-                row.append(r[h] or "")
+                if h not in types or h == "Count" or h == "Samples":
+                    row.append(r[h] or "")
+                    continue
+
+                if types[h] == "integer":
+                    if agg[0] == "p":
+                        p = int(agg[1:])
+                        row.append(r[h]['percentiles'][p])
+
+                    elif agg == "Sum":
+                        row.append(r[h] * r.Count or "")
+
+                    elif agg == "Avg":
+                        row.append(r[h] or "")
+                    elif agg == "Count":
+                        pass
+                else:
+                    row.append(r[h] or "")
+
+
 
             table.append(row)
 

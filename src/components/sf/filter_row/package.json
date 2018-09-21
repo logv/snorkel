@@ -1,0 +1,7 @@
+{
+  "main" : "filter_row",
+  "helpers": [],
+  "style": "filter_row.css",
+  "styles": [],
+  "template": "filter_row.html.erb"
+}

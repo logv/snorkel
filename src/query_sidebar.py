@@ -33,9 +33,10 @@ def run_query(cls, table=None, query=None, viewarea=None):
     if viewarea:
         viewarea.html(v.render())
 
-    print query
     return {
-        "queryUrl": flask.url_for('get_view', **query)
+        "queryUrl": flask.url_for('get_view', **query),
+        "res" : res,
+        "query" : query
     }
 
 @QuerySidebar.api

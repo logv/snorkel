@@ -1,0 +1,13 @@
+& {
+  margin-left: 20px;
+  margin-right: 20px;
+}
+
+.filter_value {
+  width: 300px;
+  height: 30px;
+}
+
+.filter_field, .filter_op {
+  margin-top: 5px;
+}
