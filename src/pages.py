@@ -2,7 +2,7 @@ import pudgy
 import flask
 
 from .components import *
-from .views import TableView
+from .views import TableView, get_view_by_name
 from .query_sidebar import QuerySidebar
 from .presenter import DatasetPresenter
 
@@ -42,7 +42,8 @@ class QueryPage(Page, pudgy.SassComponent, pudgy.BackboneComponent):
 
         table_selector = Selector(name="table", selected=table, options=tables)
 
-        view = TableView()
+        VwClass = get_view_by_name(view)
+        view = VwClass()
         view.context.update(metadata=table_info, presenter=presenter, query=query)
 
         viewarea = ViewArea()

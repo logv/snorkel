@@ -121,6 +121,11 @@ class SybilBackend(Backend):
 
             cmd_args.extend(["-str-filter", FIELD_SEPARATOR.join(map(str, filter_strs))])
 
+    def add_limit(self, query_spec, cmd_args):
+        # TODO: limit should depend on the view. time series limit defaults to
+        # 10 or 20
+        limit = query_spec.get("limit", 100)
+        cmd_args.extend(["-limit", limit])
 
     def add_metrics(self, query_spec, cmd_args):
         if query_spec.get('metric', 'Avg')[0] == 'p' or query_spec.get('view') == 'dist':
@@ -135,6 +140,7 @@ class SybilBackend(Backend):
         self.add_fields(query_spec, cmd_args)
         self.add_filters(query_spec, cmd_args)
         self.add_metrics(query_spec, cmd_args)
+        self.add_limit(query_spec, cmd_args)
 
         # TODO: pull metric off query and determine whether to build hist or not
 
@@ -167,12 +173,14 @@ class SybilBackend(Backend):
         self.add_fields(query_spec, cmd_args)
         self.add_filters(query_spec, cmd_args)
         self.add_metrics(query_spec, cmd_args)
+        self.add_limit(query_spec, cmd_args)
 
         return run_query_command(cmd_args)
 
     def run_samples_query(self, table, query_spec):
         cmd_args = [ "-table", table, "-samples" ]
         self.add_filters(query_spec, cmd_args)
+        self.add_limit(query_spec, cmd_args)
         return run_query_command(cmd_args)
 
 

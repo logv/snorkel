@@ -1,5 +1,6 @@
 import pudgy
 from .view import ViewBase, get_column_types
+from ..components import Table
 
 class TableView(ViewBase, pudgy.JSComponent,
     pudgy.MustacheComponent, pudgy.SassComponent):
@@ -56,3 +57,9 @@ class TableView(ViewBase, pudgy.JSComponent,
         self.context.table = table
         self.context.headers = headers
 
+    def __render__(self):
+        t = Table()
+        t.context.update(**self.context.toDict())
+
+        r = t.render()
+        return r

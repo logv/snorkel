@@ -16,6 +16,9 @@ class Button(UIComponent, pudgy.MustacheComponent):
 class TextInput(UIComponent, pudgy.MustacheComponent):
     pass
 
+class Table(UIComponent, pudgy.MustacheComponent, pudgy.SassComponent):
+    pass
+
 class Selector(UIComponent, pudgy.MustacheComponent, pudgy.SassComponent):
     def __init__(self, *args, **kwargs):
         super(Selector, self).__init__(*args, **kwargs)
