@@ -10,8 +10,8 @@ var OPS = [
   ["$ne", "integer", "!="],
   ["$lt", "integer", "&lt;"],
   ["$gt", "integer", "&gt;"],
-  ["$regex", "string", "~="],
-  ["$regexv", "string", "!="],
+  ["$re", "string", "~="],
+  ["$nre", "string", "!="],
   ["$in", "set", "in"],
   ["$all", "set", "all"],
   ["$nin", "set", "nin"]
@@ -20,7 +20,7 @@ var OPS = [
 set_default("ops", OPS);
 %>
 
-<div class="clearfix filter_row no-select">
+<div class="clearfix select">
   <div>
     <div style="margin-top: 5px; float: right;">
       <a class="addFilter btn btn-mini">&nbsp;<i class="icon-plus"></i></a>
@@ -54,9 +54,7 @@ set_default("ops", OPS);
   </div>
 
   <div>
-    <input type="text" value="" class="filter_value span2" data-provide="typeahead">
-      <%= value %>
-    </input>
+    <input type="text" value="<%= value %>" class="filter_value span2" data-provide="typeahead" />
   </div>
 
 </div>

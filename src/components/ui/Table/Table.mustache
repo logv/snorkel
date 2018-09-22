@@ -1,20 +1,15 @@
-<div>
-  <h3>Table View</h3>
+<table class='table table-striped'>
+<thead>
+  {{ #headers }}
+    <th>{{ . }}</th>
+  {{ /headers }}
+</thead>
 
-  <table class='table table-striped'>
-  <thead>
-    {{ #headers }}
-      <th>{{ . }}</th>
-    {{ /headers }}
-  </thead>
-
-  {{ #table }}
-    <tr>
-      {{ #. }}
-        <td>{{ . }}</td>
-      {{ /. }}
-    </tr>
-  {{ /table }}
-  </table>
-
-</div>
+{{ #table }}
+  <tr>
+    {{ #. }}
+      <td>{{ . }}</td>
+    {{ /. }}
+  </tr>
+{{ /table }}
+</table>

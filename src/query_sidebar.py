@@ -12,19 +12,23 @@ import flask
 class QuerySidebar(UIComponent, pudgy.BackboneComponent, pudgy.JinjaComponent, pudgy.SassComponent, pudgy.ServerBridge, pudgy.Pagelet):
     def __prepare__(self):
         self.context.controls = self.context.view.get_controls()
-        self.context.filters = self.context.view.get_filters()
+        print "FILTERS", self.context.filters
+        self.context.filters = self.context.view.get_filters(self.context.filters)
 
 @QuerySidebar.api
-def run_query(cls, table=None, query=None, viewarea=None):
+def run_query(cls, table=None, query=None, viewarea=None, filters=[]):
     # this is a name/value encoded array, unfortunately
     query = QuerySpec(query)
+    bs = backend.SybilBackend()
+
+    ti = bs.get_table_info(table)
     query.add('table', table)
+    query.add('filters', filters)
 
     view = query.get('view')
 
-    bs = backend.SybilBackend()
-    ti = bs.get_table_info(table)
-    res = bs.run_query(table, query)
+
+    res = bs.run_query(table, query, ti)
 
     VwClass = views.get_view_by_name(view)
     v = VwClass()
@@ -40,7 +44,7 @@ def run_query(cls, table=None, query=None, viewarea=None):
     }
 
 @QuerySidebar.api
-def update_controls(cls, table=None, view=None, query=None, viewarea=None):
+def update_controls(cls, table=None, view=None, query=None, viewarea=None, filters=[]):
     p = DatasetPresenter(table=table)
 
     bs = backend.SybilBackend()
@@ -52,8 +56,9 @@ def update_controls(cls, table=None, view=None, query=None, viewarea=None):
 
     v = VwClass()
     v.context.update(metadata=ti, presenter=p, query=query)
+    query_filters= filters['query']
 
-    qs = QuerySidebar(view=v, presenter=p, query=query)
+    qs = QuerySidebar(view=v, presenter=p, query=query, filters=query_filters)
     qs.marshal(table=table, viewarea=viewarea)
 
     # we undelegate our events because we are about to replace ourself

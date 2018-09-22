@@ -48,8 +48,18 @@ class QueryPage(Page, pudgy.SassComponent, pudgy.BackboneComponent):
 
         viewarea = ViewArea()
 
+        import ast
 
-        qs = QuerySidebar(info=table_info, view=view)
+        filters = []
+        try:
+            filters = query.get('filters')
+            filters = ast.literal_eval(filters)
+            filters = filters['query']
+        except Exception as e:
+            print e
+
+
+        qs = QuerySidebar(info=table_info, view=view, filters=filters or [])
         qs.async()
         qs.marshal(table=table, viewarea=viewarea)
 

@@ -162,15 +162,24 @@ class ViewBase(pudgy.BackboneComponent):
         button = Button(name='go', className='go')
         controls.append(button)
 
-    def get_filters(self):
+    def get_filters(self, filters):
         controls = []
         md = self.context.metadata
 
         fields, types = get_column_types(md)
+        if not filters:
+            # at least one default filter
+            filters = [[ "", "", ""]]
 
-        filter = FilterRow(fields=fields)
-        filter.marshal(types=types)
-        controls.append(filter)
+        for f in filters:
+            filter = FilterRow(fields=fields)
+            filter.context.update(
+                selected=f[0],
+                op=f[1],
+                value=f[2]
+            )
+            filter.marshal(types=types)
+            controls.append(filter)
 
         return controls
 

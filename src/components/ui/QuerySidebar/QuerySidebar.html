@@ -8,12 +8,24 @@
 
   <h3 class='ml-4'>Filters</h3>
 
+    <div id="filters">
 
-    <div class='filter_group'>
-      {% for filter in filters %}
-        {{ filter }}
-      {% endfor %}
+      <div class='filter_group'>
+        {% for filter in filters %}
+          {{ filter }}
+        {% endfor %}
+      </div>
     </div>
+
+
+<!--     <div class='filter_group hidden'> -->
+<!--       {% for filter in compare_filters %} -->
+<!--         {{ filter }} -->
+<!--       {% endfor %} -->
+<!--  -->
+<!--  -->
+<!--     </div> -->
+  </div>
 
   <h3 class='ml-4'>Stats</h3>
 

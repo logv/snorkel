@@ -16,7 +16,7 @@ function update_operators(selector, new_op) {
   var shown = [];
   var options = this.options;
 
-  
+
   var field_types = options && options.types || {};
   _.each(ops, function(op) {
     var $op = $(op);

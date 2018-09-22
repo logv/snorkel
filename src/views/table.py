@@ -11,7 +11,6 @@ class TableView(ViewBase, pudgy.JSComponent,
     def __prepare__(self):
         headers = []
         md = self.context.metadata
-        print "METADATA", md
 
         query = self.context.query
         for s in query.getlist("groupby[]"):

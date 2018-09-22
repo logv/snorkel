@@ -47,14 +47,12 @@ class Backend(object):
 FIELD_SEPARATOR=","
 FILTER_SEPARATOR=":"
 
-class SybilBackend(Backend):
-    def list_tables(self):
-        return run_query_command(["-tables"])
+class SybilQuery(object):
+    def run_query(self, table, query_spec, metadata):
+        self.metadata = metadata
+        self.table = table
+        self.query = query_spec
 
-    def get_table_info(self, table):
-        return run_query_command(["-table",  table, "-info"])
-
-    def run_query(self, table, query_spec):
         view = query_spec.get('view')
         if view == 'table':
             return self.run_table_query(table, query_spec)
@@ -88,6 +86,9 @@ class SybilBackend(Backend):
             cmd_args.append(field)
 
     def add_filters(self, query_spec, cmd_args):
+        from .views import get_column_types
+
+
         # add time filters
         start = query_spec.get('start', "-1 week")
         start_s = time_to_seconds(start)
@@ -97,10 +98,36 @@ class SybilBackend(Backend):
 
         time_col = "time"
 
+        md = self.metadata
+        fields, types = get_column_types(md)
+
         # TODO: use proper field separators (\r and \t)
         # put all filters into a list and collapse later
+        filters = query_spec.get('filters')['query']
+
         int_filters = defaultdict(list)
         str_filters = defaultdict(list)
+
+        for f in filters:
+            col, op, val = f
+            if val == "":
+                continue
+
+            if op[0] != "$":
+                continue
+
+            op = op[1:]
+
+            if col in types:
+                tp = types[col]
+
+
+
+                if tp == "string":
+                    str_filters[col].append((op, val))
+                elif tp == "integer":
+                    int_filters[col].append((op, val))
+
 
 
         int_filters[time_col].append(("gt", start_s))
@@ -117,7 +144,7 @@ class SybilBackend(Backend):
         for col in str_filters:
             filter_strs = []
             for f in str_filters[col]:
-                filter_strs.append(FIELD_SEPARATOR.join(map(str, (col, f[0], f[1]))))
+                filter_strs.append(FILTER_SEPARATOR.join(map(str, (col, f[0], f[1]))))
 
             cmd_args.extend(["-str-filter", FIELD_SEPARATOR.join(map(str, filter_strs))])
 
@@ -185,6 +212,19 @@ class SybilBackend(Backend):
 
 
 
+
+
+
+class SybilBackend(Backend):
+    def list_tables(self):
+        return run_query_command(["-tables"])
+
+    def get_table_info(self, table):
+        return run_query_command(["-table",  table, "-info"])
+
+    def run_query(self, table, query_spec, metadata):
+        q = SybilQuery()
+        return q.run_query(table, query_spec, metadata)
 
 
 
