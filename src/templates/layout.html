@@ -3,6 +3,13 @@
 {{ add_stylesheet("bootstrap.min.css") }}
 {{ add_stylesheet("bootstrap.flatly.css") }}
 {{ add_stylesheet("bootstrap.glyphs.css") }}
+{{ add_stylesheet("main.css") }}
+
+<div class='header'>
+  <h3 class='lfloat'><a href='{{ url_for('get_index') }}'>snorkelite</a></h3>
+
+  {{ table_selector }}
+</div>
 
 {% block body %}
 

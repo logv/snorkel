@@ -59,7 +59,7 @@ class QueryPage(Page, pudgy.SassComponent, pudgy.BackboneComponent):
             print e
 
 
-        qs = QuerySidebar(info=table_info, view=view, filters=filters or [])
+        qs = QuerySidebar(info=table_info, view=view, filters=filters or [], metadata=table_info)
         qs.async()
         qs.marshal(table=table, viewarea=viewarea)
 
