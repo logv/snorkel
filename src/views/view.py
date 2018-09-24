@@ -75,7 +75,7 @@ def get_column_types(md):
 
 @pudgy.Virtual
 class ViewBase(pudgy.BackboneComponent):
-    BASE_DIR = os.path.join(pudgy.Component.BASE_DIR, "views")
+    NAMESPACE = "views"
     DISPLAY_NAME=""
     NAME="ViewBase"
 
@@ -85,7 +85,7 @@ class ViewBase(pudgy.BackboneComponent):
 
     @classmethod
     def get_name(self):
-        return self.NAME
+        return "%s" % (self.NAME)
 
     def add_time_controls(self, controls):
         start_time = Selector(
@@ -159,7 +159,7 @@ class ViewBase(pudgy.BackboneComponent):
         controls.append(ControlRow("fields[]", "Fields", fields))
 
     def add_go_button(self, controls):
-        button = Button(name='go', className='go')
+        button = Button(name='Go', className='go')
         controls.append(button)
 
     def get_filters(self, filters):
@@ -197,7 +197,6 @@ class ViewBase(pudgy.BackboneComponent):
 
         self.add_metric_selector(controls)
         self.add_fields_selector(controls)
-        self.add_go_button(controls)
 
         return controls
 

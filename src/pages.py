@@ -15,10 +15,11 @@ import os
 class ViewArea(UIComponent, pudgy.JinjaComponent, pudgy.BackboneComponent):
     pass
 
+@pudgy.Virtual
 class Page(pudgy.FlaskPage):
-    BASE_DIR = os.path.join(pudgy.Component.BASE_DIR, "pages")
+    NAMESPACE = "pages"
 
-class HomePage(Page):
+class HomePage(Page, pudgy.SassComponent):
     def __prepare__(self):
         bs = backend.SybilBackend()
         self.context.tables = bs.list_tables()

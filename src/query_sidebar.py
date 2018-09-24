@@ -32,9 +32,10 @@ def format_count(w):
 
 class StatsBox(UIComponent, pudgy.MustacheComponent):
     def __prepare__(self):
-        self.context.object_size = format_bytes(self.context.storageSize / self.context.count)
-        self.context.count = format_count(self.context.count)
-        self.context.storageSize = format_bytes(self.context.storageSize)
+        if self.context.count:
+            self.context.object_size = format_bytes(self.context.storageSize / self.context.count)
+            self.context.count = format_count(self.context.count)
+            self.context.storageSize = format_bytes(self.context.storageSize)
 
 class QuerySidebar(UIComponent, pudgy.BackboneComponent, pudgy.JinjaComponent, pudgy.SassComponent, pudgy.ServerBridge, pudgy.Pagelet):
     def __prepare__(self):

@@ -5,10 +5,10 @@ import os
 
 @pudgy.Virtual
 class OldSnorkelComponent(pudgy.SuperfluousComponent):
-    BASE_DIR = os.path.join(pudgy.Component.BASE_DIR, "sf")
+    NAMESPACE = "sf"
 
 class UIComponent(pudgy.Component):
-    BASE_DIR = os.path.join(pudgy.Component.BASE_DIR, "ui")
+    NAMESPACE = "ui"
 
 class Button(UIComponent, pudgy.MustacheComponent):
     pass
@@ -43,7 +43,6 @@ class Selector(UIComponent, pudgy.MustacheComponent, pudgy.SassComponent):
 
 
 class LineGraph(UIComponent, pudgy.JSComponent):
-    NAMESPACE="grapher"
     pass
 
 # TODO: add selected

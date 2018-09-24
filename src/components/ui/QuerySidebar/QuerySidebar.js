@@ -18,6 +18,7 @@ module.exports = {
   initialize: function(ctx) {
     this.table = ctx.table;
     this.viewarea = ctx.viewarea;
+    console.timeStamp("FADING IN");
     this.$el.fadeIn();
 
     filter_helper.set_container(this.$el);
@@ -44,7 +45,6 @@ module.exports = {
       })
       .done(function(res, err) {
         if (!err) {
-          console.log("URL", self.dom_to_query_str());
           swapUrl(res.queryUrl);
         }
 

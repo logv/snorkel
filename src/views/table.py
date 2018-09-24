@@ -40,7 +40,7 @@ class TableView(ViewBase, pudgy.JSComponent,
                         row.append(r[h]['percentiles'][p])
 
                     elif agg == "Sum":
-                        row.append(r[h] * r.Count or "")
+                        row.append(r[h] * r["Count"] or "")
 
                     elif agg == "Avg":
                         row.append(r[h] or "")
