@@ -1,5 +1,7 @@
 "use strict";
 
+require("vendor/hex-rgb.src.js");
+
 var color_hashes = {};
 var COLORS = [
   '#4572A7',
@@ -84,7 +86,7 @@ function row_key(group_by, result) {
 function result_key(group_by, result) {
   var row = [];
   _.each(group_by, function(group) {
-    row.push(result.string[group]);
+    row.push(result[group]);
   });
 
 

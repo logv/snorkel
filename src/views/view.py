@@ -60,6 +60,9 @@ class filter_row(OldSnorkelComponent):
 class tabs(OldSnorkelComponent):
     pass
 
+class modal(OldSnorkelComponent):
+    pass
+
 FilterRow = filter_row
 
 def get_column_types(md):

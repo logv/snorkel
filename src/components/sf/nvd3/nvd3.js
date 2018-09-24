@@ -295,7 +295,6 @@ module.exports = {
           .useInteractiveGuideline(true)  //We want nice looking tooltips and a guideline!
           .xScale(d3.time.scale());
 
-        console.dir(chart);
         chart.dispatch.on("renderEnd", _.throttle(function() {
           drawPlotLines();
           drawFocusFilters();
@@ -587,7 +586,6 @@ module.exports = {
       });
 
 
-      console.dir(chart);
       return chart;
     });
 

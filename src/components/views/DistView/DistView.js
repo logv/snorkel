@@ -129,16 +129,9 @@ function marshall_dist_rows(query_spec, rows) {
 
 var DistView = {
   initialize: function(ctx) {
-    this.graph_component = "nvd3";
-    var parsed = ctx.query;
-    sf_shim.add_old_params(parsed);
-    console.log("CTX", ctx);
-    var rows = marshall_dist_rows(parsed, ctx.results);
-    this.data = this.prepare({ results: rows, parsed: ctx.query} );
-    console.log("THIS DATA", this.data);
-
-    this.render();
+    sf_shim.initialize.apply(this, [ctx]);
   },
+  marshall_rows: marshall_dist_rows,
   prepare: function(data) {
     var series = [];
     var col = data.parsed.col || data.parsed.cols[0];

@@ -1,0 +1,24 @@
+<% set_default("tabs", {
+  'settings' : $("<div>foozle div</div>"),
+  'testings' : $("<div>testings div</div>") 
+}) %>
+
+<% set_default("active", null) %>
+
+<ul class="nav nav-tabs " data-toggle="pills">
+  <% _.each(tabs, function(tab, id) { %>
+    <li class="<%= active === id ? "active" : "" %>">
+      <a data-toggle="tab" data-target="#tab_<%= id %>">
+        <%= id %>      
+      </a>
+    </li>
+  <%  }); %>
+</ul>
+ 
+<div class="tab-content">
+  <% _.each(tabs, function(tab, id) { %>
+    <div class="tab-pane <%= active === id ? "active" : "" %>" id="tab_<%= id %>">
+      <%= tab.html() %>
+    </div>
+  <%  }); %>
+</div>

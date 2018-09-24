@@ -12,7 +12,7 @@ METRIC_OPTIONS = [
     "Distinct",
 ]
 
-VIEW_OPTIONS = [ TableView, TimeView, DistView, SamplesView ]
+VIEW_OPTIONS = [ TableView, TimeView, DistView, SamplesView, TimelineView ]
 class DatasetPresenter(object):
     def __init__(self, *args, **kwargs):
         self.table = kwargs['table']

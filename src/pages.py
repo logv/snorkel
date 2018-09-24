@@ -84,18 +84,19 @@ class QueryPage(Page, pudgy.SassComponent, pudgy.BackboneComponent):
 def run_query(cls, table=None, query=None, viewarea=None, filters=[]):
     # this is a name/value encoded array, unfortunately
     query = QuerySpec(query)
+    query.add('table', table)
+    query.add('filters', filters)
+    d = query.__makedict__()
+
     bs = backend.SybilBackend()
 
     ti = bs.get_table_info(table)
-    query.add('table', table)
-    query.add('filters', filters)
 
     view = query.get('view')
-
-
+    VwClass = get_view_by_name(view)
+    query.set('view', VwClass.BASE)
     res = bs.run_query(table, query, ti)
 
-    VwClass = get_view_by_name(view)
     v = VwClass()
     v.context.update(query=query, results=res, metadata=ti)
     v.marshal(query=query, results=res, metadata=ti)
@@ -103,7 +104,6 @@ def run_query(cls, table=None, query=None, viewarea=None, filters=[]):
     if viewarea:
         viewarea.html(v.render())
 
-    d = query.__makedict__()
     return {
         "queryUrl": flask.url_for('get_view', **d),
         "res" : res,
