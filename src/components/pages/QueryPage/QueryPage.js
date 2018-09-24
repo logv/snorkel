@@ -1,4 +1,4 @@
-var $ = require("jquery");
+var $ = $require("jquery");
 
 module.exports = {
   events: {

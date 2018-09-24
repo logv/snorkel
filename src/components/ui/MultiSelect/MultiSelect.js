@@ -1,6 +1,6 @@
 "use strict";
 
-var jQuery = require("jquery");
+// TODO: understand how to put globals into a shared namespace
 var chosen = require("./chosen.jquery.js");
 var chosenCss = require("./chosen.sass");
 

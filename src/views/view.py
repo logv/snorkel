@@ -54,16 +54,8 @@ AGAINST_TIME_OPTIONS = [
 
 VIEW_OPTIONS = []
 
-class filter_row(OldSnorkelComponent):
-    pass
 
-class tabs(OldSnorkelComponent):
-    pass
-
-class modal(OldSnorkelComponent):
-    pass
-
-FilterRow = filter_row
+from ..sf_components import filter_row as FilterRow
 
 def get_column_types(md):
     types = {}
