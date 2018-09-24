@@ -150,7 +150,7 @@ TIME_SLICE_OPTIONS = [
 class nvd3(OldSnorkelComponent):
     pass
 
-class TimeView(ViewBase, pudgy.JSComponent):
+class TimeView(ViewBase, pudgy.JSComponent, pudgy.SassComponent):
     NAME="time"
     BASE="time"
     DISPLAY_NAME="Time View"

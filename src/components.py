@@ -42,9 +42,6 @@ class Selector(UIComponent, pudgy.MustacheComponent, pudgy.SassComponent):
             })
 
 
-class LineGraph(UIComponent, pudgy.JSComponent):
-    pass
-
 # TODO: add selected
 class MultiSelect(UIComponent, pudgy.JinjaComponent, pudgy.BackboneComponent):
     pass

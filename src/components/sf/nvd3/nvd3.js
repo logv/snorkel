@@ -1,10 +1,10 @@
-// Format function for the tooltip values column.
 var d3 = require("./d3.v3.js");
 window.d3 = d3;
 
 var nvd3 = require("./nv.d3.js");
 var nvd3Css = require("./nv.d3.css");
 
+// Format function for the tooltip values column.
 function makeGenerator(tooltip) {
   return function tooltipGenerator(d) {
       if (d === null) {
@@ -167,7 +167,10 @@ module.exports = {
 
     console.log("INITIALIZING NVD3 WITH DATA", highcharts_options);
     var self = this;
-    self.$el.addClass(nvd3Css.className);
+
+    // NOTE: we are editing whole body class because we need tooltip CSS
+    // applied
+    $("html").addClass(nvd3Css.className);
 
     var chartType = highcharts_options.chart.type;
     var legend = true;
@@ -531,12 +534,12 @@ module.exports = {
           var end_date = new Date(extents[1]);
 
 
-          var start_date_str = _.template(date_template_str, { date: start_date });
-          var end_date_str = _.template(date_template_str, {date: end_date });
+          var start_date_str = _.template(date_template_str)( { date: start_date });
+          var end_date_str = _.template(date_template_str)( {date: end_date });
 
           if (+start_date != +end_date) {
             focusEl.find('.text').html(
-              _.template(focused_template, {
+              _.template(focused_template)( {
                 start_date_str: start_date_str,
                 end_date_str: end_date_str,
                 style_str: "style='width: 80px; display: inline-block;'" }

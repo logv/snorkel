@@ -74,7 +74,10 @@ var TimeView = {
       legend: {enabled: true},
       tooltip: {
         useHTML: true,
+        hideDelay: 0,
         formatter: function() {
+          $(".nvtooltip").remove();
+
           var el = $("<div><b>" + Highcharts.dateFormat('%a %d %b %H:%M:%S', this.x) + "</b></div>");
           _.each(this.points, function(point) {
             var ptDiv = $("<div class='clearfix'>");

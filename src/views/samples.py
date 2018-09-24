@@ -2,7 +2,7 @@ import pudgy
 from .view import ViewBase, get_column_types
 from ..components import Table
 
-class SamplesView(ViewBase, pudgy.JSComponent, pudgy.MustacheComponent):
+class SamplesView(ViewBase, pudgy.JSComponent):
     NAME="samples"
     BASE="samples"
     DISPLAY_NAME="Samples View"
