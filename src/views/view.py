@@ -120,7 +120,7 @@ class ViewBase(pudgy.BackboneComponent):
     def add_limit_selector(self, controls):
         limit_selector = TextInput(
             name="limit",
-            value=self.context.query.get('limit', 10))
+            value=self.context.query.get('limit', 10) or 10)
 
         controls.append(ControlRow("limit", "Limit", limit_selector))
 

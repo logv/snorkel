@@ -64,14 +64,17 @@ def run_query(cls, table=None, query=None, viewarea=None, filters=[]):
     VwClass = views.get_view_by_name(view)
     v = VwClass()
     v.context.update(query=query, results=res, metadata=ti)
+    v.marshal(query=query, results=res, metadata=ti)
 
     if viewarea:
         viewarea.html(v.render())
 
+    d = query.__makedict__()
+    print "MADE DICT", d
     return {
-        "queryUrl": flask.url_for('get_view', **query),
+        "queryUrl": flask.url_for('get_view', **d),
         "res" : res,
-        "query" : query
+        "query" : d
     }
 
 @QuerySidebar.api

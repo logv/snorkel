@@ -1,0 +1,22 @@
+.dashed {
+  stroke-dasharray: 5,5;
+}
+
+.nvd3 g.nv-groups .nv-linesWrap path.nv-line {
+  stroke-width: 2px;
+}
+
+.plotline {
+  opacity: 0.7;
+  stroke-color: black;
+}
+
+.light {
+  font-weight: normal;
+}
+
+&.draw-markers .nv-point {
+  stroke-opacity: 1!important;
+  stroke-width: 5px!important;
+  fill-opacity: 1!important;
+}

@@ -12,6 +12,8 @@ from .components import UIComponent
 import werkzeug
 import os
 
+from .query_spec import QuerySpec
+
 class ViewArea(UIComponent, pudgy.JinjaComponent, pudgy.BackboneComponent):
     pass
 
@@ -28,10 +30,12 @@ class HomePage(Page, pudgy.SassComponent):
 class QueryPage(Page, pudgy.SassComponent, pudgy.BackboneComponent):
     def __prepare__(self):
         # locate the potential views
-        query = flask.request.args
+        query = QuerySpec(flask.request.args)
 
         table = self.context.table
-        view = self.context.view
+        print "QUERY", query, flask.request.args
+        view = query.get('view', 'table')
+        print("VIEW", view)
 
 
         presenter = DatasetPresenter(table=table)
@@ -46,6 +50,9 @@ class QueryPage(Page, pudgy.SassComponent, pudgy.BackboneComponent):
         VwClass = get_view_by_name(view)
         view = VwClass()
         view.context.update(metadata=table_info, presenter=presenter, query=query)
+        # its up to a view to decide on marshalling its data to client,
+        # but we auto marshal the table metadata and query for every view
+        view.marshal(metadata=table_info, query=query)
 
         viewarea = ViewArea()
 
