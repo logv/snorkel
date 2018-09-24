@@ -273,5 +273,6 @@ class TimeView(ViewBase, pudgy.JSComponent, pudgy.SassComponent):
 
 
     def __prepare__(self):
+
         self.marshall_rows()
 

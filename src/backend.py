@@ -47,6 +47,23 @@ class Backend(object):
 FIELD_SEPARATOR=","
 FILTER_SEPARATOR=":"
 
+def estimate_time_buckets(query_interval, buckets):
+    best_bucket_count = buckets or 1000;
+    min_intervals = [ 5, 10, 30, 60, 120, 360, 720, 1440 ];
+    interval_ms = 0
+
+    i = 0
+    while i < len(min_intervals):
+        interval = min_intervals[i] * 60 * 1000;
+        interval_ms = min_intervals[i] * 60;
+        if (query_interval / interval < best_bucket_count):
+            break;
+
+        i += 1
+
+    return interval_ms;
+
+
 class SybilQuery(object):
     def run_query(self, table, query_spec, metadata):
         self.metadata = metadata
@@ -95,6 +112,19 @@ class SybilQuery(object):
 
         end = query_spec.get('end', "now")
         end_s = time_to_seconds(end)
+
+        query_spec.set('start_ms', start_s * 1000)
+        query_spec.set('end_ms', end_s * 1000)
+
+
+        query_interval = abs(end_s - start_s) * 1000;
+        time_bucket = query_spec.get("time_bucket", "")
+
+        if not time_bucket or time_bucket == "auto":
+            time_bucket = estimate_time_buckets(query_interval, 800)
+
+        query_spec.set('time_bucket', time_bucket)
+
 
         time_col = "time"
 
@@ -192,15 +222,15 @@ class SybilQuery(object):
         time_col = "time"
         cmd_args = [ "-table", table, "-time-col", time_col, "-time"]
 
-        time_bucket = query_spec.get("time_bucket", 300)
-        if time_bucket != "auto":
-            cmd_args.extend(["-time-bucket", time_bucket ])
-
         self.add_group_by(query_spec, cmd_args)
         self.add_fields(query_spec, cmd_args)
         self.add_filters(query_spec, cmd_args)
         self.add_metrics(query_spec, cmd_args)
         self.add_limit(query_spec, cmd_args)
+
+        time_bucket = query_spec.get("time_bucket", 300)
+        if time_bucket != "auto":
+            cmd_args.extend(["-time-bucket", str(time_bucket) ])
 
         return run_query_command(cmd_args)
 

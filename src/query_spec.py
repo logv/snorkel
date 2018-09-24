@@ -16,13 +16,15 @@ class QuerySpec(object):
 
 
         self.md = md
+
+        # we will need to put together an exported interface
         self.fields = md.getlist('fields[]')
         self.groupby = md.getlist('groupby[]')
 
     def __makedict__(self):
         ret = {
-        
-        
+
+
         }
         for f in self.md:
             if f.endswith("[]"):
@@ -34,6 +36,11 @@ class QuerySpec(object):
 
     def __json__(self):
         return self.__makedict__()
+
+    def set(self, k, v):
+        if k in self.md:
+            self.md.pop(k)
+        self.md.add(k,v)
 
     def add(self, k, v):
         self.md.add(k, v)

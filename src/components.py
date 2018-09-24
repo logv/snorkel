@@ -35,14 +35,17 @@ class Selector(UIComponent, pudgy.MustacheComponent, pudgy.SassComponent):
             if len(option) == 2 and type(option) != str:
                 name, value = option
 
+            selected = str(kwargs.get('selected', ''))
+            value = str(value)
+
+
             self.context.options.append({
                 "name" : name,
                 "value" : value,
-                "selected": "selected" if value == kwargs.get('selected') else ""
+                "selected": "selected" if value == selected else ""
             })
 
 
-# TODO: add selected
 class MultiSelect(UIComponent, pudgy.JinjaComponent, pudgy.BackboneComponent):
     pass
 

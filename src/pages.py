@@ -78,3 +78,58 @@ class QueryPage(Page, pudgy.SassComponent, pudgy.BackboneComponent):
             sidebar=qs,
             viewarea=viewarea,
             table_selector=table_selector)
+
+# TODO: place these on QueryPage?
+@QuerySidebar.api
+def run_query(cls, table=None, query=None, viewarea=None, filters=[]):
+    # this is a name/value encoded array, unfortunately
+    query = QuerySpec(query)
+    bs = backend.SybilBackend()
+
+    ti = bs.get_table_info(table)
+    query.add('table', table)
+    query.add('filters', filters)
+
+    view = query.get('view')
+
+
+    res = bs.run_query(table, query, ti)
+
+    VwClass = get_view_by_name(view)
+    v = VwClass()
+    v.context.update(query=query, results=res, metadata=ti)
+    v.marshal(query=query, results=res, metadata=ti)
+
+    if viewarea:
+        viewarea.html(v.render())
+
+    d = query.__makedict__()
+    return {
+        "queryUrl": flask.url_for('get_view', **d),
+        "res" : res,
+        "query" : d
+    }
+
+@QuerySidebar.api
+def update_controls(cls, table=None, view=None, query=None, viewarea=None, filters=[]):
+    p = DatasetPresenter(table=table)
+
+    bs = backend.SybilBackend()
+    ti = bs.get_table_info(table)
+
+    query = QuerySpec(query)
+
+    VwClass = get_view_by_name(view)
+
+    v = VwClass()
+    v.context.update(metadata=ti, presenter=p, query=query)
+    query_filters= filters['query']
+
+    qs = QuerySidebar(view=v, presenter=p, query=query, filters=query_filters, metadata=ti)
+    qs.marshal(table=table, viewarea=viewarea)
+
+    # we undelegate our events because we are about to replace ourself
+    # with the same component
+    cls.call("undelegateEvents")
+    cls.replace_html(qs.render())
+

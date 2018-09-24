@@ -1,13 +1,26 @@
 var time_helper = require("common/time_helper.js");
 var helpers = require("common/sf_helpers.js");
 
+// TODO:
+// start_ms / end_ms
+function add_old_params(parsed) {
+  parsed.dims = parsed["groupby[]"]
+  parsed.cols = parsed["fields[]"] || [];
+  parsed.agg = "$" + parsed["metric"].toLowerCase();
+
+  if (parsed.cols.length == 0 && parsed.agg == "$avg") {
+    parsed.agg = "$count";
+  }
+
+  parsed.custom_fields = []
+
+}
 var presenter = {};
 
 var TimeView = {
   initialize: function(ctx) {
     var parsed = ctx.query;
-    parsed.dims = parsed["groupby[]"]
-    parsed.cols = parsed["fields[]"]
+    add_old_params(parsed);
 
     this.data = this.prepare({ results: ctx.rows, parsed: ctx.query} );
 
@@ -21,7 +34,7 @@ var TimeView = {
     var dataset = this.table;
     var is_compare = this.compare_query === data;
     this.max_x = data.end_ms || "";
-    var fill_missing = true;
+    var fill_missing = "zero";
     var custom_params = {};
 
     var series = time_helper.prepare(data, {
