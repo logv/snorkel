@@ -296,10 +296,10 @@ module.exports = {
     var col_formatters = [];
     var fields = this.fields;
     _.each(headers, function(col) {
-      var field = presenter.extract_field(col) || col;
-      var agg = presenter.extract_agg(col);
+      var field = extract_field(col) || col;
+      var agg = extract_agg(col);
       td = $("<th>");
-      var display_name = presenter.get_field_name(dataset, field);
+      var display_name = field;
 
       // the data-name is the underlying name of the column, not including
       // the aggregation
@@ -311,7 +311,7 @@ module.exports = {
       }
 
       row.append(td);
-      col_formatters.push(presenter.get_field_formatter(dataset, field));
+      col_formatters.push(function(w) { return w })
     });
 
 

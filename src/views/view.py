@@ -57,6 +57,9 @@ VIEW_OPTIONS = []
 class filter_row(OldSnorkelComponent):
     pass
 
+class tabs(OldSnorkelComponent):
+    pass
+
 FilterRow = filter_row
 
 def get_column_types(md):
