@@ -1,6 +1,5 @@
 var _labels = {};
 function add_missing_values(serie, time_bucket, start, end) {
-  console.log("ADDING MISSING VALUES", serie, time_bucket, start, end)
   serie = _.sortBy(serie, function(s) { return s.x; } );
 
   var expected = start;

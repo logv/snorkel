@@ -89,7 +89,7 @@ class ViewBase(pudgy.BackboneComponent):
         start_time = Selector(
             name="start",
             options=START_TIME_OPTIONS,
-            selected=self.context.query.get('start'))
+            selected=self.context.query.get('start', '-1 week'))
 
         end_time = Selector(
             name="end",

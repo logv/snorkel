@@ -9,7 +9,11 @@ from collections import defaultdict
 
 def run_query_command(cmd_args):
     init_cmd_args = ["sybil", "query", "-json"]
+    init_cmd_args.extend(["-field-separator", FIELD_SEPARATOR])
+    init_cmd_args.extend(["-filter-separator", FILTER_SEPARATOR])
     init_cmd_args.extend(cmd_args)
+
+
 
 
     ret = run_command(init_cmd_args)
@@ -44,8 +48,8 @@ def time_delta_to_seconds(timedelta):
 class Backend(object):
     pass
 
-FIELD_SEPARATOR=","
-FILTER_SEPARATOR=":"
+FIELD_SEPARATOR="\r"
+FILTER_SEPARATOR="\t"
 
 def estimate_time_buckets(query_interval, buckets):
     best_bucket_count = buckets or 1000;
