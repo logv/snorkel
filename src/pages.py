@@ -3,7 +3,7 @@ import flask
 
 from .components import *
 from .views import TableView, get_view_by_name
-from .query_sidebar import QuerySidebar
+from .components import QuerySidebar
 from .presenter import DatasetPresenter
 
 from . import backend

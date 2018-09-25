@@ -55,7 +55,8 @@ AGAINST_TIME_OPTIONS = [
 VIEW_OPTIONS = []
 
 
-from ..sf_components import filter_row as FilterRow
+from ..components import sf
+FilterRow = sf.filter_row
 
 def get_column_types(md):
     types = {}
