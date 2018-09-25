@@ -6,6 +6,9 @@ import json
 SYBIL_BIN="sybil"
 
 from collections import defaultdict
+from .backend import Backend
+
+from ..util import time_to_seconds, time_delta_to_seconds
 
 def run_query_command(cmd_args):
     init_cmd_args = ["sybil", "query", "-json"]
@@ -25,28 +28,6 @@ def run_command(cmd_args):
     output = subprocess.check_output(cmd_args)
 
     return output
-
-
-# time translation command is:
-# `date -d "<str>" +%s`
-def time_to_seconds(timestr):
-    cmd_args = ["date", "-d", timestr, "+%s"]
-    try:
-        output = subprocess.check_output(cmd_args)
-    except:
-        raise Exception("Unknown time string: ", timestr)
-    return int(output)
-
-def time_delta_to_seconds(timedelta):
-    now = time_to_seconds("now")
-    then = time_to_seconds(timedelta)
-
-    return now - then
-
-
-
-class Backend(object):
-    pass
 
 FIELD_SEPARATOR="\r"
 FILTER_SEPARATOR="\t"
@@ -107,7 +88,7 @@ class SybilQuery(object):
             cmd_args.append(field)
 
     def add_filters(self, query_spec, cmd_args):
-        from .views import get_column_types
+        from ..views import get_column_types
 
 
         # add time filters
@@ -243,10 +224,6 @@ class SybilQuery(object):
         self.add_filters(query_spec, cmd_args)
         self.add_limit(query_spec, cmd_args)
         return run_query_command(cmd_args)
-
-
-
-
 
 
 class SybilBackend(Backend):
