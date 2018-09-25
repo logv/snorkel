@@ -33,9 +33,7 @@ class QueryPage(Page, pudgy.SassComponent, pudgy.BackboneComponent):
         query = QuerySpec(flask.request.args)
 
         table = self.context.table
-        print "QUERY", query, flask.request.args
         view = query.get('view', 'table')
-        print("VIEW", view)
 
 
         presenter = DatasetPresenter(table=table)

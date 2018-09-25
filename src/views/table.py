@@ -35,17 +35,25 @@ class TableView(ViewBase, pudgy.JSComponent,
                     continue
 
                 if types[h] == "integer":
+                    f = r[h]
                     if agg[0] == "p":
                         p = int(agg[1:])
                         row.append(r[h]['percentiles'][p])
 
                     elif agg == "Sum":
-                        row.append(r[h] * r["Count"] or "")
+                        if type(r[h]) == dict:
+                            row.append(r[h]["avg"] * r["Count"] or "")
+                        else:
+                            row.append(r[h] * r["Count"] or "")
 
                     elif agg == "Avg":
-                        row.append(r[h] or "")
+                        if type(r[h]) == dict:
+                            row.append(r[h]["avg"])
+                        else:
+                            row.append(r[h]or "")
+
                     elif agg == "Count":
-                        pass
+                        row.append(r["Count"])
                 else:
                     row.append(r[h] or "")
 

@@ -175,6 +175,9 @@ def read_host_info():
     hosts = []
     for line in hostinfo:
         line = line.strip()
+        if not line:
+            continue
+
         if line[0] == '#':
             continue
         hosts.append(line.split(" "))

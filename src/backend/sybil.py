@@ -1,9 +1,19 @@
 import os
+from subprocess import Popen, PIPE, check_output
+
 import subprocess
 import shlex
 import json
+import pudgy
 
+MSYBIL_BIN=os.path.join(os.path.dirname(__file__), "msybil.py")
 SYBIL_BIN="sybil"
+
+# TODO: dont hardcode this
+MSYBIL_INPUT = """
+okay@logv.org ~/snorkel/snorkel/ ~/snorkel/snorkel/bin/sybil
+# okay@superfluous.io ~/scoop/snorkel/ ~/scoop/snorkel/bin/sybil
+"""
 
 from collections import defaultdict
 from .backend import Backend
@@ -11,9 +21,11 @@ from .backend import Backend
 from ..util import time_to_seconds, time_delta_to_seconds
 
 def run_query_command(cmd_args):
-    init_cmd_args = ["sybil", "query", "-json"]
-    init_cmd_args.extend(["-field-separator", FIELD_SEPARATOR])
-    init_cmd_args.extend(["-filter-separator", FILTER_SEPARATOR])
+    init_cmd_args = [MSYBIL_BIN, "query", "-json"]
+    init_cmd_args.extend(["-read-log"])
+    init_cmd_args.extend(["-cache-queries"])
+    init_cmd_args.extend(["-field-separator", "%s" % FIELD_SEPARATOR])
+    init_cmd_args.extend(["-filter-separator", "%s" % FILTER_SEPARATOR])
     init_cmd_args.extend(cmd_args)
 
 
@@ -24,13 +36,16 @@ def run_query_command(cmd_args):
     return json.loads(ret)
 
 def run_command(cmd_args):
-    print "RUNNING COMMAND", cmd_args
-    output = subprocess.check_output(cmd_args)
+    print "RUNNING COMMAND", " ".join(cmd_args)
+    p = Popen(cmd_args, stdin=PIPE, stdout=PIPE, stderr=PIPE)
+    stdout, stderr = p.communicate(MSYBIL_INPUT)
 
-    return output
+    return stdout
 
-FIELD_SEPARATOR="\r"
-FILTER_SEPARATOR="\t"
+#FIELD_SEPARATOR="\r"
+#FILTER_SEPARATOR="\t"
+FIELD_SEPARATOR=","
+FILTER_SEPARATOR=":"
 
 def estimate_time_buckets(query_interval, buckets):
     best_bucket_count = buckets or 1000;
@@ -149,19 +164,19 @@ class SybilQuery(object):
         int_filters[time_col].append(("lt", end_s))
 
         # TODO: add filters from query here
+        filter_strs = []
         for col in int_filters:
-            filter_strs = []
             for f in int_filters[col]:
                 filter_strs.append(FILTER_SEPARATOR.join(map(str, [col, f[0], f[1]])))
 
-            cmd_args.extend(["-int-filter", FIELD_SEPARATOR.join(filter_strs)])
+        cmd_args.extend(["-int-filter", FIELD_SEPARATOR.join(filter_strs)])
 
+        filter_strs = []
         for col in str_filters:
-            filter_strs = []
             for f in str_filters[col]:
                 filter_strs.append(FILTER_SEPARATOR.join(map(str, (col, f[0], f[1]))))
 
-            cmd_args.extend(["-str-filter", FIELD_SEPARATOR.join(map(str, filter_strs))])
+        cmd_args.extend(["-str-filter", FIELD_SEPARATOR.join(map(str, filter_strs))])
 
     def add_limit(self, query_spec, cmd_args):
         # TODO: limit should depend on the view. time series limit defaults to
@@ -170,8 +185,7 @@ class SybilQuery(object):
         cmd_args.extend(["-limit", limit])
 
     def add_metrics(self, query_spec, cmd_args):
-        if query_spec.get('metric', 'Avg')[0] == 'p' or query_spec.get('view') == 'dist':
-            cmd_args.extend(["-op", "hist"])
+        pass
 
 
 
@@ -183,6 +197,7 @@ class SybilQuery(object):
         self.add_filters(query_spec, cmd_args)
         self.add_metrics(query_spec, cmd_args)
         self.add_limit(query_spec, cmd_args)
+        cmd_args.extend(["-op", "hist"])
 
         # TODO: pull metric off query and determine whether to build hist or not
 
@@ -227,9 +242,11 @@ class SybilQuery(object):
 
 
 class SybilBackend(Backend):
+    @pudgy.util.memoize
     def list_tables(self):
         return run_query_command(["-tables"])
 
+    @pudgy.util.memoize
     def get_table_info(self, table):
         return run_query_command(["-table",  table, "-info"])
 
