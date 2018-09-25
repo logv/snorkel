@@ -169,14 +169,16 @@ class SybilQuery(object):
             for f in int_filters[col]:
                 filter_strs.append(FILTER_SEPARATOR.join(map(str, [col, f[0], f[1]])))
 
-        cmd_args.extend(["-int-filter", FIELD_SEPARATOR.join(filter_strs)])
+        if filter_strs:
+            cmd_args.extend(["-int-filter", FIELD_SEPARATOR.join(filter_strs)])
 
         filter_strs = []
         for col in str_filters:
             for f in str_filters[col]:
                 filter_strs.append(FILTER_SEPARATOR.join(map(str, (col, f[0], f[1]))))
 
-        cmd_args.extend(["-str-filter", FIELD_SEPARATOR.join(map(str, filter_strs))])
+        if filter_strs:
+            cmd_args.extend(["-str-filter", FIELD_SEPARATOR.join(map(str, filter_strs))])
 
     def add_limit(self, query_spec, cmd_args):
         # TODO: limit should depend on the view. time series limit defaults to
