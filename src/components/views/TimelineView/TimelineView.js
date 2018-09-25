@@ -163,6 +163,7 @@ var SessionView = {
 
     var fields = this.metadata.columns;
 
+    console.log("FIELDS ARE", fields);
     _.each(fields, function(field) {
       lookup[field.name] = field.type_str;
       if (cols[field.type_str]) {
@@ -171,9 +172,9 @@ var SessionView = {
     });
 
     var headers = [];
-    var integer_cols = Object.keys(cols.integer);
-    var string_cols = Object.keys(cols.string);
-    var set_cols = Object.keys(cols.set);
+    var integer_cols = fields.ints;
+    var string_cols = fields.strs;
+    var set_cols = fields.sets;
     var dataset = this.table;
 
     integer_cols.sort();

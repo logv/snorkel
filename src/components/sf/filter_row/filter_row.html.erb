@@ -31,7 +31,7 @@ set_default("ops", OPS);
       <select class="span2 filter_field" data-id="1">
         <% _.each(fields, function(label, name) { %>
           <option value="<%= name %>"
-                  <%= name === selected ? "selected" : ""%> >
+                  <%= name == selected ? "selected" : ""%> >
               <%= label %>
           </option>
         <% }); %>
@@ -44,7 +44,7 @@ set_default("ops", OPS);
             _type = packed[1],
             _label = packed[2];
       %>
-        <option <%= (_op === op) ? "selected" : "" %>
+        <option <%= (_op == op) ? "selected" : "" %>
           value="<%= _op %>" data-type="<%= _type %>">
             <%= _label %>
         </option>

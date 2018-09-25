@@ -18,7 +18,7 @@ module.exports = {
   initialize: function(ctx) {
     this.table = ctx.table;
     this.viewarea = ctx.viewarea;
-    console.timeStamp("FADING IN");
+    console.timeStamp("SIDEBAR FADING IN");
     this.$el.fadeIn();
 
     filter_helper.set_container(this.$el);

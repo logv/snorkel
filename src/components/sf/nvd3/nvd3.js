@@ -165,7 +165,6 @@ module.exports = {
       return
     }
 
-    console.log("INITIALIZING NVD3 WITH DATA", highcharts_options);
     var self = this;
 
     // NOTE: we are editing whole body class because we need tooltip CSS

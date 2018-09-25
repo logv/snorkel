@@ -40,13 +40,11 @@ function update_operators(selector, new_op) {
     console.log("No operators supported for", val);
   }
 
-  _.delay(function() {
-    // Select the first op :-)
-    var firstEl = $(op).find("option:not(:disabled)")
-      .first()
-      .attr("selected", true);
+  // Select the first op :-)
+  var firstEl = $(op).find("option:not(:disabled)")
+    .first()
+    .attr("selected", true);
 
-  });
 }
 
 module.exports = {
