@@ -1,5 +1,10 @@
 var filter_helper = require("QuerySidebar/filters.js");
+var Throbber = require("./Throbber.js");
+var StatusBar = require("./StatusBar.js");
+
 var $ = window.jQuery;
+
+console.log("THROBBER IS", Throbber);
 
 
 function serialized_array_to_str(arr) {
@@ -34,6 +39,29 @@ module.exports = {
     var self = this;
     self.$page = $("body");
 
+    var _start = +new Date();
+    function get_text() {
+      // For the first second, look like we're sending the query to the server :-)
+      if (Date.now() - _start > 1000) {
+        ret = "Running Query";
+      } else {
+        ret = "Uploading Query";
+      }
+
+      return $("<h1>")
+        .html(ret);
+
+    }
+
+    var viewEl = this.viewarea.$el;
+    viewEl.html("");
+
+    throbber = Throbber.create(viewEl, get_text);
+    throbber.tick(function(elapsed) {
+      StatusBar.set_query_time(elapsed);
+    });
+    throbber.start();
+
     this
       .rpc
       .run_query()
@@ -44,10 +72,10 @@ module.exports = {
         viewarea: this.viewarea,
       })
       .done(function(res, err) {
+        throbber.stop();
         if (!err) {
           swapUrl(res.queryUrl);
         }
-
       });
   },
   dom_to_query_str: function() {
