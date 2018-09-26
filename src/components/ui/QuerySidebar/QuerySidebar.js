@@ -105,15 +105,15 @@ module.exports = {
     var table = this.table;
     var self = this;
 
-    this.$el.find(".querycontrols").slideUp();
     var filters = filter_helper.get();
+    this.$el.find(".querycontrols").animate({"opacity": 0});
 
     this
       .rpc
       .update_controls()
       .kwargs({ view: view, table: table, query: this.get_query(), viewarea: this.viewarea, filters: filters })
       .done(function(res, err) {
-
+        this.$el.find(".querycontrols").animate({"opacity": 1});
       });
 
   }

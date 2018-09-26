@@ -127,5 +127,5 @@ def update_controls(cls, table=None, view=None, query=None, viewarea=None, filte
     qs.__prepare__()
     # we undelegate our events because we are about to replace ourself
     # with the same component
-    cls.replace_html(qs.context.querycontrols.render(), selector=".querycontrols")
+    cls.html(qs.context.querycontrols.render(), selector=".querycontrols")
 
