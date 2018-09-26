@@ -105,7 +105,7 @@ module.exports = {
     var table = this.table;
     var self = this;
 
-    this.$el.fadeOut();
+    this.$el.find(".querycontrols").slideUp();
     var filters = filter_helper.get();
 
     this
@@ -113,8 +113,6 @@ module.exports = {
       .update_controls()
       .kwargs({ view: view, table: table, query: this.get_query(), viewarea: this.viewarea, filters: filters })
       .done(function(res, err) {
-        // we are being replaced?
-        self.undelegateEvents();
 
       });
 

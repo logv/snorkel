@@ -10,8 +10,6 @@ class SamplesView(ViewBase, pudgy.JSComponent):
     def get_controls(self):
         controls = []
 
-        self.add_go_button(controls)
-        self.add_view_selector(controls)
         self.add_time_controls(controls)
 
         self.add_limit_selector(controls)

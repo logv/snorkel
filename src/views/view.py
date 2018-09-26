@@ -183,11 +183,17 @@ class ViewBase(pudgy.BackboneComponent):
         return controls
 
 
-    def get_controls(self):
+    def get_view_control(self):
         controls = []
 
         self.add_go_button(controls)
         self.add_view_selector(controls)
+
+        return controls
+
+    def get_controls(self):
+        controls = []
+
         self.add_time_controls(controls)
 #        self.add_time_comparison(controls)
 

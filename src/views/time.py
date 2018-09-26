@@ -175,8 +175,6 @@ class TimeView(ViewBase, pudgy.JSComponent, pudgy.SassComponent):
     def get_controls(self):
         controls = []
 
-        self.add_go_button(controls)
-        self.add_view_selector(controls)
         self.add_time_controls(controls)
 #        self.add_time_comparison(controls)
 

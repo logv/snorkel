@@ -124,10 +124,8 @@ def update_controls(cls, table=None, view=None, query=None, viewarea=None, filte
     query_filters= filters['query']
 
     qs = QuerySidebar(view=v, presenter=p, query=query, filters=query_filters, metadata=ti)
-    qs.marshal(table=table, viewarea=viewarea)
-
+    qs.__prepare__()
     # we undelegate our events because we are about to replace ourself
     # with the same component
-    cls.call("undelegateEvents")
-    cls.replace_html(qs.render())
+    cls.replace_html(qs.context.querycontrols.render(), selector=".querycontrols")
 

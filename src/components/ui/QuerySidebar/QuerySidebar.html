@@ -1,9 +1,11 @@
 <div class='sidebar clearfix'>
 
   <form>
-    {% for control in controls %}
+    {% for control in viewcontrols %}
       {{ control }}
     {% endfor %}
+
+    {{ querycontrols }}
   </form>
 
   <h3 class='ml-4'>Filters</h3>

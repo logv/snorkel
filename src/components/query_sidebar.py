@@ -32,11 +32,16 @@ class StatsBox(UIComponent, pudgy.MustacheComponent):
             self.context.count = format_count(self.context.count)
             self.context.storageSize = format_bytes(self.context.storageSize)
 
+class QueryControls(UIComponent, pudgy.JinjaComponent):
+    pass
+
 class QuerySidebar(UIComponent, pudgy.BackboneComponent, pudgy.JinjaComponent, pudgy.SassComponent, pudgy.ServerBridge, pudgy.Pagelet):
     def __prepare__(self):
-        self.context.controls = self.context.view.get_controls()
+        self.context.querycontrols = QueryControls(controls=self.context.view.get_controls())
+        self.context.viewcontrols = self.context.view.get_view_control()
+
         self.context.filters = self.context.view.get_filters(self.context.filters)
 
-        print self.context.metadata
-
         self.context.stats = StatsBox(**self.context.metadata.toDict())
+
+        print "CONTROLS", self.context.controls
