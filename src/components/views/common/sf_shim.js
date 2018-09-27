@@ -1,11 +1,16 @@
+var $ = $require("jquery");
+
 module.exports = {
   add_old_params: function(parsed) {
     if (!parsed) {
       return;
     }
-    parsed.dims = parsed["groupby[]"]
+    parsed.dims = parsed["groupby[]"] || [];
     parsed.cols = parsed["fields[]"] || [];
-    parsed.col = parsed["field"] || parsed.cols[0] || null;
+    if (parsed["field"]) {
+      parsed.cols = [ parsed["field"] ]
+    }
+    parsed.col = parsed.cols[0] || null;
     parsed.agg = "$" + (parsed["metric"] || "count").toLowerCase();
 
     if (parsed.cols.length == 0 && parsed.agg == "$avg") {
@@ -33,5 +38,23 @@ module.exports = {
     console.log("THIS DATA", this.data);
 
     this.render();
+
+  },
+  prepare_and_render: function(view, ctx) {
+    var parsed = ctx.query;
+    module.exports.add_old_params(parsed);
+    ctx.parsed = parsed;
+
+    view.metadata = ctx.metadata;
+    view.query = parsed;
+    view.parsed = parsed;
+
+    view.data = ctx;
+    view.data = view.prepare(ctx);
+    console.log("VIEW DATA", view.data);
+
+    view.finalize();
+    view.render();
+
   }
 };

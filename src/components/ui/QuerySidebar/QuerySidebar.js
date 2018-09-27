@@ -24,7 +24,15 @@ module.exports = {
     this.table = ctx.table;
     this.viewarea = ctx.viewarea;
     console.timeStamp("SIDEBAR FADING IN");
+    SF.on("set_custom_time", function(start, end) {
+      console.log("SETTING CUSTOM TIME", start, "END", end);
+    })
     this.$el.fadeIn();
+
+    $('body').on("click", function() {
+      console.log("SF EMITTING PAGE CLICK");
+      SF.emit("page:clicked");
+    });
 
     filter_helper.set_container(this.$el);
   },
@@ -70,6 +78,8 @@ module.exports = {
         table: this.table,
         filters: filters,
         viewarea: this.viewarea,
+      })
+      .before(function(res, err) {
       })
       .done(function(res, err) {
         throbber.stop();

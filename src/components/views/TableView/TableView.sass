@@ -1,0 +1,30 @@
+thead {
+  text-align: left;
+
+}
+
+.table td, .table th {
+  border: 0px;
+}
+
+.table-striped > tbody > tr:nth-child(2n+1) > td,
+.table-striped > tbody > tr:nth-child(2n+1) > th {
+   background-color: #efefef;
+}
+
+.table td {
+  max-width: 400px;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+  border-right: 1px solid lightgray;
+}
+
+.table th {
+  border-top: 0px;
+  border-bottom: 0px;
+}
+
+.table td:last-child {
+  border-right: 0px;
+}

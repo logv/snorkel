@@ -23,7 +23,8 @@ def get_view():
 
     return QueryPage(template="query.html", table=table, view=view).pipeline()
 
-
+pudgy.add_to_prelude("bootstrap", os.path.join(app.static_folder, "bootstrap.min.js"))
+pudgy.add_prelude_line("require('bootstrap')");
 app.after_request(pudgy.compress_request)
 
 if __name__ == "__main__":

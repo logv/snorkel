@@ -11,3 +11,6 @@ class modal(OldSnorkelComponent):
 
 class table_popover(OldSnorkelComponent):
     pass
+
+class query_details(OldSnorkelComponent):
+    pass

@@ -1,22 +1,18 @@
 var time_helper = require("common/time_helper.js");
 var helpers = require("common/sf_helpers.js");
 var sf_shim = require("common/sf_shim.js");
+var sf_marshal = require("common/marshal.js");
 
 
 var presenter = {};
 
 var TimeView = {
   initialize: function(ctx) {
-    var parsed = ctx.query;
-    sf_shim.add_old_params(parsed);
-
-    this.data = this.prepare({ results: ctx.rows, parsed: ctx.query} );
-
-    this.render();
+    sf_shim.prepare_and_render(this, ctx);
 
   },
   prepare: function(data) {
-    console.log("PREPARING DATA", data);
+    data.results = sf_marshal.marshall_time_rows({ opts: data.parsed}, data.results);
     data.parsed = data.parsed || {};
 
     var dataset = this.table;
@@ -192,7 +188,6 @@ var TimeView = {
           });
 
           $el.append(annotations);
-          console.log("SERIES DATA", series_data);
 
           // There's a little setup cost to highcharts, maybe?
           cmp.client(series_options);

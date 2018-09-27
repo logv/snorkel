@@ -517,8 +517,7 @@ module.exports = {
             var start_date = new Date(extents[0]);
             var end_date = new Date(extents[1]);
 
-            SF.controller().show_custom_time_inputs();
-            SF.controller().set_custom_time_inputs(start_date, end_date);
+            SF.emit("set_custom_time", start_date, end_date);
 
           });
           focusEl.append(clickEl);

@@ -1,0 +1,12 @@
+.table_popover a {
+  padding: 5px;
+  display: block;
+  color: #666;
+  cursor: pointer;
+}
+
+.table_popover .overview:hover,
+.table_popover .view:hover,
+.table_popover .option:hover {
+  background-color: #dedede;
+}

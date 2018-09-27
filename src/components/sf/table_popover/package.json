@@ -1,0 +1,7 @@
+{
+  "main" : "table_popover",
+  "helpers": [],
+  "style": "table_popover.css",
+  "styles": [],
+  "template": "table_popover.html.erb"
+}

@@ -51,6 +51,7 @@ class QueryPage(Page, pudgy.SassComponent, pudgy.BackboneComponent):
         # its up to a view to decide on marshalling its data to client,
         # but we auto marshal the table metadata and query for every view
         view.marshal(metadata=table_info, query=query)
+        print "METADATA", table_info
 
         viewarea = ViewArea()
 

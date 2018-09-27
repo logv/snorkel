@@ -11,9 +11,19 @@ SYBIL_BIN="sybil"
 
 # TODO: dont hardcode this
 MSYBIL_INPUT = """
-okay@logv.org ~/snorkel/snorkel/ ~/snorkel/snorkel/bin/sybil
-# okay@superfluous.io ~/scoop/snorkel/ ~/scoop/snorkel/bin/sybil
 """
+
+SYBIL_INPUT = ""
+
+if "MSYBIL" in os.environ:
+    print " s Using Multisybil"
+    with open(os.environ["MSYBIL"]) as f:
+        MSYBIL_INPUT = f.read()
+
+    SYBIL_BIN = MSYBIL_BIN
+    SYBIL_INPUT = MSYBIL_INPUT
+
+
 
 from collections import defaultdict
 from .backend import Backend
@@ -21,7 +31,7 @@ from .backend import Backend
 from ..util import time_to_seconds, time_delta_to_seconds
 
 def run_query_command(cmd_args):
-    init_cmd_args = [MSYBIL_BIN, "query", "-json"]
+    init_cmd_args = [SYBIL_BIN, "query", "-json"]
     init_cmd_args.extend(["-read-log"])
     init_cmd_args.extend(["-cache-queries"])
     init_cmd_args.extend(["-field-separator", "%s" % FIELD_SEPARATOR])
@@ -38,7 +48,8 @@ def run_query_command(cmd_args):
 def run_command(cmd_args):
     print "RUNNING COMMAND", " ".join(cmd_args)
     p = Popen(cmd_args, stdin=PIPE, stdout=PIPE, stderr=PIPE)
-    stdout, stderr = p.communicate(MSYBIL_INPUT)
+    stdout, stderr = p.communicate(SYBIL_INPUT)
+    print stderr
 
     return stdout
 
@@ -250,7 +261,11 @@ class SybilBackend(Backend):
 
     @pudgy.util.memoize
     def get_table_info(self, table):
-        return run_query_command(["-table",  table, "-info"])
+        from ..views import get_column_types
+        meta = run_query_command(["-table",  table, "-info"])
+        fields, types = get_column_types(meta)
+        meta["col_types"] = types
+        return meta
 
     def run_query(self, table, query_spec, metadata):
         q = SybilQuery()

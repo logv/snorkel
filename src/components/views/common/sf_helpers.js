@@ -72,7 +72,26 @@ function get_col_aggs(dataset, parsed_query) {
 }
 
 
+function get_field_type(metadata, col) {
+  // TODO: add final_types to metadata
+  return metadata.col_types[col];
 
+}
+function get_field_value(result, col) {
+    var agg = extract_agg(col);
+    var field = extract_field(col);
+
+    var ret = null;
+    var pos = [fieldname(agg, field), col, field];
+    for (var c in pos) {
+      if (result[pos[c]] !== null) {
+        ret = result[pos[c]];
+        break;
+      }
+    }
+
+    return ret
+}
 function row_key(group_by, result) {
   var row = [];
   _.each(group_by, function(group) {
@@ -221,7 +240,6 @@ module.exports = {
 
   // # {{{ TABLE POPOVER HELPERS
   get_wrapper_for_cell: function(el) {
-    var presenter = require("app/client/views/presenter");
     var $el = $(el);
     if (!$el.is("td")) {
       $el = $el.parents("td");
@@ -230,17 +248,15 @@ module.exports = {
     return $el;
   },
   get_field_type_for_cell: function(table, el) {
-    var presenter = require("app/client/views/presenter");
     var $td = this.get_wrapper_for_cell(el);
     var $th = $td.closest('table').find('th').eq($td.index());
 
     var col_name = $th.data('name');
-    var col_type = presenter.get_field_type(table, col_name);
+    var col_type = get_field_type(table, col_name);
 
     return col_type;
   },
   get_field_name_for_cell: function(table, el) {
-    var presenter = require("app/client/views/presenter");
     var $td = this.get_wrapper_for_cell(el);
     var $th = $td.closest('table').find('th').eq($td.index());
 
@@ -286,7 +302,6 @@ module.exports = {
 
   // # }}}
   build_table: function(dataset, headers, rows, column_config) {
-    var presenter = require("app/client/views/presenter");
 
     // TODO: data formatting / munging goes on where?
     // How configurable is group by order?
@@ -486,38 +501,6 @@ module.exports = {
 
 
 };
-
-var INPUTS = {
-  TIME_INPUTS: [
-    "start", "end"
-  ],
-  LIMIT: [
-    "max_results"
-  ],
-  MAX_RESULTS: [
-    "max_results"
-  ],
-
-  GROUP_BY: [ "group_by"],
-
-  MULTI_AGG: [ "fieldset", "agg", "custom_fields" ],
-  SINGLE_AGG: [ "field", "agg" ],
-
-  STACKING: [ "stacking" ],
-  SORT: [ "sort_by" ],
-  TIME_BUCKET: [ "time_bucket", "time_divisor" ],
-  TIME_FIELD: [ "time_field" ],
-  HIST_BUCKET: [ "hist_bucket" ],
-  COMPARE: ["compare"],
-  TWO_FIELDS: [
-    "field_one", "field_two"
-
-  ]};
-
-
-_.extend(module.exports, INPUTS);
-module.exports.inputs = INPUTS;
-
 _.extend(module.exports, {
   VIEWS: {
     TIME: "time",
@@ -526,17 +509,6 @@ _.extend(module.exports, {
     DIST: "dist",
     SAMPLES: "samples"
   },
-  STD_INPUTS: INPUTS.TIME_INPUTS
-    .concat(INPUTS.GROUP_BY)
-    .concat(INPUTS.MULTI_AGG)
-    .concat(INPUTS.LIMIT),
-
-  STD_EXCLUDES: INPUTS.SINGLE_AGG
-    .concat(INPUTS.MULTI_AGG)
-    .concat(INPUTS.TIME_BUCKET)
-    .concat(INPUTS.SORT)
-    .concat(INPUTS.HIST_BUCKET)
-    .concat(INPUTS.STACKING)
 });
 
 
@@ -547,7 +519,9 @@ var FIELD_HELPERS = {
   extract_agg: extract_agg,
   extract_field: extract_field,
   agg_is: agg_is,
-  get_col_aggs: get_col_aggs
+  get_col_aggs: get_col_aggs,
+  get_field_value: get_field_value,
+  get_field_type: get_field_type
 
 };
 _.extend(module.exports, FIELD_HELPERS);
