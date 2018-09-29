@@ -38,21 +38,21 @@ function get_filter_data() {
   return filters;
 }
 
-var typed_fields = {};
-var field_types = {};
+var FIELDS = {};
+var FIELD_TYPES = {};
 function set_fields(fields) {
-  _.each(fields, function(field) {
-    if (BLACKLIST[field.name] || BLACKLIST[field.final_type]) {
-      return;
-    }
+  FIELDS = fields;
+}
 
-    typed_fields[field.name] = field.display_name || field.name;
-    field_types[field.name] = field.type_str;
-  });
+
+function set_field_types(field_types) {
+  FIELD_TYPES = field_types
+
 }
 
 var compare_area, filter_area, container;
 function set_container(el) {
+  console.log("SETTING CONTAINER", el);
   container = el;
 }
 
@@ -82,10 +82,13 @@ function add_filter(filter, compare, force) {
   }
   var filters = _filter_els;
 
-  $C("filter_row", { fields: typed_fields, op: op, selected: val, field: field, types: field_types }, function(cmp) {
+
+
+  $C("filter_row", { fields: FIELDS, op: op, selected: val, field: field, types: FIELD_TYPES }, function(cmp) {
     filters.push(cmp.$el);
-    cmp.set_field(field);
+    cmp.set_field(field, FIELD_TYPES[field]);
     cmp.set_value(val);
+
 
     // There are some annoying inter-dependencies going on with
     // set_field/set_value above, so we push set_op into a delay
@@ -135,11 +138,11 @@ function set_filter_data(filters, no_add_if_empty) {
 
   filter_area.show();
 
-  if (hide_compare) {
-    SF.controller().trigger("hide_compare_filters");
-  } else {
-    SF.controller().trigger("show_compare_filters", true);
-  }
+//  if (hide_compare) {
+//    SF.controller().trigger("hide_compare_filters");
+//  } else {
+//    SF.controller().trigger("show_compare_filters", true);
+//  }
 
 }
 
@@ -182,6 +185,7 @@ function add_or_update_filter(filters, compare_filters) {
 
 
   _.each(to_add, function(filter) {
+
     add_filter(filter);
   });
 
@@ -202,5 +206,6 @@ module.exports = {
   add_or_update: add_or_update_filter,
   set_container: set_container,
   set_fields: set_fields,
+  set_field_types: set_field_types,
   BLACKLIST: BLACKLIST
 };

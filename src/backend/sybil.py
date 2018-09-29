@@ -53,10 +53,10 @@ def run_command(cmd_args):
 
     return stdout
 
-#FIELD_SEPARATOR="\r"
-#FILTER_SEPARATOR="\t"
-FIELD_SEPARATOR=","
-FILTER_SEPARATOR=":"
+FIELD_SEPARATOR="\r"
+FILTER_SEPARATOR="\t"
+#FIELD_SEPARATOR=","
+#FILTER_SEPARATOR=":"
 
 def estimate_time_buckets(query_interval, buckets):
     best_bucket_count = buckets or 1000;

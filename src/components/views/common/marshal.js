@@ -125,7 +125,6 @@ function marshall_table_rows(query_spec, rows) {
   var agg = query_spec.opts.agg;
   var custom_fields = query_spec.opts.custom_fields || [];
 
-  console.log("MARSHALING ROWS", rows);
 
 
   var ret = [];
@@ -160,7 +159,6 @@ function marshall_table_rows(query_spec, rows) {
     ret.push(row);
   });
 
-  console.log("RET", ret);
   return ret;
 }
 

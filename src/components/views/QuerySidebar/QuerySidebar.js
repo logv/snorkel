@@ -4,9 +4,6 @@ var StatusBar = require("./StatusBar.js");
 
 var $ = window.jQuery;
 
-console.log("THROBBER IS", Throbber);
-
-
 function serialized_array_to_str(arr) {
 
   var form_str = _.map(arr, function(f) { return f.name + "=" + f.value; }).join('&');
@@ -21,20 +18,30 @@ function swapUrl(url) {
 
 module.exports = {
   initialize: function(ctx) {
+    var self = this;
     this.table = ctx.table;
     this.viewarea = ctx.viewarea;
     console.timeStamp("SIDEBAR FADING IN");
     SF.on("set_custom_time", function(start, end) {
       console.log("SETTING CUSTOM TIME", start, "END", end);
     })
-    this.$el.fadeIn();
+
+
+    // listen for someone wanting to change views
+    self.on("switch_views", function(view) {
+      console.log("SWITCHING VIEWS", view);
+      self.$el.find(".selector[name=view]").val(view).change();
+    });
 
     $('body').on("click", function() {
-      console.log("SF EMITTING PAGE CLICK");
       SF.emit("page:clicked");
     });
 
     filter_helper.set_container(this.$el);
+    filter_helper.set_fields(ctx.fields);
+    filter_helper.set_field_types(ctx.metadata.col_types);
+
+    this.$el.fadeIn();
   },
   events: {
     "change .selector[name='view']" : "handle_view_changed",

@@ -71,10 +71,16 @@ function get_col_aggs(dataset, parsed_query) {
   return col_aggs;
 }
 
+var METADATA;
+function set_metadata(md) {
+  console.log("SETTING METADATA", md);
+  METADATA = md;
+}
+
 
 function get_field_type(metadata, col) {
   // TODO: add final_types to metadata
-  return metadata.col_types[col];
+  return METADATA.col_types[col];
 
 }
 function get_field_value(result, col) {
@@ -284,7 +290,7 @@ module.exports = {
   get_filter_for_cell: function(table, el) {
     var field_type = this.get_field_type_for_cell(table, el);
     var field_name = this.get_field_name_for_cell(table, el);
-    var op = "$regex";
+    var op = "$re";
 
     var value;
     if (el.find(".cell_data").length) {
@@ -521,7 +527,8 @@ var FIELD_HELPERS = {
   agg_is: agg_is,
   get_col_aggs: get_col_aggs,
   get_field_value: get_field_value,
-  get_field_type: get_field_type
+  get_field_type: get_field_type,
+  set_metadata: set_metadata
 
 };
 _.extend(module.exports, FIELD_HELPERS);

@@ -15,6 +15,7 @@ function update_operators(selector, new_op) {
   var types = ["integer", "set", "string"];
   var shown = [];
   var options = this.options;
+  console.log("THIS OPTIONS", this.options);
 
 
   var field_types = options && options.types || {};
@@ -63,10 +64,11 @@ module.exports = {
   set_value: function(val) {
     this.$el.find(".filter_value").val(val);
   },
-  set_field: function(val) {
-    this.$el.find(".filter_field").val(val);
-    if (val) {
-      var type = val.split('.').shift();
+  set_field: function(val, type) {
+    var el = this.$el.find(".filter_field");
+    this.$el.find(".filter_field").val(val).change();
+
+    if (val && type) {
       this.update_available_ops(type);
     }
   },

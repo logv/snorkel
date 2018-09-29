@@ -1,4 +1,5 @@
 var $ = $require("jquery");
+var helpers = require("common/sf_helpers.js");
 
 module.exports = {
   add_old_params: function(parsed) {
@@ -21,6 +22,7 @@ module.exports = {
 
   },
   initialize: function(ctx) {
+
     this.graph_component = "nvd3";
     var parsed = ctx.query;
     parsed.custom = parsed.custom || {};
@@ -48,6 +50,7 @@ module.exports = {
     view.metadata = ctx.metadata;
     view.query = parsed;
     view.parsed = parsed;
+    helpers.set_metadata(ctx.metadata);
 
     view.data = ctx;
     view.data = view.prepare(ctx);

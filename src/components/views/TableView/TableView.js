@@ -1,10 +1,11 @@
-
 "use strict";
 
 //var filter_helper = require("QuerySidebar/filters.js");
 var helpers = require("common/sf_helpers.js");
 var sf_shim = require("common/sf_shim.js");
 var sf_marshal = require("common/marshal.js");
+var filter_helper = require("QuerySidebar/filters.js");
+
 
 var row_key = helpers.row_key;
 function get_wrapper_for_cell(el) {
@@ -36,7 +37,7 @@ var TableView = {
     "click .popover a.overview" : "handle_overview_clicked"
   },
   initialize: function(ctx) {
-    console.log("CTX", ctx);
+    this.controller = $P._refs.sidebar;
     sf_shim.prepare_and_render(this, ctx);
   },
 
@@ -169,6 +170,7 @@ var TableView = {
   },
 
   handle_cell_clicked: function(evt) {
+    console.log("TABLE VIEW HANDLING CELL CLICKED");
     if (this.options.widget) {
       return;
     }
@@ -231,6 +233,7 @@ var TableView = {
   },
 
   handle_popover_view_clicked: function(evt) {
+    var filter_helper = $require("QuerySidebar/filters.js");
     var el = $(evt.target);
     if (!el.hasClass("view")) {
       el = el.parents(".view");
@@ -251,9 +254,10 @@ var TableView = {
 
 
     if (filters.length) {
-      if (SF.controller().compare_mode()) {
+      // TODO: check the sidebar to see if its in compare mode
+      if (this.compare_mode) {
         filter_helper.add_or_update(filters, filters);
-        SF.controller().show_compare_filters();
+        this.controller.show_compare_filters();
       } else {
         filter_helper.add_or_update(filters);
       }
@@ -272,20 +276,24 @@ var TableView = {
       agg = "$count";
     }
 
+    var controller = this.controller;
+
 
 
     if (field) {
-      SF.controller().trigger("set_control", "field", field);
-      SF.controller().trigger("set_control", "fieldset", fields);
+      controller.trigger("set_control", "field", field);
+      controller.trigger("set_control", "fieldset", fields);
     }
 
     if (agg) {
-      SF.controller().trigger("set_control", "agg", agg);
+      controller.trigger("set_control", "agg", agg);
     }
 
 
-    SF.controller().trigger("swap_panes", false);
-    SF.controller().trigger("switch_views", to_view);
+    controller.trigger("swap_panes", false);
+    _.delay(function() {
+      controller.trigger("switch_views", to_view);
+    });
 
     // update location
   },

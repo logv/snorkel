@@ -67,8 +67,9 @@ class QueryPage(Page, pudgy.SassComponent, pudgy.BackboneComponent):
 
 
         qs = QuerySidebar(info=table_info, view=view, filters=filters or [], metadata=table_info)
+        qs.set_ref("sidebar")
         qs.async()
-        qs.marshal(table=table, viewarea=viewarea)
+        qs.marshal(table=table, viewarea=viewarea, metadata=table_info)
 
         self.marshal(sidebar=qs)
 
@@ -126,6 +127,7 @@ def update_controls(cls, table=None, view=None, query=None, viewarea=None, filte
 
     qs = QuerySidebar(view=v, presenter=p, query=query, filters=query_filters, metadata=ti)
     qs.__prepare__()
+    qs.nomarshal()
     # we undelegate our events because we are about to replace ourself
     # with the same component
     cls.html(qs.context.querycontrols.render(), selector=".querycontrols")
