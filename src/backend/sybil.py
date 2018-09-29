@@ -34,8 +34,8 @@ def run_query_command(cmd_args):
     init_cmd_args = [SYBIL_BIN, "query", "-json"]
     init_cmd_args.extend(["-read-log"])
     init_cmd_args.extend(["-cache-queries"])
-    init_cmd_args.extend(["-field-separator", "%s" % FIELD_SEPARATOR])
-    init_cmd_args.extend(["-filter-separator", "%s" % FILTER_SEPARATOR])
+    init_cmd_args.extend(["-field-separator", "'%s'" % FIELD_SEPARATOR])
+    init_cmd_args.extend(["-filter-separator", "'%s'" % FILTER_SEPARATOR])
     init_cmd_args.extend(cmd_args)
 
 
@@ -53,8 +53,8 @@ def run_command(cmd_args):
 
     return stdout
 
-FIELD_SEPARATOR="\r"
-FILTER_SEPARATOR="\t"
+FIELD_SEPARATOR=chr(30)
+FILTER_SEPARATOR=chr(31)
 #FIELD_SEPARATOR=","
 #FILTER_SEPARATOR=":"
 
