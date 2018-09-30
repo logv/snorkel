@@ -22,6 +22,9 @@ class Page(pudgy.FlaskPage):
     NAMESPACE = "pages"
 
 class HomePage(Page, pudgy.SassComponent):
+    pass
+
+class DatasetsPage(Page, pudgy.SassComponent):
     def __prepare__(self):
         bs = backend.SybilBackend()
         self.context.tables = bs.list_tables()

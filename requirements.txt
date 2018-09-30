@@ -1,2 +1,4 @@
 flask
+flask-security
+bcrypt
 pudgy

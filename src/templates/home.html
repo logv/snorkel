@@ -1,15 +1,9 @@
 {% extends "layout.html" %}
 
 {% block body %} 
-<div class='container'>
-  {% for t in tables %}
-    <div class='dataset_tile'>
-      <h3>
-        <a href='{{ url_for('get_view', table=t, view="table") }}'>
-          {{ t }}
-        </a>
-      </h3>
-    </div>
-  {% endfor %}
+<div class='container centered'>
+  <h2>Welcome to Snorkelite</h2>
+
+  <a href='{{ url_for('get_datasets') }} '>Get Started!</a>
 </div>
 {% endblock %}
