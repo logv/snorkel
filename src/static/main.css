@@ -2,13 +2,13 @@
   margin: 0px;
 }
 
-.header .selector {
+.pageheader .selector {
   height: 30px;
   margin-left: 10px;
   margin-top: 5px;
 }
 
-.header {
+.pageheader {
   background-color: #003;
   width: 100%;
   height: 50px;
@@ -38,8 +38,35 @@
     margin-right: 10px;
 
   }
+
+  h4 {
+    font-size: 1em;
+    margin-top: 1em;
+    font-weight: normal;
+    margin-left: 20px;
+    margin-right: 20px;
+
+  }
 }
 
 .body_spacer {
   height: 60px;
 }
+
+.centered {
+	text-align: center;
+}
+
+.hide {
+  display: none;
+}
+
+.tablesorter{
+   width:100%;
+   }
+
+
+.table {
+  display: table;
+}
+

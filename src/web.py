@@ -4,7 +4,7 @@ import os
 
 from .pages import QueryPage, DatasetsPage, HomePage
 
-from . import auth, users
+from . import auth, errors, components, results
 
 
 from flask_security import login_required, core
@@ -30,21 +30,23 @@ def get_view():
     query = flask.request.args
 
     query_id = query.get("h")
+    table = query.get('table')
+    view = query.get('view', 'table')
+    sq = None
     if query_id:
-        # TODO load saved query and display it too
-        pass
-    else:
-        table = query.get('table')
-        view = query.get('view', 'table')
+        sq = results.get_by_hashid(query_id)
+        if sq:
+            sq = sq.pop()
+            print "SAVED QUERY", sq
 
-        return QueryPage(template="query.html", table=table, view=view).pipeline()
+            table = sq["table"]
+            view = sq["parsed"]["view"]
+
+    return QueryPage(template="query.html", table=table, view=view, saved=sq).pipeline()
 
 auth.install(app)
-pudgy.use_jquery()
-pudgy.add_to_prelude("bootstrap", os.path.join(app.static_folder, "bootstrap.min.js"))
-pudgy.add_prelude_line("require('bootstrap')");
-app.after_request(pudgy.compress_request)
+errors.install(app)
+components.install(app)
 
 if __name__ == "__main__":
-    app.run(port=2333)
-
+    app.run(port=2333, use_reloader=False)

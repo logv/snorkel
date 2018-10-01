@@ -2,28 +2,31 @@
 
 {% block body %}
 
+  {% if error %}
+    {{ error }}
+  {% else %}
+    <div class='container-fluid'>
 
-  <div class='container-fluid'>
+      <div class='row'>
+        <div class='sidebar_pane'>
+            {{ sidebar }}
+        </div>
 
-    <div class='row'>
-      <div class='sidebar_pane'>
-          {{ sidebar }}
+        <div class='results_pane'>
+            <div class='results'>
+              {{ viewarea }}
+            </div>
+        </div>
       </div>
 
-      <div class='results_pane'>
-          <div class='results'>
-            {{ viewarea }}
-          </div>
-      </div>
     </div>
 
-  </div>
-
-  <div id='status_bar' class="clearfix">
-    <small>
-      <span href="#" class="timing"> </span>
-      <a href="#" class="details hidden"></a>
-      <a href="http://github.com/logv/snorkel/issues/new" id="report_bug">see a bug? let us know!</a>
-    </small>
-  </div>
+    <div id='status_bar' class="clearfix">
+      <small>
+        <span href="#" class="timing"> </span>
+        <a href="#" class="details hidden"></a>
+        <a href="http://github.com/logv/snorkel/issues/new" id="report_bug">see a bug? let us know!</a>
+      </small>
+    </div>
+  {% endif %}
 {% endblock %}

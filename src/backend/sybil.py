@@ -34,11 +34,11 @@ def run_query_command(cmd_args):
     init_cmd_args = [SYBIL_BIN, "query", "-json"]
     init_cmd_args.extend(["-read-log"])
     init_cmd_args.extend(["-cache-queries"])
-    init_cmd_args.extend(["-field-separator", "'%s'" % FIELD_SEPARATOR])
-    init_cmd_args.extend(["-filter-separator", "'%s'" % FILTER_SEPARATOR])
+    init_cmd_args.extend(["--field-separator=%s" % FIELD_SEPARATOR])
+    init_cmd_args.extend(["--filter-separator=%s" % FILTER_SEPARATOR])
     init_cmd_args.extend(cmd_args)
 
-
+    init_cmd_args = [a.encode('ascii', errors='replace') for a in init_cmd_args]
 
 
     ret = run_command(init_cmd_args)
@@ -81,7 +81,8 @@ class SybilQuery(object):
         self.table = table
         self.query = query_spec
 
-        view = query_spec.get('view')
+        view = query_spec.get('viewbase') or query_spec.get('view')
+
         if view == 'table':
             return self.run_table_query(table, query_spec)
 

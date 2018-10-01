@@ -52,7 +52,6 @@ function set_field_types(field_types) {
 
 var compare_area, filter_area, container;
 function set_container(el) {
-  console.log("SETTING CONTAINER", el);
   container = el;
 }
 

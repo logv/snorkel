@@ -1,18 +1,20 @@
 import pudgy
 import flask
 
-from .components import *
 from .views import TableView, get_view_by_name
-from .components import QuerySidebar
+from .components import QuerySidebar, UserButton, UserModal
 from .presenter import DatasetPresenter
 
-from . import backend
-from .components import UIComponent
+from . import backend, results
+from .components import UIComponent, Selector
 
 import werkzeug
 import os
 
+import flask_security
+
 from .query_spec import QuerySpec
+from .errors import ServerError
 
 class ViewArea(UIComponent, pudgy.JinjaComponent, pudgy.BackboneComponent):
     pass
@@ -28,23 +30,52 @@ class DatasetsPage(Page, pudgy.SassComponent):
     def __prepare__(self):
         bs = backend.SybilBackend()
         self.context.tables = bs.list_tables()
+        self.context.tables = list(self.context.tables)
+        self.context.tables.sort()
+
+        self.context.user_button = UserButton()
+        self.context.user_modal = UserModal()
 
 
-class QueryPage(Page, pudgy.SassComponent, pudgy.BackboneComponent):
+def read_filters(query):
+    import ast
+
+    filters = []
+    try:
+        filters = query.get('filters')
+        if type(filters) == str:
+            filters = ast.literal_eval(filters)
+
+        filters = filters['query']
+    except Exception as e:
+        print "FILTER ERR", e
+
+    return filters
+
+
+class QueryPage(Page, pudgy.SassComponent, pudgy.BackboneComponent, pudgy.ServerBridge):
     def __prepare__(self):
         # locate the potential views
         query = QuerySpec(flask.request.args)
+        self.context.error = None
+        if "saved" in self.context and self.context.saved:
+            query = QuerySpec(self.context.saved.parsed)
+
 
         table = self.context.table
         view = query.get('view', 'table')
-
 
         presenter = DatasetPresenter(table=table)
 
         bs = backend.SybilBackend()
 
-        table_info = bs.get_table_info(table)
-        tables = bs.list_tables()
+        try:
+            table_info = bs.get_table_info(table)
+            tables = bs.list_tables()
+        except Exception as e:
+            self.context.error = "Couldn't read table info for table %s" % (table)
+	    return
+
 
         table_selector = Selector(name="table", selected=table, options=tables)
 
@@ -54,31 +85,32 @@ class QueryPage(Page, pudgy.SassComponent, pudgy.BackboneComponent):
         # its up to a view to decide on marshalling its data to client,
         # but we auto marshal the table metadata and query for every view
         view.marshal(metadata=table_info, query=query)
-        print "METADATA", table_info
 
         viewarea = ViewArea()
+        if self.context.saved:
+            sq = self.context.saved
+            view.context.update(sq.parsed, results=sq.results)
+            view.marshal(query=sq.parsed, results=sq.results)
+            viewarea.context.update(view=view)
 
-        import ast
-
-        filters = []
-        try:
-            filters = query.get('filters')
-            filters = ast.literal_eval(filters)
-            filters = filters['query']
-        except Exception as e:
-            print e
-
+        filters = read_filters(query)
 
         qs = QuerySidebar(info=table_info, view=view, filters=filters or [], metadata=table_info)
+
         qs.set_ref("sidebar")
-        qs.async()
         qs.marshal(table=table, viewarea=viewarea, metadata=table_info)
 
-        self.marshal(sidebar=qs)
+
+        user_button = UserButton()
+        user_modal = UserModal()
+
+        self.marshal(sidebar=qs, table=table, user_modal=user_modal)
 
         self.context.update(
             table=table,
             sidebar=qs,
+            user_button=user_button,
+            user_modal=user_modal,
             viewarea=viewarea,
             table_selector=table_selector)
 
@@ -97,12 +129,16 @@ def run_query(cls, table=None, query=None, viewarea=None, filters=[]):
 
     view = query.get('view')
     VwClass = get_view_by_name(view)
-    query.set('view', VwClass.BASE)
+    query.set('viewbase', VwClass.BASE)
     res = bs.run_query(table, query, ti)
 
+    sq = results.save_for_user(flask_security.core.current_user, query, res)
+
+    d["h"] = sq.hashid
+
     v = VwClass()
-    v.context.update(query=query, results=res, metadata=ti)
-    v.marshal(query=query, results=res, metadata=ti)
+    v.context.update(query=sq.parsed, results=sq.results, metadata=ti)
+    v.marshal(query=sq.parsed, results=sq.results, metadata=ti)
 
     if viewarea:
         viewarea.html(v.render())
@@ -135,3 +171,15 @@ def update_controls(cls, table=None, view=None, query=None, viewarea=None, filte
     # with the same component
     cls.html(qs.context.querycontrols.render(), selector=".querycontrols")
 
+@QueryPage.api
+def get_saved_queries(cls, table=None):
+    user = flask_security.core.current_user
+
+    if table:
+        recent_queries = results.get_for_user(user, table)
+
+    return {
+        "recent" : recent_queries,
+        "table" : table
+
+    }

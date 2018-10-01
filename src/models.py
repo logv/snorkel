@@ -1,6 +1,10 @@
 from peewee import *
+from playhouse.sqlite_ext import *
+
 from flask_security import RoleMixin, UserMixin
 import os
+
+from playhouse.sqliteq import SqliteQueueDatabase
 
 DB_DIR="sdb"
 userdb = SqliteDatabase(os.path.join(DB_DIR, 'users.db'))
@@ -15,11 +19,15 @@ class UserModel(Model):
         database = userdb
 
 class SavedQuery(QueryModel):
-    query_params = TextField()
-    user = IntegerField()
-    results = TextField()
-    created = TimestampField()
-    updated = TimestampField()
+    user = IntegerField(index=True)
+    table = CharField(index=True)
+
+    hashid = CharField(index=True)
+    created = TimestampField(index=True, utc=True)
+    updated = TimestampField(utc=True)
+
+    results = JSONField()
+    parsed = JSONField()
 
     class Meta:
         database = querydb
@@ -49,4 +57,3 @@ if __name__ == "__main__":
         c._meta.database.connect()
         if "RESET" in os.environ:
             c._meta.database.create_tables([c])
-

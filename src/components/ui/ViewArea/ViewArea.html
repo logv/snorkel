@@ -1,4 +1,8 @@
-<div class='welcomer'>
-  <div class='heading'>Welcome to <b>snorkelite</b> </div>
-  <div class='subheading mt-3'> Setup a query and press Go to get started.  </div>
-</div>
+{% if view %}
+  {{ view }}
+{% else %}
+  <div class='welcomer'>
+    <div class='heading'>Welcome to <b>snorkelite</b> </div>
+    <div class='subheading mt-3'> Setup a query and press Go to get started.  </div>
+  </div>
+{% endif %}

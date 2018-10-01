@@ -1,0 +1,7 @@
+{
+  "main" : "query_tile",
+  "helpers": [],
+  "style": "query_tile.css",
+  "styles": [],
+  "template": "query_tile.html.erb"
+}

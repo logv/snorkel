@@ -1,0 +1,117 @@
+<% set_default("icon", "") %>
+<% set_default("results", "") %>
+<% set_default("username", null) %>
+<% set_default("query", { parsed: {}}) %>
+<div class="query_tile">
+  <div class="query_graph mll">
+
+    <div width="100%" background-color="#000">
+
+      <div class='titlehover'>
+        <a href='/query?h=<%= query.hashid %>&table=<%= query.table %>'>
+          <span class='title'>
+
+            <% if (query.title) { %>
+              <%= query.title %>
+            <% } else { %>
+              <%= (query.parsed.view  + " view") %>
+            <% } %>
+
+          </span>
+        </a>
+
+        <span class="icon delete"> <i class="icon-trash"></i> </span>
+
+      </div>
+
+
+      <div class="pll">
+        <small class="fsi">
+        <% if (query.updated != query.created) { %>
+          <span class="updated" style='display: none;'>updated
+            <span class="timestamp"></span>,
+          </span>
+        <% } %>
+
+        <% if (query.username) { %>
+            created by <%= query.username %>
+        <% } %>
+          <span class="created timestamp"> </span>
+
+        </small>
+      </div>
+    </div>
+
+
+
+
+
+    <div class="row-fluid pll">
+
+
+      <div>
+        <div class="span6">
+          <b>Dataset:</b> <%= query.parsed.table %>
+
+          <% if (query.title) { %>
+            <div>
+              <b>View:</b> <%= query.parsed.view %>
+            </div>
+          <% } %>
+
+
+          <div><% if (query.parsed.dims.length) { %> <b>Grouped by:</b> <%= query.parsed.dims.join(',') %> <% } %></div>
+          <div><% if (query.parsed.cols.length) { %> <b>Fields:</b> <%= query.parsed.cols.join(',') %> <% } %></div>
+
+        </div>
+
+        <div class="span6">
+          <% if (query.parsed.start_str) { %> <b>From:</b> <%= query.parsed.start_str %> <% } %>
+          <% if (query.parsed.end_str) { %> &ndash; <%= query.parsed.end_str %> <% } %>
+          <% if (query.parsed.compare_str) { %>
+            <br />
+            <b>Compared against:</b> <%= query.parsed.compare_str %>
+          <% } %>
+        </div>
+
+
+      </div>
+
+      <div class="span12" style='min-height: inherit'>
+
+        <% if (query.parsed.filters && _.isArray(query.parsed.filters) && query.parsed.filters.length) { %>
+          <div class="span6">
+            <b>Filters</b>
+            <% _.each(query.parsed.filters, function(filt) { %>
+              <div><small class="pll">
+                <%= filt.column %>:
+
+                <% _.each(filt.conditions, function(condition) { %>
+                  <%= condition.op %> <%= condition.value %>
+                <% }); %>
+
+              </small></div>
+            <% }) %>
+          </div>
+        <% } %>
+
+        <% if (query.parsed.compare_filters && query.parsed.compare_filters.length) { %>
+          <div class="span6">
+            <b>Compare Filters</b>
+            <% _.each(query.parsed.compare_filters, function(filt) { %>
+              <div><small class="pll">
+                <%= filt.column %>:
+
+                <% _.each(filt.conditions, function(condition) { %>
+                  <%= condition.op %> <%= condition.value %>
+                <% }); %>
+
+              </small></div>
+            <% }) %>
+          </div>
+        <% } %>
+      </div>
+    </div>
+  </div>
+
+</div>

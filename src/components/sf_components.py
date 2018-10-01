@@ -9,8 +9,17 @@ class tabs(OldSnorkelComponent):
 class modal(OldSnorkelComponent):
     pass
 
+class timeago(OldSnorkelComponent):
+    pass
+
+class tablesorter(OldSnorkelComponent):
+    pass
+
 class table_popover(OldSnorkelComponent):
     pass
 
 class query_details(OldSnorkelComponent):
+    pass
+
+class query_tile(OldSnorkelComponent):
     pass

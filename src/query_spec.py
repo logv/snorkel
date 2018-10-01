@@ -1,11 +1,13 @@
 import werkzeug
 import json
+import dotmap
 
 class QuerySpec(object):
     def __init__(self, query):
         # we list all attributes of a query spec up front so others know what
         # to expect
         md = werkzeug.MultiDict()
+        print query, type(query)
         for q in query:
             if type(q) == dict:
                 md.add(q['name'], q['value'].strip())
@@ -14,8 +16,19 @@ class QuerySpec(object):
             else:
                 md.add(q, query[q])
 
+        self.ismultidict = False
+        self.isdotmap = False
+        if isinstance(query, werkzeug.MultiDict):
+            self.ismultidict = True
+        elif isinstance(query, dotmap.DotMap):
+            self.isdotmap = True
+        elif isinstance(query, list):
+            self.ismultidict = True
+        else:
+            raise Exception("Unknown entry for query spec")
 
         self.md = md
+        print "QUERY SPEC MD", self.md
 
         # we will need to put together an exported interface
         self.fields = md.getlist('fields[]')
@@ -28,7 +41,11 @@ class QuerySpec(object):
         }
         for f in self.md:
             if f.endswith("[]"):
-                ret[f] = self.md.getlist(f)
+                if self.ismultidict:
+                    ret[f] = self.md.getlist(f)
+                else:
+                    ret[f] = self.md.get(f)
+
             else:
                 ret[f] = self.md.get(f)
 
@@ -46,7 +63,11 @@ class QuerySpec(object):
         self.md.add(k, v)
 
     def getlist(self, k, d=[]):
-        return self.md.getlist(k)
+        if self.ismultidict:
+            return self.md.getlist(k)
+
+        print "GETTING LIST", k, self.md.get(k)
+        return self.md.get(k) or []
 
     def get(self, k, d=None):
         return self.md.get(k, d)

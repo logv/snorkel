@@ -1,0 +1,53 @@
+.query_tile {
+  overflow: hidden;
+  display: block;
+  padding: 5px;
+}
+
+.query_tile small {
+  color: #666;
+}
+
+.query_tile .timestamp {
+  margin-bottom: 5px;
+}
+
+#query_queue .query_data {
+  opacity: 0.9;
+}
+
+#query_queue .query_graph,
+#query_queue .query_graph img {
+  cursor: pointer;
+  width: 100%;
+}
+
+.query_actions {
+  line-height: 30px;
+  font-weight: bold;
+  font-size: 16px;
+}
+
+.query_actions a {
+  padding-left: 15px;
+  padding-right: 15px;
+  color: #666;
+  text-decoration: none;
+}
+
+.query_tile:hover {
+  background-color: #dedede;
+  text-decoration: none;
+
+}
+
+.query_tile .title {
+  height: 20px;
+  zoom: 1.5;
+  display: inline-block;
+
+}
+
+.query_tile .icon {
+  display: none;
+}

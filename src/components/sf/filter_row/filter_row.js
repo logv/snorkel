@@ -15,7 +15,6 @@ function update_operators(selector, new_op) {
   var types = ["integer", "set", "string"];
   var shown = [];
   var options = this.options;
-  console.log("THIS OPTIONS", this.options);
 
 
   var field_types = options && options.types || {};

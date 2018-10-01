@@ -5,10 +5,19 @@
 {{ add_stylesheet("main.css") }}
 {{ add_stylesheet("box.css") }}
 
-<div class='header'>
-  <h3 class='lfloat'><a href='{{ url_for('get_index') }}'>snorkelite</a></h3>
+<div class='pageheader'>
+  <div class='clearfix'>
+    <h3 class='lfloat'><a href='{{ url_for('get_index') }}'>snorkelite</a></h3>
 
-  {{ table_selector }}
+    <div class='lfloat clearfix'>
+      {{ table_selector }}
+    </div>
+
+    <div class='rfloat mrl'>
+      {{ user_button }}
+    </div>
+  </div>
+
 </div>
 
 <div class='body_spacer'>
@@ -16,4 +25,9 @@
 
 {% block body %}
 
+{% endblock %}
+
+{% block footer %}
+
+  {{ user_modal }}
 {% endblock %}

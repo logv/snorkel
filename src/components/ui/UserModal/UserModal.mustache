@@ -1,0 +1,34 @@
+<div id="user_dialog" class="modal hide" tabindex="-1" role="dialog">
+  <div class="modal_header">
+    <button type="button" class="close glyphicon glyphicon-minus" style='left: -20px'
+      data-dismiss="modal" aria-hidden="true"></button>
+  </div>
+  <div class="modal_body">
+    <div class="">
+      <div id="query_queue" class="collapsed needsclick" style="text-align: left">
+
+      <ul class="nav nav-tabs">
+        <li class="active"><a href="#query_list" data-toggle="tab">Recent Queries</a></li>
+<!--         <li><a href="#saved_queries" data-toggle="tab">Saved</a></li> -->
+<!--         <li><a href="#shared_queries" data-toggle="tab">Shared by others</a></li> -->
+      </ul>
+
+      <div class="tab-content">
+        <div id="query_list" class="clearfix query_list tab-pane active">
+        </div>
+
+        <div id="saved_queries" class="clearfix saved_queries tab-pane">
+        </div>
+
+        <div id="shared_queries" class="clearfix shared_queries tab-pane">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-footer">
+    <a class="btn btn-link lfloat logout" href="#">(Logout)</a>
+    <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
+  </div>
+</div>
+
