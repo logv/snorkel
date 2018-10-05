@@ -1,6 +1,7 @@
 var filter_helper = require("QuerySidebar/filters.js");
 var Throbber = require("./Throbber.js");
 var StatusBar = require("./StatusBar.js");
+var views = require("views::common/view.js");
 
 var $ = window.jQuery;
 
@@ -23,7 +24,8 @@ module.exports = {
     this.viewarea = ctx.viewarea;
     console.timeStamp("SIDEBAR FADING IN");
     SF.on("set_custom_time", function(start, end) {
-      console.log("SETTING CUSTOM TIME", start, "END", end);
+      self.show_custom_time_inputs();
+      self.set_custom_time_inputs(start, end);
     })
 
 
@@ -45,11 +47,11 @@ module.exports = {
   },
   events: {
     "change .selector[name='view']" : "handle_view_changed",
-    "click .btn.go" : "handle_go_clicked"
-
+    "click .btn.go" : "handle_go_clicked",
+    "click .custom_time_inputs" : "handle_custom_time_inputs"
   },
   handle_go_clicked: function() {
-    var queryUrl
+    var queryUrl;
     var filters = filter_helper.get();
     var self = this;
     self.$page = $("body");
@@ -133,6 +135,83 @@ module.exports = {
         this.$el.find(".querycontrols").animate({"opacity": 1});
       });
 
-  }
+  },
+
+  set_custom_time_inputs: function(start, end) {
+    var customStartRow = views.get_control_row("custom_start");
+    var customEndRow = views.get_control_row("custom_end");
+
+    var start_str = start.toLocaleDateString('en-us') + " " + start.toLocaleTimeString('en-us');
+    var end_str = end.toLocaleDateString('en-us') + " " + end.toLocaleTimeString('en-us');
+
+    var offset = start.getTimezoneOffset();
+    var hours = offset / 60 * 100;
+
+    start_str += " GMT-" + hours;
+    end_str += " GMT-" + hours;
+
+    customStartRow.find("input[type=text]").val(start_str);
+    customEndRow.find("input[type=text]").val(end_str);
+  },
+
+  show_custom_time_inputs: function() {
+    var startControl = views.get_control_row("start");
+    var endControl = views.get_control_row("end");
+
+    console.log("START CONTROL", startControl);
+
+    var customStartRow = views.get_control_row("custom_start");
+    var customEndRow = views.get_control_row("custom_end");
+
+    customStartRow.removeClass("hidden");
+    customEndRow.removeClass("hidden");
+
+    startControl.slideUp();
+    endControl.slideUp();
+
+    customStartRow.slideDown();
+    customEndRow.slideDown();
+
+    startControl.addClass('hidden');
+    endControl.addClass('hidden');
+
+    this.$el.find(".custom_time_inputs").text("quick select time");
+
+
+
+  },
+  hide_custom_time_inputs: function() {
+    var startControl = views.get_control_row("start");
+    var endControl = views.get_control_row("end");
+
+    var customStartRow = views.get_control_row("custom_start");
+    var customEndRow = views.get_control_row("custom_end");
+
+    views.set_control("custom_start", "");
+    views.set_control("custom_end", "");
+
+    startControl.removeClass('hidden');
+    endControl.removeClass('hidden');
+
+    customStartRow.slideUp();
+    customEndRow.slideUp();
+    startControl.slideDown();
+    endControl.slideDown();
+
+    customStartRow.addClass("hidden");
+    customEndRow.addClass("hidden");
+
+    this.$el.find(".custom_time_inputs").text("use custom time");
+  },
+
+  handle_custom_time_inputs: function() {
+    console.log("HANDLING CUSTOM TIME INPUTS");
+    if (views.get_control_row("start").is(":visible")) {
+      this.show_custom_time_inputs();
+    } else if (views.get_control_row("custom_start").is(":visible")) {
+      this.hide_custom_time_inputs();
+    }
+  },
+
 
 }

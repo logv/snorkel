@@ -125,6 +125,16 @@ class SybilQuery(object):
         end = query_spec.get('end', "now")
         end_s = time_to_seconds(end)
 
+
+        custom_end = query_spec.get('custom_end', '')
+        custom_start = query_spec.get('custom_start', '')
+
+        if custom_start:
+            start_s = time_to_seconds(custom_start)
+
+        if custom_end:
+            end_s = time_to_seconds(custom_end)
+
         query_spec.set('start_ms', start_s * 1000)
         query_spec.set('end_ms', end_s * 1000)
 

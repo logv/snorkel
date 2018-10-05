@@ -57,7 +57,7 @@
 	text-align: center;
 }
 
-.hide {
+.hide, .hidden {
   display: none;
 }
 

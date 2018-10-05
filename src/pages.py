@@ -150,6 +150,7 @@ def run_query(cls, table=None, query=None, viewarea=None, filters=[]):
     }
 
 @QuerySidebar.api
+@flask_security.login_required
 def update_controls(cls, table=None, view=None, query=None, viewarea=None, filters=[]):
     p = DatasetPresenter(table=table)
 

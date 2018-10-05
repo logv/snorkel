@@ -89,6 +89,11 @@ class ViewBase(pudgy.BackboneComponent):
         return "%s" % (self.NAME)
 
     def add_time_controls(self, controls):
+
+        has_custom = False
+        if self.context.query.get('custom_start'):
+            has_custom = True
+
         start_time = Selector(
             name="start",
             options=START_TIME_OPTIONS,
@@ -99,8 +104,28 @@ class ViewBase(pudgy.BackboneComponent):
             options=END_TIME_OPTIONS,
             selected=self.context.query.get('end'))
 
-        controls.append(ControlRow("start", "Start", start_time))
-        controls.append(ControlRow("end", "End", end_time))
+        controls.append(ControlRow("start", "Start", start_time, hidden=has_custom))
+        controls.append(ControlRow("end", "End", end_time, hidden=has_custom))
+
+        custom_start = TextInput(
+            name="custom_start",
+            value=self.context.query.get('custom_start', '')
+        )
+        controls.append(ControlRow("custom_start", "Start", custom_start,
+            hidden=not has_custom))
+
+        custom_end = TextInput(
+            name="custom_end",
+            value=self.context.query.get('custom_end', '')
+        )
+        controls.append(ControlRow("custom_end", "End", custom_end,
+            hidden=not has_custom))
+
+        title = "use custom time"
+        if has_custom:
+            title = "quick select time"
+
+        controls.append(jinja2.Markup("<div class='clearfix centered'><a href='#' class='mrl mtl custom_time_inputs' >%s</a></div>" % title))
 
     def add_time_comparison(self, controls):
         against_time = Selector(

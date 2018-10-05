@@ -50,8 +50,9 @@ class MultiSelect(UIComponent, pudgy.JinjaComponent, pudgy.BackboneComponent):
     pass
 
 class ControlRow(UIComponent, pudgy.MustacheComponent):
-    def __init__(self, name, label, control):
+    def __init__(self, name, label, control, hidden=False):
         super(ControlRow, self).__init__(name, label, control)
         self.context.name = name
         self.context.label = label
+        self.context.hidden = "hidden" if hidden else ""
         self.context.control = control.__html__
