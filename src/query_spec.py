@@ -4,10 +4,10 @@ import dotmap
 
 class QuerySpec(object):
     def __init__(self, query):
-        # we list all attributes of a query spec up front so others know what
-        # to expect
+        # TODO: we list all attributes of a query spec up front so others know
+        # what to expect
+
         md = werkzeug.MultiDict()
-        print query, type(query)
         for q in query:
             if type(q) == dict:
                 md.add(q['name'], q['value'].strip())
@@ -28,7 +28,6 @@ class QuerySpec(object):
             raise Exception("Unknown entry for query spec")
 
         self.md = md
-        print "QUERY SPEC MD", self.md
 
         # we will need to put together an exported interface
         self.fields = md.getlist('fields[]')
@@ -66,7 +65,6 @@ class QuerySpec(object):
         if self.ismultidict:
             return self.md.getlist(k)
 
-        print "GETTING LIST", k, self.md.get(k)
         return self.md.get(k) or []
 
     def get(self, k, d=None):
