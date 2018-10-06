@@ -52,6 +52,10 @@ class UserRoles(UserModel):
     description = property(lambda self: self.role.description)
 
 if __name__ == "__main__":
+    try:
+        os.makedirs(DB_DIR)
+    except Exception, e:
+        pass
 
     for c in [SavedQuery, User]:
         c._meta.database.connect()

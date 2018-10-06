@@ -3,6 +3,15 @@
 snorkel.pudgy is a re-implementation of [snorkel](https://github.com/logv/snorkel) in python
 
 
+### installation
+
+```
+git clone https://git.kthxb.ai/okay/snorkel.pudgy
+cd snorkel.pudgy
+make build
+make run
+```
+
 ### motivation
 
 the reasons for moving to python are severalfold:
@@ -21,13 +30,18 @@ the reasons for moving to python are severalfold:
 
 ## features
 
-### implemented
+### ported from original snorkel
 
 * table, time, dist and samples views
 * timeline view (for browsing samples)
-* filters (ported from original snorkel)
-* saved queries
+* filters and filter helpers
+* saved query dialog
 * custom time inputs
+
+### re-implemented in snorkel.pudgy
+
+* query sidebar and view controls
+* query builder (query spec -> sybil invocation)
 * dataset landing page
 * user auth (with flask_security)
 
