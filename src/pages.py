@@ -26,7 +26,7 @@ class Page(pudgy.FlaskPage):
 class HomePage(Page, pudgy.SassComponent):
     pass
 
-class DatasetsPage(Page, pudgy.SassComponent):
+class DatasetsPage(Page):
     def __prepare__(self):
         bs = backend.SybilBackend()
         self.context.tables = bs.list_tables()
