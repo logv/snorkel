@@ -1,7 +1,7 @@
 import pudgy
 import flask
 
-from .views import TableView, get_view_by_name
+from .views import get_view_by_name
 from .components import QuerySidebar, UserButton, UserModal
 from .presenter import DatasetPresenter
 
@@ -116,6 +116,7 @@ class QueryPage(Page, pudgy.SassComponent, pudgy.BackboneComponent, pudgy.Server
 
 # TODO: place these on QueryPage?
 @QuerySidebar.api
+@flask_security.login_required
 def run_query(cls, table=None, query=None, viewarea=None, filters=[]):
     # this is a name/value encoded array, unfortunately
     query = QuerySpec(query)
@@ -173,6 +174,7 @@ def update_controls(cls, table=None, view=None, query=None, viewarea=None, filte
     cls.html(qs.context.querycontrols.render(), selector=".querycontrols")
 
 @QueryPage.api
+@flask_security.login_required
 def get_saved_queries(cls, table=None):
     user = flask_security.core.current_user
 

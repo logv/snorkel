@@ -4,7 +4,7 @@ import os
 
 from .pages import QueryPage, DatasetsPage, HomePage
 
-from . import auth, errors, components, results
+from . import auth, components, results
 
 
 from flask_security import login_required, core
@@ -45,7 +45,6 @@ def get_view():
     return QueryPage(template="query.html", table=table, view=view, saved=sq).pipeline()
 
 auth.install(app)
-errors.install(app)
 components.install(app)
 
 if __name__ == "__main__":
