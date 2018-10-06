@@ -512,7 +512,9 @@ module.exports = {
           focusEl.css("font-size", "85%");
 
           var clickEl = $("<a href='#' class='lfloat mll btn btn-primary'>add custom time filters</a>");
-          clickEl.on("click", function() {
+          clickEl.on("click", function(e) {
+            e.preventDefault();
+
             var extents = chart.focus.brush.extent();
             var start_date = new Date(extents[0]);
             var end_date = new Date(extents[1]);

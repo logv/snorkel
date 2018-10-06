@@ -17,6 +17,10 @@ function swapUrl(url) {
   history.pushState({}, "", url);
 }
 
+window.onpopstate = function(event) {
+  window.location.reload();
+};
+
 module.exports = {
   initialize: function(ctx) {
     var self = this;
