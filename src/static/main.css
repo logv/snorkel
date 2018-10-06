@@ -53,14 +53,6 @@
   height: 60px;
 }
 
-.centered {
-	text-align: center;
-}
-
-.hide, .hidden {
-  display: none;
-}
-
 .tablesorter{
    width:100%;
    }

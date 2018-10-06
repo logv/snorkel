@@ -49,5 +49,3 @@ class QuerySidebar(UIComponent, pudgy.BackboneComponent, pudgy.JinjaComponent, p
 
         fields, types = get_column_types(self.context.metadata)
         self.marshal(fields=fields, types=types)
-
-        print "CONTROLS", self.context.controls

@@ -37,8 +37,6 @@ def get_view():
         sq = results.get_by_hashid(query_id)
         if sq:
             sq = sq.pop()
-            print "SAVED QUERY", sq
-
             table = sq["table"]
             view = sq["parsed"]["view"]
 
