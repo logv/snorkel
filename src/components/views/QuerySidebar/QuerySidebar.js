@@ -17,6 +17,13 @@ function swapUrl(url) {
   history.pushState({}, "", url);
 }
 
+$(window).on("click", function(e) {
+  var target = $(e.target).closest("a");
+  if (target.attr('href') == "#") {
+    e.preventDefault();
+  }
+});
+
 window.onpopstate = function(event) {
   window.location.reload();
 };
@@ -129,15 +136,12 @@ module.exports = {
     var self = this;
 
     var filters = filter_helper.get();
-    this.$el.find(".querycontrols").animate({"opacity": 0});
 
     this
       .rpc
       .update_controls()
       .kwargs({ view: view, table: table, query: this.get_query(), viewarea: this.viewarea, filters: filters })
-      .done(function(res, err) {
-        this.$el.find(".querycontrols").animate({"opacity": 1});
-      });
+      .done(function(res, err) { });
 
   },
 
