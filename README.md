@@ -3,6 +3,7 @@
 snorkel.pudgy is a re-implementation of [snorkel](https://github.com/logv/snorkel) in python
 
 
+
 ### installation
 
 ```
@@ -27,6 +28,10 @@ the reasons for moving to python are severalfold:
 * make an app that is easy to white label (and self host inside organizations)
 * re-use as much work from original snorkel while keeping the implementation clean (ish)
 * minimize external dependencies: use sqlite for data store, flask for web, etc
+
+## screengifs
+
+<img src="https://git.kthxb.ai/okay/snorkel.pudgy/raw/docs/images/table.gif" width="800"/>
 
 ## features
 
@@ -64,3 +69,4 @@ the reasons for moving to python are severalfold:
 * dashboards (grafana?)
 * favorite queries
 * query audit log
+
