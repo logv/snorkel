@@ -22,7 +22,7 @@ module.exports = {
 
   },
   initialize: function(ctx) {
-
+    helpers.set_metadata(ctx.metadata);
     this.graph_component = "nvd3";
     var parsed = ctx.query;
     parsed.custom = parsed.custom || {};

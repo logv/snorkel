@@ -164,6 +164,8 @@ function bytesToSize(bytes) {
 }
 
 module.exports = {
+  formatters: {},
+  inner_formatters: {},
 
   number_format: function number_format (number, decimals, dec_point, thousands_sep) {
 
@@ -287,6 +289,52 @@ module.exports = {
     return [name, op, value];
 
   },
+  get_field_number_formatter: function(dataset, col) {
+    col = extract_field(col);
+    var self = this;
+    var formatter = function(val) {
+      if (self.inner_formatters[dataset]) {
+        var inner_formatter = self.inner_formatters[dataset][col];
+
+        if (inner_formatter) {
+          return inner_formatter(val);
+        }
+      }
+      return val;
+    };
+
+    return formatter;
+
+  },
+
+  get_field_formatter: function(dataset, col) {
+    col = extract_field(col);
+    if (!this.formatters[dataset])  {
+      this.formatters[dataset] = {};
+      this.inner_formatters[dataset] = {};
+    }
+
+    if (!this.formatters[dataset][col]) {
+
+      var col_type = this.get_field_type(dataset, col);
+      this.formatters[dataset][col] = function(val) {
+
+        if (col_type === "integer" &&
+            (typeof(val) === "string" || typeof(val) === "number")) {
+          var formatted_value = module.exports.count_format(val);
+
+          return $("<div >")
+            .attr("data-value", val)
+            .addClass("value_cell")
+            .append(formatted_value);
+        }
+
+        return val;
+      };
+    }
+
+    return this.formatters[dataset][col];
+  },
   get_filter_for_cell: function(table, el) {
     var field_type = this.get_field_type_for_cell(table, el);
     var field_name = this.get_field_name_for_cell(table, el);
@@ -308,7 +356,7 @@ module.exports = {
 
   // # }}}
   build_table: function(dataset, headers, rows, column_config) {
-
+    var self = this;
     // TODO: data formatting / munging goes on where?
     // How configurable is group by order?
     var table = $("<table class='table table-hover table-striped table-bordered'/>");
@@ -334,7 +382,8 @@ module.exports = {
       }
 
       row.append(td);
-      col_formatters.push(function(w) { return w })
+      var f = self.get_field_formatter(dataset, field);
+      col_formatters.push(f);
     });
 
 

@@ -21,7 +21,8 @@
     input[type=text],
     input[type=password] {
       width: 90%;
-      padding: 20px 5px;
+      padding: 10px 5px;
+      margin-top: 5px;
     }
 
     input[type=checkbox] {
@@ -33,4 +34,8 @@
 
 .centered {
   text-align: center;
+}
+
+fieldset {
+  border: 0px;
 }
