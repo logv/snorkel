@@ -108,7 +108,9 @@ function marshall_time_rows(query_spec, time_buckets) {
 
       row.count = r.Count || r.Samples;
       row.weighted_count = r.Count || r.Samples;
-      row.distinct = r.Distinct;
+      if (typeof r.Distinct != "undefined") {
+        row.distinct = r.Distinct;
+      }
 
       ret.push(row);
     });
@@ -149,7 +151,12 @@ function marshall_table_rows(query_spec, rows) {
     });
 
     row.count = r.Samples || r.Count;
+
     row.distinct = r.Distinct || r.distinct;
+    if (typeof row.distinct == "undefined") {
+      delete row["distinct"];
+    }
+
     row.weighted_count = r.Count || r.Samples;
 
     if (query_spec.opts.agg === "$distinct") {
