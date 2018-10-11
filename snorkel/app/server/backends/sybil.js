@@ -224,7 +224,9 @@ function marshall_time_rows(query_spec, time_buckets) {
 
       row.count = r.Count || r.Samples;
       row.weighted_count = r.Count || r.Samples;
-      row.distinct = r.Distinct;
+      if (typeof r.Distinct != "undefined") {
+        row.distinct = r.Distinct;
+      }
 
       ret.push(row);
     });
