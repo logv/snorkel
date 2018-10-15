@@ -1,11 +1,13 @@
 import pudgy
-from .view import ViewBase, get_column_types
-from ..components import Table
+from snorkel.views import ViewBase, get_column_types
+from snorkel.components import Table
+import os
 
 class SamplesView(ViewBase, pudgy.JSComponent):
     NAME="samples"
     BASE="samples"
     DISPLAY_NAME="Samples View"
+    BASE_DIR=os.path.dirname(__file__)
 
     def get_controls(self):
         controls = []

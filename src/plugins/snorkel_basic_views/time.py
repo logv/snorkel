@@ -1,7 +1,8 @@
 import pudgy
-from .view import ViewBase
 
-from ..components import *
+from snorkel.views import ViewBase
+from snorkel.components import *
+import os
 
 import numbers
 
@@ -28,6 +29,7 @@ class TimeView(ViewBase, pudgy.JSComponent):
     NAME="time"
     BASE="time"
     DISPLAY_NAME="Time View"
+    BASE_DIR=os.path.dirname(__file__)
 
 
     def add_time_series_controls(self, controls):

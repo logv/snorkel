@@ -1,10 +1,11 @@
 default: tags cscope
 
 run:
-				python -m src.web
+				python -m src.main
 
 dev:
-				TURBO_PUDGY=1 python -m src.web
+				TURBO_PUDGY=1 python -m src.main
+
 setup: install-deps setup-db
 setup-db:
 				RESET=1 python src/models.py

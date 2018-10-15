@@ -1,10 +1,13 @@
+import os
 import pudgy
-from .view import ViewBase
+
+from snorkel.views import ViewBase
 
 class DistView(ViewBase, pudgy.JSComponent):
     NAME="dist"
     BASE="dist"
     DISPLAY_NAME="Dist View"
+    BASE_DIR=os.path.dirname(__file__)
 
     def get_controls(self):
         controls = []
@@ -16,5 +19,3 @@ class DistView(ViewBase, pudgy.JSComponent):
         self.add_go_button(controls)
 
         return controls
-
-

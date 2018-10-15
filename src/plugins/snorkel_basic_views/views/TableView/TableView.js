@@ -4,7 +4,7 @@
 var helpers = require("common/sf_helpers.js");
 var sf_shim = require("common/sf_shim.js");
 var sf_marshal = require("common/marshal.js");
-var filter_helper = require("QuerySidebar/filters.js");
+var filter_helper = require("common/filters.js");
 
 
 var row_key = helpers.row_key;
@@ -233,7 +233,6 @@ var TableView = {
   },
 
   handle_popover_view_clicked: function(evt) {
-    var filter_helper = $require("QuerySidebar/filters.js");
     var el = $(evt.target);
     if (!el.hasClass("view")) {
       el = el.parents(".view");

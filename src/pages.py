@@ -3,9 +3,8 @@ import flask
 
 from .views import get_view_by_name
 from .components import QuerySidebar, UserButton, UserModal
-from .presenter import DatasetPresenter
 
-from . import backend, results
+from . import backend, results, presenter
 from .components import UIComponent, Selector
 
 import werkzeug
@@ -14,7 +13,6 @@ import os
 import flask_security
 
 from .query_spec import QuerySpec
-from .errors import ServerError
 
 class ViewArea(UIComponent, pudgy.JinjaComponent, pudgy.BackboneComponent):
     pass
@@ -65,7 +63,7 @@ class QueryPage(Page, pudgy.SassComponent, pudgy.BackboneComponent, pudgy.Server
         table = self.context.table
         view = query.get('view', 'table')
 
-        presenter = DatasetPresenter(table=table)
+        pr = presenter.GetPresenter(table)
 
         bs = backend.SybilBackend()
 
@@ -81,7 +79,7 @@ class QueryPage(Page, pudgy.SassComponent, pudgy.BackboneComponent, pudgy.Server
 
         VwClass = get_view_by_name(view)
         view = VwClass()
-        view.context.update(metadata=table_info, presenter=presenter, query=query)
+        view.context.update(metadata=table_info, presenter=pr, query=query)
         # its up to a view to decide on marshalling its data to client,
         # but we auto marshal the table metadata and query for every view
         view.marshal(metadata=table_info, query=query)
@@ -153,7 +151,7 @@ def run_query(cls, table=None, query=None, viewarea=None, filters=[]):
 @QuerySidebar.api
 @flask_security.login_required
 def update_controls(cls, table=None, view=None, query=None, viewarea=None, filters=[]):
-    p = DatasetPresenter(table=table)
+    pr = presenter.GetPresenter(table)
 
     bs = backend.SybilBackend()
     ti = bs.get_table_info(table)
@@ -163,10 +161,10 @@ def update_controls(cls, table=None, view=None, query=None, viewarea=None, filte
     VwClass = get_view_by_name(view)
 
     v = VwClass()
-    v.context.update(metadata=ti, presenter=p, query=query)
+    v.context.update(metadata=ti, presenter=pr, query=query)
     query_filters= filters['query']
 
-    qs = QuerySidebar(view=v, presenter=p, query=query, filters=query_filters, metadata=ti)
+    qs = QuerySidebar(view=v, presenter=pr, query=query, filters=query_filters, metadata=ti)
     qs.__prepare__()
     qs.nomarshal()
     # we undelegate our events because we are about to replace ourself

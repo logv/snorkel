@@ -235,7 +235,6 @@ class ViewBase(pudgy.BackboneComponent):
     def get_stats(self):
         pass
 
-
 def get_view_by_name(name):
     for cls in pudgy.util.inheritors(ViewBase):
         if cls.NAME.lower() == name.lower():

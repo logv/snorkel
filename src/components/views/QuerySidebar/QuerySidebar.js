@@ -1,7 +1,7 @@
-var filter_helper = require("QuerySidebar/filters.js");
+var filter_helper = require("./filters.js");
 var Throbber = require("./Throbber.js");
 var StatusBar = require("./StatusBar.js");
-var views = require("views::common/view.js");
+var views = require("./view.js");
 
 var $ = window.jQuery;
 

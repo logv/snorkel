@@ -3,10 +3,7 @@ import flask
 import os
 
 from .pages import QueryPage, DatasetsPage, HomePage
-
 from . import auth, components, results
-
-
 from flask_security import login_required, core
 
 app = flask.Flask(__name__)
