@@ -24,6 +24,11 @@ setup(
     # license='MIT',
     description='a data exploration UI',
     long_description=open('README.md').read(),
+    entry_points= {
+        'console_scripts' : [
+            'snorkel.msybil = snorkel.backend.msybil:main'
+        ]
+    },
     install_requires=[ w.strip() for w in open('requirements.txt').readlines()]
     )
 

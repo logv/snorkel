@@ -6,7 +6,9 @@ import shlex
 import json
 import pudgy
 
-MSYBIL_BIN=os.path.join(os.path.dirname(__file__), "msybil.py")
+import sys
+
+MSYBIL_BIN="snorkel.msybil"
 SYBIL_BIN="sybil"
 
 # TODO: dont hardcode this
@@ -16,7 +18,7 @@ MSYBIL_INPUT = """
 SYBIL_INPUT = ""
 
 if "MSYBIL" in os.environ:
-    print " s Using Multisybil"
+    print >> sys.stderr,  "s Using Multisybil"
     with open(os.environ["MSYBIL"]) as f:
         MSYBIL_INPUT = f.read()
 
@@ -40,9 +42,7 @@ def run_query_command(cmd_args):
 
     init_cmd_args = [a.encode('ascii', errors='replace') for a in init_cmd_args]
 
-
     ret = run_command(init_cmd_args)
-
     return json.loads(ret)
 
 def run_command(cmd_args):

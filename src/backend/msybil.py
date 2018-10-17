@@ -193,7 +193,7 @@ def read_host_info():
             f.write("\n")
 
 
-def main():
+def _main():
     global CMD
     setup_dirs()
     operator = None
@@ -214,11 +214,17 @@ def main():
 if "DEBUG" in os.environ:
     KEEP_RESULTS=True
 
-if __name__ == "__main__":
+SYBIL_BIN=None
+def main():
+    global SYBIL_BIN
     SYBIL_BIN, _ = run_subprocess("which sybil")
 
     try:
-        main()
+        _main()
     finally:
         cleanup()
+
+if __name__ == "__main__":
+    main()
+
 # vim: set syntax=python
