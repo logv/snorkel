@@ -19,4 +19,8 @@ tags:
 cscope:
 				pycscope -R -S src/
 
+
+build-package:
+				python setup.py sdist build
+
 .PHONY: tags clean build cscope run dev

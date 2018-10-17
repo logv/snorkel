@@ -51,7 +51,8 @@ class UserRoles(UserModel):
     name = property(lambda self: self.role.name)
     description = property(lambda self: self.role.description)
 
-if __name__ == "__main__":
+
+def create_db_if_not():
     try:
         os.makedirs(DB_DIR)
     except Exception, e:
@@ -59,5 +60,8 @@ if __name__ == "__main__":
 
     for c in [SavedQuery, User]:
         c._meta.database.connect()
-        if "RESET" in os.environ:
-            c._meta.database.create_tables([c])
+        c._meta.database.create_tables([c])
+
+if __name__ == "__main__":
+    if "RESET" in os.environ:
+        create_db_if_not()
