@@ -49,6 +49,7 @@ the reasons for moving to python are severalfold:
 * query builder (query spec -> sybil invocation)
 * dataset landing page
 * user auth (with flask_security)
+* customize which views a dataset uses
 
 
 ### planned
@@ -58,7 +59,6 @@ the reasons for moving to python are severalfold:
 * dataset presenters
 * dataset settings page
 * custom aggregations (p63(foo), for example)
-* per dataset view listings
 * bring over more views (scatter, multihist, forecasting, bars, mapview, drilldown, etc)
 * user roles and per table permissions
 

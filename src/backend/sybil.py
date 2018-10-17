@@ -18,7 +18,7 @@ MSYBIL_INPUT = """
 SYBIL_INPUT = ""
 
 if "MSYBIL" in os.environ:
-    print >> sys.stderr,  "s Using Multisybil"
+    print >> sys.stderr,  " s Using Multisybil"
     with open(os.environ["MSYBIL"]) as f:
         MSYBIL_INPUT = f.read()
 

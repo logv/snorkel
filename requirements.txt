@@ -1,5 +1,7 @@
-flask
-flask-security
 bcrypt
-pudgy
+flask
+flask_peewee
+flask-security
 peewee
+preparable
+pudgy
