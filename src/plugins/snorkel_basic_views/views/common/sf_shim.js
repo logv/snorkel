@@ -1,5 +1,6 @@
 var $ = $require("jquery");
 var helpers = require("common/sf_helpers.js");
+var filters = require("common/filters.js");
 
 module.exports = {
   add_old_params: function(parsed) {
@@ -18,7 +19,7 @@ module.exports = {
       parsed.agg = "$count";
     }
 
-    parsed.custom_fields = []
+    parsed.custom_fields = parsed["custom_fields[]"] || [];
 
   },
   initialize: function(ctx) {
@@ -37,8 +38,6 @@ module.exports = {
 
     this.query = { results: rows, parsed: parsed};
     this.data = this.prepare(this.query);
-    console.log("THIS DATA", this.data);
-
     this.render();
 
   },

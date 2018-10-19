@@ -18,7 +18,7 @@ module.exports = {
       parsed.agg = "$count";
     }
 
-    parsed.custom_fields = []
+    parsed.custom_fields = parsed["custom_fields[]"] || [];
 
   },
   initialize: function(ctx) {

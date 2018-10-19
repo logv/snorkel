@@ -1,6 +1,6 @@
 
 function get_control(name) {
-  var selector = "#query_sidebar .controls[name=" + name + "]";
+  var selector = "#query_sidebar .controls[name='" + name + "']";
   var ctl = $(selector);
   console.log("GETTING CONTROL", name);
 

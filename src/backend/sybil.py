@@ -32,6 +32,18 @@ from .backend import Backend
 
 from ..util import time_to_seconds, time_delta_to_seconds
 
+import re
+
+# group 1 is the agg (avg, sum, etc)
+# group 2 is the col name
+col_re = re.compile("(.*)\((.*)\)")
+def extract_field(col):
+    m = col_re.match(col)
+    if m:
+        return m.group(2)
+
+    return col
+
 def run_query_command(cmd_args):
     init_cmd_args = [SYBIL_BIN, "query", "-json"]
     init_cmd_args.extend(["-read-log"])
@@ -104,15 +116,25 @@ class SybilQuery(object):
             cmd_args.append(FIELD_SEPARATOR.join(groupby))
 
     def add_fields(self, query_spec, cmd_args):
+        all_fields = []
+
         fields = query_spec.getlist("fields[]")
         if fields:
-            cmd_args.append("-int")
-            cmd_args.append(FIELD_SEPARATOR.join(fields))
+            all_fields.extend(fields)
+
+        custom_fields = query_spec.getlist("custom_fields[]")
+        if custom_fields:
+            all_fields.extend([extract_field(c) for c in custom_fields])
+            cmd_args.extend(["-op", "hist", "-loghist"])
 
         field = query_spec.get("field")
         if field:
+            all_fields.append(field)
+
+
+        if all_fields:
             cmd_args.append("-int")
-            cmd_args.append(field)
+            cmd_args.append(FIELD_SEPARATOR.join(all_fields))
 
     def add_filters(self, query_spec, cmd_args):
         from ..views import get_column_types

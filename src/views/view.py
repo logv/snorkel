@@ -12,6 +12,12 @@ import jinja2
 def make_dict(arr):
     return dict([(w,w) for w in arr])
 
+def fieldname(a, c):
+    return "%s(%s)" % (a.strip(), c)
+
+def displayname(a, c):
+    return "%s(%s)" % (a.strip(), c)
+
 START_TIME_OPTIONS = [
     "-1 hour",
     "-3 hours",
@@ -160,12 +166,17 @@ class ViewBase(pudgy.BackboneComponent):
         controls.append(ControlRow("groupby[]", "Group By", groupby))
 
     def add_metric_selector(self, controls):
+
+        has_custom = False
+        if self.context.query.getlist('custom_fields[]'):
+            has_custom=True
+
         metric_selector = Selector(
             name="metric",
             options=self.context.presenter.get_metrics(),
             selected=self.context.query.get('metric'))
 
-        controls.append(ControlRow("metric", "Metric", metric_selector))
+        controls.append(ControlRow("metric", "Metric", metric_selector, hidden=has_custom))
 
 
     def add_field_selector(self, controls):
@@ -177,12 +188,39 @@ class ViewBase(pudgy.BackboneComponent):
         controls.append(ControlRow("field", "Field", fields))
 
     def add_fields_selector(self, controls):
+        has_custom = False
+        custom_str = "use custom fields"
+        if self.context.query.getlist('custom_fields[]'):
+            custom_str = "quick select fields"
+            has_custom = True
+
         fields = make_dict(self.context.metadata["columns"]["ints"])
         fields = MultiSelect(
             name="fields[]",
             options=fields,
             selected=self.context.query.getlist('fields[]'))
-        controls.append(ControlRow("fields[]", "Fields", fields))
+        controls.append(ControlRow("fields[]", "Fields", fields, hidden=has_custom))
+
+
+        # add custom fields
+
+        metrics = self.context.presenter.get_metrics()
+        int_fields = self.context.metadata["columns"]["ints"]
+        custom_fields = {}
+        for m in metrics:
+            m = m.lower()
+            for c in int_fields:
+                custom_fields[fieldname(m, c)] = displayname(m, c)
+
+        cf_selector = MultiSelect(
+            name="custom_fields[]",
+            options=custom_fields,
+            selected=self.context.query.getlist('custom_fields[]'))
+        controls.append(ControlRow("custom_fields[]", "Custom Fields", cf_selector, hidden=not has_custom))
+
+        custom_toggler = "<div class='' style='text-align: center'><a href='#' class='custom_field_inputs mrl'>%s</a></div>" % custom_str
+        controls.append(jinja2.Markup(custom_toggler))
+
 
     def add_go_button(self, controls):
         button = Button(name='Go', className='go')

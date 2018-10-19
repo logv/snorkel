@@ -29,6 +29,12 @@ window.onpopstate = function(event) {
 };
 
 module.exports = {
+  events: {
+    "change .selector[name='view']" : "handle_view_changed",
+    "click .btn.go" : "handle_go_clicked",
+    "click .custom_time_inputs" : "handle_custom_time_inputs",
+    "click .custom_field_inputs" : "handle_custom_fields_input"
+  },
   initialize: function(ctx) {
     var self = this;
     this.table = ctx.table;
@@ -53,13 +59,9 @@ module.exports = {
     filter_helper.set_container(this.$el);
     filter_helper.set_fields(ctx.fields);
     filter_helper.set_field_types(ctx.metadata.col_types);
+    this.filters = filter_helper;
 
     this.$el.fadeIn();
-  },
-  events: {
-    "change .selector[name='view']" : "handle_view_changed",
-    "click .btn.go" : "handle_go_clicked",
-    "click .custom_time_inputs" : "handle_custom_time_inputs"
   },
   handle_go_clicked: function() {
     var queryUrl;
@@ -221,5 +223,49 @@ module.exports = {
     }
   },
 
+  show_custom_fields_input: function() {
+    var fieldsControl = views.get_control_row("fields[]");
+    var aggControl = views.get_control_row("metric");
+    console.log("FIELDS CONTROL", fieldsControl);
 
+    var customFieldsRow = views.get_control_row("custom_fields[]");
+
+    customFieldsRow.removeClass("hidden");
+    fieldsControl.finish().slideUp();
+    aggControl.finish().slideUp();
+    customFieldsRow.finish().slideDown();
+    customFieldsRow.find("select").attr("data-disabled", false);
+    fieldsControl.find("select").attr("data-disabled", true);
+
+    fieldsControl.addClass('hidden');
+    aggControl.addClass('hidden');
+
+    this.$el.find(".custom_field_inputs").text("quick select fields");
+  },
+  hide_custom_fields_input: function() {
+    var fieldsControl = views.get_control_row("fields[]");
+    var aggControl = views.get_control_row("metric");
+    var customFieldsRow = views.get_control_row("custom_fields[]");
+
+    fieldsControl.removeClass('hidden');
+    aggControl.removeClass('hidden');
+
+    customFieldsRow.finish().slideUp();
+    customFieldsRow.find("select").attr("data-disabled", true);
+    fieldsControl.find("select").attr("data-disabled", false);
+    fieldsControl.finish().slideDown();
+    aggControl.finish().slideDown();
+
+    customFieldsRow.addClass("hidden");
+
+    this.$el.find(".custom_field_inputs").text("use custom fields");
+  },
+
+  handle_custom_fields_input: function() {
+    if (views.get_control_row("fields[]").is(":visible")) {
+      this.show_custom_fields_input();
+    } else if (views.get_control_row("custom_fields[]").is(":visible")) {
+      this.hide_custom_fields_input();
+    }
+  },
 }

@@ -1,3 +1,9 @@
+var helpers = require("common/sf_helpers.js");
+console.log("HELPERS", helpers);
+
+var extract_agg = helpers.extract_agg;
+var extract_field = helpers.extract_field;
+
 function fieldname(a,c) {
   return a.replace(/^\$/, "") + "(" + c + ")";
 }
@@ -125,7 +131,7 @@ function marshall_table_rows(query_spec, rows) {
   var cols = query_spec.opts.cols;
   var dims = query_spec.opts.dims;
   var agg = query_spec.opts.agg;
-  var custom_fields = query_spec.opts.custom_fields || [];
+  var custom_fields = query_spec.opts["custom_fields[]"] || [];
 
 
 
