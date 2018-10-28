@@ -9,6 +9,10 @@ from flask_security import login_required, core
 app = flask.Flask(__name__)
 pudgy.register_blueprint(app)
 
+app.config.update({
+    "SESSION_COOKIE_NAME" : "slite"
+})
+
 
 @app.route('/')
 def get_index():

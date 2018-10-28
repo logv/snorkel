@@ -38,11 +38,16 @@ def install(app):
 def rpc_login_required(func):
     f = login_required(func)
     def wrapped_func(*args, **kwargs):
+
         r = f(*args, **kwargs)
         if isinstance(r, Response):
             # if we have a redirect, we need to translate it to the grpc framework
             if r.status_code in [301, 302, 303, 305, 307]:
                 flask.request.pudgy.activations.append("window.location.reload()")
+
+                # get and unset all the flashed messages
+                # TODO: this is a temporary workaround for duplicate messages
+                flashed = set(flask.get_flashed_messages(with_categories=True))
                 return { "_status" : r.status, "_nextUrl" : r.location }
 
         return r

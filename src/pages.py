@@ -10,6 +10,7 @@ from .components import UIComponent, Selector
 
 import werkzeug
 import os
+from collections import defaultdict
 
 import flask_security
 
@@ -25,12 +26,24 @@ class Page(pudgy.FlaskPage):
 class HomePage(Page, pudgy.SassComponent):
     pass
 
-class DatasetsPage(Page):
+class DatasetsPage(Page, pudgy.BackboneComponent, pudgy.SassComponent):
     def __prepare__(self):
         bs = backend.SybilBackend()
         self.context.tables = bs.list_tables()
         self.context.tables = list(self.context.tables)
         self.context.tables.sort()
+        groups = defaultdict(list)
+        self.context.table_groups = groups
+        for t in self.context.tables:
+            tokens = t.split("@")
+            if tokens > 1:
+                superset = tokens[0]
+                dataset = " ".join(tokens[1:])
+
+                groups[superset].append(dataset)
+            else:
+                groups[""].append(dataset)
+
 
         self.context.user_button = UserButton()
         self.context.user_modal = UserModal()

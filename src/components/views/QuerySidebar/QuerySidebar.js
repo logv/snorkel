@@ -1,3 +1,5 @@
+"use strict"
+
 var filter_helper = require("./filters.js");
 var Throbber = require("./Throbber.js");
 var StatusBar = require("./StatusBar.js");

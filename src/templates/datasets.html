@@ -1,15 +1,31 @@
 {% extends "layout.html" %}
 
-{% block body %} 
+{% block body %}
 <div class='container'>
-  {% for t in tables %}
-    <div class='dataset_tile'>
-      <h3>
-        <a href='{{ url_for('get_view', table=t, view="table") }}'>
-          {{ t }}
-        </a>
-      </h3>
-    </div>
-  {% endfor %}
+
+  <div>
+    <h1>Datasets</h1>
+    <input class='input-block-level dataset_finder pbl' style='zoom: 1.25' />
+  </div>
+
+  <div class='mtl'>
+    {% for super in table_groups %}
+      <div class='superset' id={{ super }}>
+        <h1>
+        &gt; {{super}}
+        </h1>
+
+        {% for t in table_groups[super] %}
+          <div class='dataset_tile'>
+            <h3>
+              <a href='{{ url_for('get_view', table="{}@{}".format(super, t), view="table") }}'>
+                {{ t }}
+              </a>
+            </h3>
+          </div>
+        {% endfor %}
+      </div>
+    {% endfor %}
+  </div>
 </div>
 {% endblock %}
