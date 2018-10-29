@@ -9,7 +9,7 @@
   </div>
 
   <div class='mtl'>
-    {% for super in table_groups %}
+    {% for super in groups %}
       <div class='superset' id={{ super }}>
         <h1>
         &gt; {{super}}
@@ -18,8 +18,14 @@
         {% for t in table_groups[super] %}
           <div class='dataset_tile'>
             <h3>
-              <a href='{{ url_for('get_view', table="{}@{}".format(super, t), view="table") }}'>
-                {{ t }}
+              {% if t %}
+                {% set table = "{}@{}".format(super, t)  %}
+              {% else %}
+                {% set table = super %}
+              {% endif %}
+
+              <a href='{{ url_for('get_view', table=table, view="table") }}'>
+                {{ t or super }}
               </a>
             </h3>
           </div>

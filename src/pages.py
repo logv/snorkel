@@ -33,18 +33,28 @@ class DatasetsPage(Page, pudgy.BackboneComponent, pudgy.SassComponent):
         self.context.tables = list(self.context.tables)
         self.context.tables.sort()
         groups = defaultdict(list)
+
         self.context.table_groups = groups
+
+        groupings = []
+        visited = {}
         for t in self.context.tables:
+            if t in visited:
+                continue
+
+            visited[t] = 1
+
             tokens = t.split("@")
-            if tokens > 1:
+            if len(tokens) > 1:
                 superset = tokens[0]
                 dataset = " ".join(tokens[1:])
-
+                print tokens, superset, dataset
                 groups[superset].append(dataset)
             else:
-                groups[""].append(dataset)
+                groups[t].append("")
 
 
+        self.context.groups = list(sorted(groups.keys()))
         self.context.user_button = UserButton()
         self.context.user_modal = UserModal()
 
@@ -83,6 +93,7 @@ class QueryPage(Page, pudgy.SassComponent, pudgy.BackboneComponent, pudgy.Server
 
         try:
             table_info = bs.get_table_info(table)
+            print "TABLE INFO", table_info
             tables = bs.list_tables()
         except Exception as e:
             self.context.error = "Couldn't read table info for table %s" % (table)

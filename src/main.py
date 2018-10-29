@@ -10,7 +10,7 @@ from . import web
 from .presenter import DatasetPresenter, RegisterPresenter
 
 from plugins.snorkel_basic_views import TableView, TimeView, DistView, SamplesView
-from plugins.snorkel_timeline_view import TimelineView
+from plugins.snorkel_advanced_views import TimelineView, OverviewView
 
 def configure_presenters():
     default_presenter = DatasetPresenter()
@@ -28,9 +28,10 @@ def configure_presenters():
         TimeView,
         DistView,
         SamplesView,
-        TimelineView
+        TimelineView,
+        OverviewView
     ])
-    RegisterPresenter(".*nginx.*", nginx_presenter)
+    RegisterPresenter(".*", nginx_presenter)
 
 
 if __name__ == "__main__":

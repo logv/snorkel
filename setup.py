@@ -19,7 +19,7 @@ setup(
         'snorkel.views',
         'snorkel.components',
         'snorkel.plugins.snorkel_basic_views',
-        'snorkel.plugins.snorkel_timeline_view' ],
+        'snorkel.plugins.snorkel_advanced_views' ],
     package_dir= { "snorkel" : "src" },
     # url = 'https://github.com/logv/slite',
     # license='MIT',
