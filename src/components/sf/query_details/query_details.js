@@ -5,10 +5,9 @@ module.exports = {
   className: "",
   client: function(options) {
     var created_str = new Date(options.created).toISOString();
-    var helpers = bootloader.require("app/client/views/helpers");
     var that = this;
 
-    var view = options.query.parsed.baseview || options.query.parsed.view;
+    var view = options.query.parsed.baseview || options.query.parsed.viewbase || options.query.parsed.view;
     var count = 0;
     var w_count = 0;
     var results = options.query.results;
@@ -19,18 +18,18 @@ module.exports = {
 
     if (view == "table" || view == "time" || view == "dist") {
       _.each(results, function(row) {
-        count += row.count;
-        w_count += row.weight;
+        count += row.count || row.Count;
+        w_count += row.weight || row.Weight;
       });
 
     }
 
     if (!_.isNaN(count)) {
-      that.$el.find(".count").text("Sample Count: " + helpers.count_format(count));
+      that.$el.find(".count").text("Sample Count: " + count);
     }
 
     if (!_.isNaN(w_count)) {
-      that.$el.find(".weight").text("Weighted Samples: " + helpers.count_format(w_count));
+      that.$el.find(".weight").text("Weighted Samples: " + w_count || count);
     }
 
     $C("timeago", {time: created_str }, function(cmp) {

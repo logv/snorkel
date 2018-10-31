@@ -16,7 +16,9 @@ import flask_security
 
 from .query_spec import QuerySpec
 
-class ViewArea(UIComponent, pudgy.JinjaComponent, pudgy.BackboneComponent):
+from .util import time_to_seconds
+
+class ViewArea(UIComponent, pudgy.JinjaComponent, pudgy.BackboneComponent, pudgy.ClientBridge):
     pass
 
 @pudgy.Virtual
@@ -75,6 +77,14 @@ def read_filters(query):
     return filters
 
 
+import datetime
+def to_object(sq):
+    print "CREATED", sq.created
+    return {
+        "parsed" : sq.parsed,
+        "results" : sq.results,
+        "created" : (sq.created - datetime.datetime(1970, 1, 1)).total_seconds()
+    }
 class QueryPage(Page, pudgy.SassComponent, pudgy.BackboneComponent, pudgy.ServerBridge):
     def __prepare__(self):
         # locate the potential views
@@ -114,6 +124,9 @@ class QueryPage(Page, pudgy.SassComponent, pudgy.BackboneComponent, pudgy.Server
             sq = self.context.saved
             view.context.update(sq.parsed, results=sq.results)
             view.marshal(query=sq.parsed, results=sq.results)
+
+
+            viewarea.call("set_query_details", to_object(sq))
             viewarea.context.update(view=view)
 
         filters = read_filters(query)
@@ -122,6 +135,8 @@ class QueryPage(Page, pudgy.SassComponent, pudgy.BackboneComponent, pudgy.Server
 
         qs.set_ref("sidebar")
         qs.marshal(table=table, viewarea=viewarea, metadata=table_info)
+
+        self.set_ref("querypage")
 
 
         user_button = UserButton()
@@ -166,6 +181,7 @@ def run_query(cls, table=None, query=None, viewarea=None, filters=[]):
 
     if viewarea:
         viewarea.html(v.render())
+        viewarea.call("set_query_details", to_object(sq))
 
     return {
         "queryUrl": flask.url_for('get_view', **d),

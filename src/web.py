@@ -16,7 +16,6 @@ app.config.update({
 
 @app.route('/')
 def get_index():
-    print type(core.current_user)
     return HomePage(template="home.html").render()
 
 
@@ -40,6 +39,8 @@ def get_view():
             sq = sq.pop()
             table = sq["table"]
             view = sq["parsed"]["view"]
+
+    print "SAVED QUERY", type(sq)
 
     return QueryPage(template="query.html", table=table, view=view, saved=sq).pipeline()
 

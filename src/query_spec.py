@@ -1,6 +1,14 @@
 import werkzeug
 import json
-import dotmap
+try:
+    import dotmap
+except:
+    dotmap = None
+
+try:
+    import addict
+except:
+    addict = None
 
 class QuerySpec(object):
     def __init__(self, query):
@@ -20,7 +28,9 @@ class QuerySpec(object):
         self.isdotmap = False
         if isinstance(query, werkzeug.MultiDict):
             self.ismultidict = True
-        elif isinstance(query, dotmap.DotMap):
+        elif addict and isinstance(query, addict.Dict):
+            self.isdotmap = True
+        elif dotmap and isinstance(query, dotmap.DotMap):
             self.isdotmap = True
         elif isinstance(query, list):
             self.ismultidict = True

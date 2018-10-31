@@ -29,6 +29,14 @@ class SavedQuery(QueryModel):
     results = JSONField()
     parsed = JSONField()
 
+    def toObject(self):
+        return { 
+            "results" : self.results,
+            "parsed" : self.parsed,
+            "created" : self.created
+
+        }
+
     class Meta:
         database = querydb
 

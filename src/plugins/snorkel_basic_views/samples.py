@@ -42,7 +42,7 @@ class SamplesView(ViewBase, pudgy.JSComponent):
 
     def __render__(self):
         t = Table()
-        t.context.update(**self.context.toDict())
+        t.context.update(**self.context)
 
         r = t.render()
 
