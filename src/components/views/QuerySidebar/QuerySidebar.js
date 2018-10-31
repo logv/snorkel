@@ -140,12 +140,18 @@ module.exports = {
     var self = this;
 
     var filters = filter_helper.get();
+    var viewEl = views.get_control_row("view");
+
+    throbber = $("<div class='spinner' />");
+    viewEl.prepend(throbber);
 
     this
       .rpc
       .update_controls()
       .kwargs({ view: view, table: table, query: this.get_query(), viewarea: this.viewarea, filters: filters })
-      .done(function(res, err) { });
+      .done(function(res, err) {
+        throbber.remove();
+      });
 
   },
 

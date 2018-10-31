@@ -50,7 +50,6 @@ class DatasetsPage(Page, pudgy.BackboneComponent, pudgy.SassComponent):
             if len(tokens) > 1:
                 superset = tokens[0]
                 dataset = " ".join(tokens[1:])
-                print tokens, superset, dataset
                 groups[superset].append(dataset)
             else:
                 groups[t].append("")
@@ -103,7 +102,6 @@ class QueryPage(Page, pudgy.SassComponent, pudgy.BackboneComponent, pudgy.Server
 
         try:
             table_info = bs.get_table_info(table)
-            print "TABLE INFO", table_info
             tables = bs.list_tables()
         except Exception as e:
             self.context.error = "Couldn't read table info for table %s" % (table)
