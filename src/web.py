@@ -40,8 +40,6 @@ def get_view():
             table = sq["table"]
             view = sq["parsed"]["view"]
 
-    print "SAVED QUERY", type(sq)
-
     return QueryPage(template="query.html", table=table, view=view, saved=sq).pipeline()
 
 auth.install(app)
