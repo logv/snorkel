@@ -14,7 +14,11 @@ def save_for_user(user, params, results):
 
 def get_for_user(user, table, limit=30):
     res = SavedQuery \
-        .select().limit(limit) \
+        .select(
+            SavedQuery.created,
+            SavedQuery.parsed,
+            SavedQuery.hashid
+        ).limit(limit) \
         .order_by(-SavedQuery.created) \
         .where(SavedQuery.user == user.id and SavedQuery.table == table).dicts()
 

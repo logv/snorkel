@@ -80,12 +80,6 @@ import datetime
 def epoch(d):
     return (d - datetime.datetime(1970, 1, 1)).total_seconds()
 
-def to_object(sq):
-    return {
-        "parsed" : sq.parsed,
-        "results" : sq.results,
-        "created" : epoch(sq.created)
-    }
 class QueryPage(Page, pudgy.SassComponent, pudgy.BackboneComponent, pudgy.ServerBridge):
     def __prepare__(self):
         # locate the potential views
