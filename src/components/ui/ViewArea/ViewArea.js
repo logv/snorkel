@@ -1,4 +1,7 @@
 module.exports = {
+  set_view: function(view) {
+    this.set_query_details(view.options);
+  },
   set_query_details: function(view) {
     console.log("QUERY DETAILS", view);
     var options = { results: view.results, query: view.query,

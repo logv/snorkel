@@ -77,12 +77,14 @@ def read_filters(query):
 
 
 import datetime
+def epoch(d):
+    return (d - datetime.datetime(1970, 1, 1)).total_seconds()
+
 def to_object(sq):
-    print "CREATED", sq.created
     return {
         "parsed" : sq.parsed,
         "results" : sq.results,
-        "created" : (sq.created - datetime.datetime(1970, 1, 1)).total_seconds()
+        "created" : epoch(sq.created)
     }
 class QueryPage(Page, pudgy.SassComponent, pudgy.BackboneComponent, pudgy.ServerBridge):
     def __prepare__(self):
@@ -121,10 +123,10 @@ class QueryPage(Page, pudgy.SassComponent, pudgy.BackboneComponent, pudgy.Server
         if self.context.saved:
             sq = self.context.saved
             view.context.update(sq.parsed, results=sq.results)
-            view.marshal(query=sq.parsed, results=sq.results)
+            view.marshal(query=sq.parsed, results=sq.results,
+                parsed=sq.parsed, created=epoch(sq.created))
 
-
-            viewarea.call("set_query_details", to_object(sq))
+            viewarea.call("set_view", view)
             viewarea.context.update(view=view)
 
         filters = read_filters(query)
@@ -175,11 +177,11 @@ def run_query(cls, table=None, query=None, viewarea=None, filters=[]):
 
     v = VwClass()
     v.context.update(query=sq.parsed, results=sq.results, metadata=ti)
-    v.marshal(query=sq.parsed, results=sq.results, metadata=ti)
+    v.marshal(query=sq.parsed, results=sq.results, metadata=ti, parsed=epoch(sq.created))
 
     if viewarea:
         viewarea.html(v.render())
-        viewarea.call("set_query_details", to_object(sq))
+        # viewarea.call("set_view", v)
 
     return {
         "queryUrl": flask.url_for('get_view', **d),

@@ -41,7 +41,6 @@ module.exports = {
     var self = this;
     this.table = ctx.table;
     this.viewarea = ctx.viewarea;
-    console.timeStamp("SIDEBAR FADING IN");
     SF.on("set_custom_time", function(start, end) {
       self.show_custom_time_inputs();
       self.set_custom_time_inputs(start, end);
@@ -176,8 +175,6 @@ module.exports = {
     var startControl = views.get_control_row("start");
     var endControl = views.get_control_row("end");
 
-    console.log("START CONTROL", startControl);
-
     var customStartRow = views.get_control_row("custom_start");
     var customEndRow = views.get_control_row("custom_end");
 
@@ -223,7 +220,6 @@ module.exports = {
   },
 
   handle_custom_time_inputs: function() {
-    console.log("HANDLING CUSTOM TIME INPUTS");
     if (views.get_control_row("start").is(":visible")) {
       this.show_custom_time_inputs();
     } else if (views.get_control_row("custom_start").is(":visible")) {
@@ -234,7 +230,6 @@ module.exports = {
   show_custom_fields_input: function() {
     var fieldsControl = views.get_control_row("fields[]");
     var aggControl = views.get_control_row("metric");
-    console.log("FIELDS CONTROL", fieldsControl);
 
     var customFieldsRow = views.get_control_row("custom_fields[]");
 
