@@ -66,8 +66,8 @@
         </div>
 
         <div class="span6">
-          <% if (query.parsed.start_str) { %> <b>From:</b> <%= query.parsed.start_str %> <% } %>
-          <% if (query.parsed.end_str) { %> &ndash; <%= query.parsed.end_str %> <% } %>
+          <% if (query.parsed.start) { %> <b>From:</b> <%= query.parsed.start %> <% } %>
+          <% if (query.parsed.end) { %> &ndash; <%= query.parsed.end %> <% } %>
           <% if (query.parsed.compare_str) { %>
             <br />
             <b>Compared against:</b> <%= query.parsed.compare_str %>
@@ -79,32 +79,40 @@
 
       <div class="span12" style='min-height: inherit'>
 
-        <% if (query.parsed.filters && _.isArray(query.parsed.filters) && query.parsed.filters.length) { %>
+        <% if (query.parsed.filters && _.isArray(query.parsed.filters.query || {}) && query.parsed.filters.query.length) { %>
           <div class="span6">
             <b>Filters</b>
-            <% _.each(query.parsed.filters, function(filt) { %>
-              <div><small class="pll">
-                <%= filt.column %>:
+            <% _.each(query.parsed.filters.query, function(arr) { %>
+              <%
+                var col = arr[0];
+                var op = arr[1];
+                var val = arr[2];
 
-                <% _.each(filt.conditions, function(condition) { %>
-                  <%= condition.op %> <%= condition.value %>
-                <% }); %>
+
+
+              %>
+              <div><small class="pll">
+                <%= col %>: <%= op %> <%= val %>
 
               </small></div>
             <% }) %>
           </div>
         <% } %>
 
-        <% if (query.parsed.compare_filters && query.parsed.compare_filters.length) { %>
+        <% if (query.parsed.filters && query.parsed.filters.compare && query.parsed.filters.compare.length > 0) { %>
           <div class="span6">
             <b>Compare Filters</b>
-            <% _.each(query.parsed.compare_filters, function(filt) { %>
-              <div><small class="pll">
-                <%= filt.column %>:
+            <% _.each(query.parsed.filters.compare, function(arr) { %>
+              <%
+                var col = arr[0];
+                var op = arr[1];
+                var val = arr[2];
 
-                <% _.each(filt.conditions, function(condition) { %>
-                  <%= condition.op %> <%= condition.value %>
-                <% }); %>
+
+
+              %>
+              <div><small class="pll">
+                <%= col %>: <%= op %> <%= val %>
 
               </small></div>
             <% }) %>
