@@ -141,11 +141,20 @@ class SybilQuery(object):
 
 
         # add time filters
-        start = query_spec.get('start', "-1 week")
-        start_s = time_to_seconds(start)
+        start_ms = query_spec.get('start_ms', '')
+        end_ms = query_spec.get('end_ms', '')
 
-        end = query_spec.get('end', "now")
-        end_s = time_to_seconds(end)
+        if start_ms:
+            start_s = int(start_ms) / 1000
+        else:
+            start = query_spec.get('start', "-1 week")
+            start_s = time_to_seconds(start)
+
+        if end_ms:
+            end_s = int(end_ms) / 1000
+        else:
+            end = query_spec.get('end', "now")
+            end_s = time_to_seconds(end)
 
 
         custom_end = query_spec.get('custom_end', '')

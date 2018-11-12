@@ -2,13 +2,14 @@ from .models import SavedQuery
 from pudgy.util  import getrandhash
 import json
 
-def save_for_user(user, params, results):
+def save_for_user(user, params, results, compare={}):
     table = params.get('table')
 
     params = params.__json__()
     hashid = getrandhash(json.dumps(params))
     hashid = hashid[:10]
-    sq = SavedQuery.create(results=results, user=user.id, parsed=params, hashid=hashid, table=table)
+    sq = SavedQuery.create(results=results, user=user.id, parsed=params, hashid=hashid,
+        table=table, compare=compare or {})
 
     return sq
 

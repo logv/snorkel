@@ -30,6 +30,8 @@ class TimeView(ViewBase, pudgy.JSComponent):
     BASE="time"
     DISPLAY_NAME="Time View"
     BASE_DIR=os.path.dirname(__file__)
+    SUPPORT_COMPARE_QUERIES=True
+
 
 
     def add_time_series_controls(self, controls):

@@ -1,6 +1,8 @@
 var _labels = {};
-function add_missing_values(serie, time_bucket, start, end) {
+function add_missing_values(serie, time_bucket, start, end, is_compare) {
   serie = _.sortBy(serie, function(s) { return s.x; } );
+
+  console.log("ADD MISSING", start, end);
 
   var expected = start;
   var new_serie = [];
@@ -25,7 +27,7 @@ function add_missing_values(serie, time_bucket, start, end) {
   }
 
   // fills in the missing values at the end of the series
-  while (expected < end) {
+  while (!is_compare && expected < end) {
     expected += time_bucket * 1000;
     missing += 1;
     pt = {
@@ -142,7 +144,17 @@ function time_prepare(data, options) {
 
   _.each(series, function(serie) {
     if (options.fill_missing == "zero") {
-      serie.data = add_missing_values(serie.data, data.parsed.time_bucket, data.parsed.start_ms, data.parsed.end_ms);
+      var start_ms = data.parsed.start_ms;
+      var end_ms = data.parsed.end_ms;
+      if (is_compare) {
+        start_ms += data.parsed.compare_delta ;
+        end_ms += data.parsed.compare_delta ;
+      }
+
+      console.log("IS COMPARE", is_compare, data.parsed.compare_delta);
+
+      serie.data = add_missing_values(serie.data, data.parsed.time_bucket,
+        start_ms, end_ms, is_compare);
     }
 
     serie.data.sort(function(a, b) {

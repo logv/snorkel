@@ -5,6 +5,7 @@ from flask_security import RoleMixin, UserMixin
 import os
 
 from playhouse.sqliteq import SqliteQueueDatabase
+from playhouse.migrate import SqliteMigrator, migrate
 
 DB_DIR="sdb"
 userdb = SqliteDatabase(os.path.join(DB_DIR, 'users.db'))
@@ -27,6 +28,7 @@ class SavedQuery(QueryModel):
     updated = TimestampField(utc=True)
 
     results = JSONField()
+    compare = JSONField()
     parsed = JSONField()
 
     def toObject(self):
@@ -69,6 +71,12 @@ def create_db_if_not():
     for c in [SavedQuery, User]:
         c._meta.database.connect()
         c._meta.database.create_tables([c])
+
+    # query DB migrations
+    migrator = SqliteMigrator(querydb)
+    migrate(
+        migrator.add_column('savedquery', 'compare', JSONField(default='')),
+    )
 
 if __name__ == "__main__":
     if "RESET" in os.environ:

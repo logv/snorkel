@@ -117,7 +117,7 @@ var TableView = {
 
         var cell_div;
         if (compare) {
-          var compare_value = helpers.get_field_value(compare_result, col) || 0;
+          var compare_value = helpers.get_field_value(compare_result || {}, col) || 0;
           cell_div = helpers.build_compare_cell(col_value, compare_value);
         } else {
           cell_div = helpers.build_compare_cell(col_value);

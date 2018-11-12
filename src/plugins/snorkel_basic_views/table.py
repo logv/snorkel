@@ -11,8 +11,7 @@ class TableView(ViewBase, pudgy.BackboneComponent, pudgy.SassComponent):
     BASE="table"
     DISPLAY_NAME="Table View"
     BASE_DIR=os.path.dirname(__file__)
-
-
+    SUPPORT_COMPARE_QUERIES=True
 
     def __render__(self):
         return ""

@@ -86,6 +86,8 @@ class ViewBase(pudgy.BackboneComponent):
     DISPLAY_NAME=""
     NAME="ViewBase"
 
+    SUPPORT_COMPARE_QUERIES=False
+
     @classmethod
     def get_display_name(self):
         return self.DISPLAY_NAME or self.NAME
@@ -132,6 +134,10 @@ class ViewBase(pudgy.BackboneComponent):
             title = "quick select time"
 
         controls.append(jinja2.Markup("<div class='clearfix centered'><a href='#' class='mrl mtl custom_time_inputs' >%s</a></div>" % title))
+
+
+        if self.SUPPORT_COMPARE_QUERIES:
+            self.add_time_comparison(controls)
 
     def add_time_comparison(self, controls):
         against_time = Selector(
@@ -260,7 +266,6 @@ class ViewBase(pudgy.BackboneComponent):
         controls = []
 
         self.add_time_controls(controls)
-#        self.add_time_comparison(controls)
 
         self.add_groupby_selector(controls)
         self.add_limit_selector(controls)

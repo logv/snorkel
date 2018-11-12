@@ -44,6 +44,7 @@ class QuerySidebar(UIComponent, pudgy.BackboneComponent, pudgy.JinjaComponent, p
         self.context.viewcontrols = self.context.view.get_view_control()
 
         self.context.filters = self.context.view.get_filters(self.context.filters)
+        self.context.compare_filters = self.context.view.get_filters(self.context.compare_filters)
 
         self.context.stats = StatsBox(**self.context.metadata)
 

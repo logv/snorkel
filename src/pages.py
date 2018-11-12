@@ -116,8 +116,8 @@ class QueryPage(Page, pudgy.SassComponent, pudgy.BackboneComponent, pudgy.Server
         viewarea = ViewArea()
         if self.context.saved:
             sq = self.context.saved
-            view.context.update(sq.parsed, results=sq.results)
-            view.marshal(query=sq.parsed, results=sq.results,
+            view.context.update(sq.parsed, results=sq.results, compare=sq.compare)
+            view.marshal(query=sq.parsed, results=sq.results, compare=sq.compare,
                 parsed=sq.parsed, created=epoch(sq.created))
 
             viewarea.call("set_view", view)
@@ -163,15 +163,40 @@ def run_query(cls, table=None, query=None, viewarea=None, filters=[]):
     view = query.get('view')
     VwClass = get_view_by_name(view)
     query.set('viewbase', VwClass.BASE)
+
     res = bs.run_query(table, query, ti)
 
-    sq = results.save_for_user(flask_security.core.current_user, query, res)
+    cmp = None
+    against = query.get('against', '')
+    if against:
+        print "COMPARISON QUERY", against
+        compare_spec = QuerySpec(query.md)
+        now = time_to_seconds('now')
+
+        compare_delta = time_to_seconds(against) - now
+
+        # compare_delta is in ms
+        query.set('compare_delta', compare_delta*1000)
+
+        startms = query.get('start_ms')
+        endms = query.get('end_ms')
+
+        startms += compare_delta * 1000
+        endms += compare_delta * 1000
+
+        compare_spec.set('start_ms', startms)
+        compare_spec.set('end_ms', endms)
+
+        cmp = bs.run_query(table, compare_spec, ti)
+        query.set('compare_mode', 1)
+
+    sq = results.save_for_user(flask_security.core.current_user, query, res, cmp)
 
     d["h"] = sq.hashid
 
     v = VwClass()
-    v.context.update(query=sq.parsed, results=sq.results, metadata=ti)
-    v.marshal(query=sq.parsed, results=sq.results, metadata=ti, parsed=epoch(sq.created))
+    v.context.update(query=sq.parsed, results=sq.results, metadata=ti, compare=sq.compare)
+    v.marshal(query=sq.parsed, results=sq.results, compare=sq.compare, metadata=ti, parsed=epoch(sq.created))
 
     if viewarea:
         viewarea.html(v.render())
@@ -180,6 +205,7 @@ def run_query(cls, table=None, query=None, viewarea=None, filters=[]):
     return {
         "queryUrl": flask.url_for('get_view', **d),
         "res" : res,
+        "cmp" : cmp,
         "query" : d
     }
 
@@ -198,8 +224,9 @@ def update_controls(cls, table=None, view=None, query=None, viewarea=None, filte
     v = VwClass()
     v.context.update(metadata=ti, presenter=pr, query=query)
     query_filters= filters['query']
+    compare_filters = filters['compare']
 
-    qs = QuerySidebar(view=v, presenter=pr, query=query, filters=query_filters, metadata=ti)
+    qs = QuerySidebar(view=v, presenter=pr, query=query, filters=query_filters, compare_filters=compare_filters, metadata=ti)
     qs.__prepare__()
     qs.nomarshal()
     # we undelegate our events because we are about to replace ourself

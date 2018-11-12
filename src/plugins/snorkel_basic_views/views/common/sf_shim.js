@@ -33,11 +33,20 @@ module.exports = {
     console.log("CTX", ctx);
 
     var rows;
-    if (this.marshall_rows) { rows = this.marshall_rows(parsed, ctx.results);
-    } else { rows = ctx.results; }
+    var crows;
+    if (this.marshall_rows) {
+      rows = this.marshall_rows(parsed, ctx.results);
+      crows =this.marshall_rows(parsed, ctx.compare);
+    } else {
+      rows = ctx.results;
+      crows = ctx.compare;
+    }
 
-    this.query = { results: rows, parsed: parsed};
+    this.query = { results: rows, parsed: parsed };
     this.data = this.prepare(this.query);
+
+    this.compare_query =  { results: crows, parsed: parsed }
+    this.compare_data = this.prepare( this.compare_query );
     this.render();
 
   },
@@ -45,15 +54,22 @@ module.exports = {
     var parsed = ctx.query;
     module.exports.add_old_params(parsed);
     ctx.parsed = parsed;
+    view.query = ctx;
 
     view.metadata = ctx.metadata;
-    view.query = parsed;
     view.parsed = parsed;
     helpers.set_metadata(ctx.metadata);
 
     view.data = ctx;
     view.data = view.prepare(ctx);
+
+    var compare_ctx = _.clone(ctx);
+    compare_ctx.results = ctx.compare;
+    view.compare_query = compare_ctx;
+    view.compare_data = view.prepare(compare_ctx);
+
     console.log("VIEW DATA", view.data);
+    console.log("COMPARE DATA", view.compare_data);
 
     view.finalize();
     view.render();

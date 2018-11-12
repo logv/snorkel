@@ -37,8 +37,10 @@ var TimeView = {
 
   finalize: function() {
     var query = this.query;
+    console.log("QUERY IS", query);
     if (this.compare_data) {
       _.each(this.compare_data, function(series) {
+        var new_data = [];
         _.each(series.data, function(pt) {
           if (query.parsed.compare_delta) {
             pt.x = pt.x - query.parsed.compare_delta;
@@ -54,6 +56,8 @@ var TimeView = {
     if (!data.length) {
       return "No samples";
     }
+
+    console.log("CONCATED DATA", data);
 
     this.data = data;
 
