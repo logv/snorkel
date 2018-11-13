@@ -60,7 +60,7 @@ class DatasetsPage(Page, pudgy.BackboneComponent, pudgy.SassComponent):
         self.context.user_modal = UserModal()
 
 
-def read_filters(query):
+def read_filters(query, i='query'):
     import ast
 
     filters = []
@@ -69,7 +69,7 @@ def read_filters(query):
         if type(filters) == str:
             filters = ast.literal_eval(filters)
 
-        filters = filters['query']
+        filters = filters[i]
     except Exception as e:
         print "FILTER ERR", e
 
@@ -124,8 +124,13 @@ class QueryPage(Page, pudgy.SassComponent, pudgy.BackboneComponent, pudgy.Server
             viewarea.context.update(view=view)
 
         filters = read_filters(query)
+        compare_filters = read_filters(query, 'compare')
 
-        qs = QuerySidebar(info=table_info, view=view, filters=filters or [], metadata=table_info)
+        qs = QuerySidebar(info=table_info, view=view, filters=filters or [],
+            compare_filters=compare_filters, metadata=table_info)
+
+        if compare_filters:
+            qs.call('show_compare_filters')
 
         qs.set_ref("sidebar")
         qs.marshal(table=table, viewarea=viewarea, metadata=table_info)
@@ -168,24 +173,30 @@ def run_query(cls, table=None, query=None, viewarea=None, filters=[]):
 
     cmp = None
     against = query.get('against', '')
-    if against:
-        print "COMPARISON QUERY", against
+    filters = query.get('filters')
+
+    compare_filters = filters['compare']
+    if against or len(compare_filters):
         compare_spec = QuerySpec(query.md)
-        now = time_to_seconds('now')
 
-        compare_delta = time_to_seconds(against) - now
+        if against:
+            now = time_to_seconds('now')
+            compare_delta = time_to_seconds(against) - now
 
-        # compare_delta is in ms
-        query.set('compare_delta', compare_delta*1000)
+            # compare_delta is in ms
+            query.set('compare_delta', compare_delta*1000)
 
-        startms = query.get('start_ms')
-        endms = query.get('end_ms')
+            startms = query.get('start_ms')
+            endms = query.get('end_ms')
 
-        startms += compare_delta * 1000
-        endms += compare_delta * 1000
+            startms += compare_delta * 1000
+            endms += compare_delta * 1000
 
-        compare_spec.set('start_ms', startms)
-        compare_spec.set('end_ms', endms)
+            compare_spec.set('start_ms', startms)
+            compare_spec.set('end_ms', endms)
+
+
+        compare_spec.set('filters', { "query" : compare_filters })
 
         cmp = bs.run_query(table, compare_spec, ti)
         query.set('compare_mode', 1)
@@ -224,11 +235,17 @@ def update_controls(cls, table=None, view=None, query=None, viewarea=None, filte
     v = VwClass()
     v.context.update(metadata=ti, presenter=pr, query=query)
     query_filters= filters['query']
-    compare_filters = filters['compare']
 
-    qs = QuerySidebar(view=v, presenter=pr, query=query, filters=query_filters, compare_filters=compare_filters, metadata=ti)
+    qs = QuerySidebar(view=v, presenter=pr, query=query, filters=query_filters, metadata=ti)
     qs.__prepare__()
     qs.nomarshal()
+
+    has_compare_filters = 'compare' in filters and len(filters['compare']) > 0
+    if v.SUPPORT_COMPARE_QUERIES and has_compare_filters:
+        cls.call("show_compare_filters")
+    else:
+        cls.call("hide_compare_filters")
+
     # we undelegate our events because we are about to replace ourself
     # with the same component
     cls.html(qs.context.querycontrols.render(), selector=".querycontrols")

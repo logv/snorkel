@@ -35,10 +35,12 @@ module.exports = {
     "change .selector[name='view']" : "handle_view_changed",
     "click .btn.go" : "handle_go_clicked",
     "click .custom_time_inputs" : "handle_custom_time_inputs",
+    "click .compare_filter" : "handle_compare_toggle",
     "click .custom_field_inputs" : "handle_custom_fields_input"
   },
   initialize: function(ctx) {
     var self = this;
+    self.$page = $("body");
     this.table = ctx.table;
     this.viewarea = ctx.viewarea;
     SF.on("set_custom_time", function(start, end) {
@@ -271,4 +273,43 @@ module.exports = {
       this.hide_custom_fields_input();
     }
   },
+
+  show_compare_filters: function(add_if_empty) {
+    var filterBox = this.$page.find(".filter_group[data-filter-type=compare]");
+    var compareFilter = this.$page.find(".compare_filter");
+    filterBox.show();
+    compareFilter.show();
+
+    // If there is no filter row and we want to show comparison filters
+    if (!filterBox.find(".filter_row").length && add_if_empty) {
+      filter_helper.add_compare(["", "", ""], true);
+    }
+
+    compareFilter.html("Remove Comparison Filters");
+    var container = filterBox.parents("#query_sidebar");
+    container.stop(true).animate({
+        scrollTop: filterBox.offset().top - container.offset().top + container.scrollTop()
+    }, 1000);
+
+  },
+
+  hide_compare_filters: function() {
+    var filterBox = this.$page.find(".filter_group[data-filter-type=compare]");
+    var compareFilter = this.$page.find(".compare_filter");
+    filterBox.hide();
+    compareFilter.html("Add Comparison Filters");
+  },
+
+  handle_compare_toggle: _.debounce(function() {
+    var filterBox = this.$page.find(".filter_group[data-filter-type=compare]");
+
+    var to_hide = $(filterBox).is(":visible") && filterBox.find(".filter_row").length;
+
+    if (to_hide) {
+      this.hide_compare_filters();
+    } else {
+      this.show_compare_filters(true /* add if empty */);
+    }
+
+  }, 50),
 }

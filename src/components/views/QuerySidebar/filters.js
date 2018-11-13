@@ -19,6 +19,7 @@ function get_filter_data() {
   // TODO: push this logic into filter_row component
   $(container).find("#filters .filter_row").each(function() {
     var row = $(this);
+    console.log("FILTERS", row);
 
     var filter_group = row.parents(".filter_group");
     var filter_type = filter_group.attr("data-filter-type") || 'query';
