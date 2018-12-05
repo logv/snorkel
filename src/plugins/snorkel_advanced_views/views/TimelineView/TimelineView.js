@@ -110,16 +110,7 @@ var SessionView = {
           tooltip: {
             enabled: false
           },
-          point: {
-            events: {
-              click: function() {
-                var details = "<pre class='sample_details'>" + JSON.stringify(this.result, null, 2) + "</pre>";
-                $C("modal", {title: "Sample details", body: details}, function(modal) {
-                  modal.show();
-                });
-              }
-            }
-          },
+          point: { },
           marker: {
             enabled: true,
             states: {
@@ -163,7 +154,6 @@ var SessionView = {
 
     var fields = this.metadata.columns;
 
-    console.log("FIELDS ARE", fields);
     _.each(fields, function(field) {
       lookup[field.name] = field.type_str;
       if (cols[field.type_str]) {

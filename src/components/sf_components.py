@@ -7,7 +7,11 @@ class tabs(OldSnorkelComponent):
     pass
 
 class modal(OldSnorkelComponent):
-    pass
+    # for our modal, we want it to close, so
+    # we don't force "display: inherit !important"
+    @classmethod
+    def add_display_rules(cls, data):
+        return data
 
 class timeago(OldSnorkelComponent):
     pass
