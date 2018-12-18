@@ -129,10 +129,16 @@ function marshall_dist_rows(query_spec, rows) {
 
 var DistView = {
   initialize: function(ctx) {
-    sf_shim.initialize.apply(this, [ctx]);
+    sf_shim.prepare_and_render(this, ctx);
+//    sf_shim.initialize.apply(this, [ctx]);
   },
   marshall_rows: marshall_dist_rows,
   prepare: function(data) {
+    data.parsed = data.query || data.parsed || {};
+    data.results = marshall_dist_rows(data.parsed, data.results);
+
+    this.query = { results: data.results, parsed: data.parsed }
+    this.table = data.parsed.table;
     var series = [];
     var col = data.parsed.col || data.parsed.cols[0];
     console.log("COL", col);
@@ -160,6 +166,7 @@ var DistView = {
       return a[0] - b[0];
     });
 
+
     var stats = calc_cdf(series, total, w_total);
 
     // copy copy copy
@@ -168,6 +175,8 @@ var DistView = {
   },
 
   finalize: function() {
+    return;
+    console.log("FINALIZING", this.query);
     var query = this.query;
     if (this.compare_data) {
       _.each(this.compare_data.percentiles, function(series) {
@@ -177,9 +186,9 @@ var DistView = {
         series.dashStyle = "LongDash";
       });
 
-      this.ks_result = ks_test(this.data.percentiles.slice(50, 950), this.compare_data.percentiles.slice(50, 950), this.data.count, this.compare_data.count);
-      this.ks_low_result = ks_test(this.data.percentiles.slice(25, 250), this.compare_data.percentiles.slice(25, 250), this.data.count, this.compare_data.count);
-      this.ks_high_result = ks_test(this.data.percentiles.slice(749, 975), this.compare_data.percentiles.slice(749, 975), this.data.count, this.compare_data.count);
+//      this.ks_result = ks_test(this.data.percentiles.slice(50, 950), this.compare_data.percentiles.slice(50, 950), this.data.count, this.compare_data.count);
+//      this.ks_low_result = ks_test(this.data.percentiles.slice(25, 250), this.compare_data.percentiles.slice(25, 250), this.data.count, this.compare_data.count);
+//      this.ks_high_result = ks_test(this.data.percentiles.slice(749, 975), this.compare_data.percentiles.slice(749, 975), this.data.count, this.compare_data.count);
 
     }
 
@@ -190,6 +199,7 @@ var DistView = {
   },
 
   render: function() {
+    console.log("RENDERING", this);
     var self = this;
     var xmin = self.data.percentiles[0][1]; // p5
     var xzero = self.data.percentiles[0][1];

@@ -34,6 +34,9 @@ from ..util import time_to_seconds, time_delta_to_seconds
 
 import re
 
+def enquote(s):
+    return '"%s"' % s
+
 # group 1 is the agg (avg, sum, etc)
 # group 2 is the col name
 col_re = re.compile("(.*)\((.*)\)")
@@ -223,7 +226,7 @@ class SybilQuery(object):
                 filter_strs.append(FILTER_SEPARATOR.join(map(str, [col, f[0], f[1]])))
 
         if filter_strs:
-            cmd_args.extend(["-int-filter", FIELD_SEPARATOR.join(filter_strs)])
+            cmd_args.extend(["-int-filter", enquote(FIELD_SEPARATOR.join(filter_strs))])
 
         filter_strs = []
         for col in str_filters:
@@ -231,7 +234,7 @@ class SybilQuery(object):
                 filter_strs.append(FILTER_SEPARATOR.join(map(str, (col, f[0], f[1]))))
 
         if filter_strs:
-            cmd_args.extend(["-str-filter", FIELD_SEPARATOR.join(map(str, filter_strs))])
+            cmd_args.extend(["-str-filter", enquote(FIELD_SEPARATOR.join(map(str, filter_strs)))])
 
     def add_limit(self, query_spec, cmd_args):
         # TODO: limit should depend on the view. time series limit defaults to
