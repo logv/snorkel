@@ -37,6 +37,13 @@ import re
 def enquote(s):
     return '"%s"' % s
 
+def get_time_col(md):
+    for c in ["time", "integer_time", "timestamp"]:
+        if c in md["col_types"]:
+            return c
+
+    return "time"
+
 # group 1 is the agg (avg, sum, etc)
 # group 2 is the col name
 col_re = re.compile("(.*)\((.*)\)")
@@ -182,10 +189,11 @@ class SybilQuery(object):
         query_spec.set('time_bucket', time_bucket)
 
 
-        time_col = "time"
 
         md = self.metadata
         fields, types = get_column_types(md)
+
+        time_col = get_time_col(md)
 
         # TODO: use proper field separators (\r and \t)
         # put all filters into a list and collapse later
@@ -277,7 +285,8 @@ class SybilQuery(object):
 
     def run_time_query(self, table, query_spec):
 
-        time_col = "time"
+        md = self.metadata
+        time_col = get_time_col(md)
         cmd_args = [ "-table", table, "-time-col", time_col, "-time"]
 
         self.add_group_by(query_spec, cmd_args)

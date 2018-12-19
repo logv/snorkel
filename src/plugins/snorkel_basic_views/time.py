@@ -43,10 +43,10 @@ class TimeView(ViewBase, pudgy.JSComponent):
         controls.append(ControlRow("time_bucket", "Time Slice", time_slice))
 
         normalize = Selector(
-            name="time_normalize",
+            name="time_divisor",
             options=[ "", "hour", "minute" ],
-            selected=self.context.query.get("time_normalize"))
-        controls.append(ControlRow("time_normalize", "Normalize", normalize))
+            selected=self.context.query.get("time_divisor"))
+        controls.append(ControlRow("time_divisor", "Normalize", normalize))
 
 
 
