@@ -1,7 +1,7 @@
 import sys
 
 from .. import components
-from .view import ViewBase
+from .view import ViewBase, ViewSeparator
 from .view import get_view_by_name, get_column_types
 
 ## SETUP PLUGINS HERE

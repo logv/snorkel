@@ -1,5 +1,8 @@
 
 module.exports = {
+  get_field_name: function(dataset, col) {
+    return col;
+  },
   get_field_number_formatter: function(dataset, col) {
     col = extract_field(col);
     var self = this;
@@ -43,6 +46,7 @@ module.exports = {
         return val;
       };
 
+    }
     return this.formatters[dataset][col];
   },
 }

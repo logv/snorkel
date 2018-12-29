@@ -278,6 +278,10 @@ class ViewBase(pudgy.BackboneComponent):
     def get_stats(self):
         pass
 
+class ViewSeparator(ViewBase):
+    DISPLAY_NAME = "--"
+    NAME = "Separator"
+
 def get_view_by_name(name):
     for cls in pudgy.util.inheritors(ViewBase):
         if cls.NAME.lower() == name.lower():

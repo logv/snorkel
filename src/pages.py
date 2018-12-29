@@ -174,6 +174,8 @@ def run_query(cls, table=None, query=None, viewarea=None, filters=[]):
     cmp = None
     against = query.get('against', '')
     filters = query.get('filters')
+#    op = query.get('metric', '')
+#    print "OP IS", op
 
     compare_filters = filters['compare']
     if against or len(compare_filters):
