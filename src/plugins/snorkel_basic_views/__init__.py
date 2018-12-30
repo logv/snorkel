@@ -5,3 +5,4 @@ from .samples import SamplesView
 from .area import AreaView
 from .scatter import ScatterView
 from .bar import BarView
+from .grouped_dist import GroupedDist

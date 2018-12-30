@@ -718,7 +718,8 @@ var DistView = {
       })
     });
 
-  }
+  },
+  calc_cdf: calc_cdf
 
 }
 module.exports = DistView;
