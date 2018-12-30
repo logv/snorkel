@@ -118,6 +118,12 @@ class SybilQuery(object):
             raise Exception("unrecognized view", view)
 
 
+    def add_op(self, query_spec, cmd_args):
+        op = query_spec.get('metric')
+        if op == "Distinct":
+            cmd_args.extend(["-op", "distinct"])
+        else:
+            cmd_args.extend(["-op", "hist"])
 
     def add_group_by(self, query_spec, cmd_args):
         groupby = query_spec.getlist("groupby[]")
@@ -135,7 +141,7 @@ class SybilQuery(object):
         custom_fields = query_spec.getlist("custom_fields[]")
         if custom_fields:
             all_fields.extend([extract_field(c) for c in custom_fields])
-            cmd_args.extend(["-op", "hist", "-loghist"])
+            cmd_args.extend(["-loghist"])
 
         field = query_spec.get("field")
         if field:
@@ -258,12 +264,12 @@ class SybilQuery(object):
     def run_table_query(self, table, query_spec):
         cmd_args = [ "-table", table ]
 
+        self.add_op(query_spec, cmd_args)
         self.add_group_by(query_spec, cmd_args)
         self.add_fields(query_spec, cmd_args)
         self.add_filters(query_spec, cmd_args)
         self.add_metrics(query_spec, cmd_args)
         self.add_limit(query_spec, cmd_args)
-        cmd_args.extend(["-op", "hist"])
 
         # TODO: pull metric off query and determine whether to build hist or not
 
@@ -271,8 +277,9 @@ class SybilQuery(object):
 
 
     def run_dist_query(self, table, query_spec):
-        cmd_args = [ "-table", table, "-op", "hist" ]
+        cmd_args = [ "-table", table ]
 
+        self.add_op(query_spec, cmd_args)
         self.add_group_by(query_spec, cmd_args)
         self.add_fields(query_spec, cmd_args)
         self.add_filters(query_spec, cmd_args)
@@ -289,6 +296,7 @@ class SybilQuery(object):
         time_col = get_time_col(md)
         cmd_args = [ "-table", table, "-time-col", time_col, "-time"]
 
+        self.add_op(query_spec, cmd_args)
         self.add_group_by(query_spec, cmd_args)
         self.add_fields(query_spec, cmd_args)
         self.add_filters(query_spec, cmd_args)
