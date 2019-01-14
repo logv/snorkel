@@ -116,6 +116,11 @@ class QueryPage(Page, pudgy.SassComponent, pudgy.BackboneComponent, pudgy.Server
         viewarea = ViewArea()
         if self.context.saved:
             sq = self.context.saved
+
+            if not sq.results:
+                viewarea.call("no_results", {
+                    "errmsg" : "No results found for this query"
+                });
             view.context.update(sq.parsed, results=sq.results, compare=sq.compare)
             view.marshal(query=sq.parsed, results=sq.results, compare=sq.compare,
                 parsed=sq.parsed, created=epoch(sq.created))
@@ -131,6 +136,8 @@ class QueryPage(Page, pudgy.SassComponent, pudgy.BackboneComponent, pudgy.Server
 
         if compare_filters:
             qs.call('show_compare_filters')
+
+        qs.call("supports_compare_filters", view.SUPPORT_COMPARE_QUERIES)
 
         qs.set_ref("sidebar")
         qs.marshal(table=table, viewarea=viewarea, metadata=table_info)
@@ -212,8 +219,13 @@ def run_query(cls, table=None, query=None, viewarea=None, filters=[]):
     v.marshal(query=sq.parsed, results=sq.results, compare=sq.compare, metadata=ti, parsed=epoch(sq.created))
 
     if viewarea:
+        if not res:
+            viewarea.call("no_results", {
+                "errmsg" : "No results found for this query"
+            });
         viewarea.html(v.render())
         # viewarea.call("set_view", v)
+
 
     return {
         "queryUrl": flask.url_for('get_view', **d),
@@ -247,6 +259,7 @@ def update_controls(cls, table=None, view=None, query=None, viewarea=None, filte
         cls.call("show_compare_filters")
     else:
         cls.call("hide_compare_filters")
+    cls.call("supports_compare_filters", v.SUPPORT_COMPARE_QUERIES)
 
     # we undelegate our events because we are about to replace ourself
     # with the same component

@@ -49,4 +49,5 @@ class QuerySidebar(UIComponent, pudgy.BackboneComponent, pudgy.JinjaComponent, p
         self.context.stats = StatsBox(**self.context.metadata)
 
         fields, types = get_column_types(self.context.metadata)
-        self.marshal(fields=fields, types=types)
+        self.marshal(fields=fields, types=types,
+            supports_compare=self.context.view.SUPPORT_COMPARE_QUERIES)

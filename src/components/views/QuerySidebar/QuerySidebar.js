@@ -274,7 +274,17 @@ module.exports = {
     }
   },
 
+  supports_compare_filters: function(f) {
+    var compareFilter = this.$page.find(".compare_filter");
+    if (f) {
+      compareFilter.show();
+    } else {
+      compareFilter.hide();
+    }
+  },
+
   show_compare_filters: function(add_if_empty) {
+    console.log("SHOWING COMPARE FILTERS");
     var filterBox = this.$page.find(".filter_group[data-filter-type=compare]");
     var compareFilter = this.$page.find(".compare_filter");
     filterBox.show();
@@ -294,6 +304,7 @@ module.exports = {
   },
 
   hide_compare_filters: function() {
+    console.log("HIDING COMPARE FILTERS");
     var filterBox = this.$page.find(".filter_group[data-filter-type=compare]");
     var compareFilter = this.$page.find(".compare_filter");
     filterBox.hide();
