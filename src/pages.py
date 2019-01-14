@@ -146,7 +146,7 @@ class QueryPage(Page, pudgy.SassComponent, pudgy.BackboneComponent, pudgy.Server
 
 
         user_button = UserButton()
-        user_modal = UserModal()
+        user_modal = UserModal(show_queries=True)
 
         self.marshal(sidebar=qs, table=table, user_modal=user_modal)
 

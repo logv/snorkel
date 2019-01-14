@@ -1,5 +1,6 @@
 bcrypt
 flask
+flas-admin
 flask_peewee
 flask-security
 peewee

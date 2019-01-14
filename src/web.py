@@ -3,8 +3,9 @@ import flask
 import os
 
 from .pages import QueryPage, DatasetsPage, HomePage
-from . import auth, components, results
+from . import auth, components, results, admin
 from flask_security import login_required, core
+
 
 app = flask.Flask(__name__)
 pudgy.register_blueprint(app)
@@ -42,6 +43,7 @@ def get_view():
 
     return QueryPage(template="query.html", table=table, view=view, saved=sq).pipeline()
 
+admin.install(app)
 auth.install(app)
 components.install(app)
 

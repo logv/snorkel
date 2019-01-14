@@ -26,6 +26,9 @@ def install(app):
             Model.drop_table(fail_silently=True)
             Model.create_table(fail_silently=True)
         user_datastore.create_user(email='okay', password='test')
+        user_datastore.create_role(name='superuser')
+        user_datastore.create_user(username='admin', email='admin',
+                                   password='nottheadmin', roles=['superuser'])
 
     # Views
     @app.route('/')

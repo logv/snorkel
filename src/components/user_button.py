@@ -6,7 +6,7 @@ class UserButton(UIComponent, pudgy.MustacheComponent):
     def __prepare__(self):
         self.context.user = flask_security.core.current_user
 
-class UserModal(UIComponent, pudgy.MustacheComponent,
+class UserModal(UIComponent, pudgy.JinjaComponent,
         pudgy.ServerBridge, pudgy.SassComponent):
     def __prepare__(self):
         self.context.user = flask_security.core.current_user

@@ -24,7 +24,7 @@ the reasons for moving to python are severalfold:
 ### goals
 
 * write an easy to deploy UI for browsing data kept in sybil
-* make it easy to extend and write new views: the client should feel empowered
+* make it easy to extend and write new views
 * make an app that is easy to white label (and self host inside organizations)
 * re-use as much work from original snorkel while keeping the implementation clean (ish)
 * minimize external dependencies: use sqlite for data store, flask for web, etc
@@ -45,22 +45,25 @@ the reasons for moving to python are severalfold:
 
 ### re-implemented in snorkel.pudgy
 
+* custom aggregations (p63(foo), for example)
+* comparison queries (run and compare two queries side by side)
 * query sidebar and view controls
 * query builder (query spec -> sybil invocation)
 * dataset landing page
+* bring over more views (scatter, multihist, bars)
 * user auth (with flask_security)
 * customize which views a dataset uses
+* no samples view
 
 
 ### planned
 
 * robust error handling
-* comparison queries (run and compare two queries side by side)
 * dataset presenters
 * dataset settings page
-* custom aggregations (p63(foo), for example)
-* bring over more views (scatter, multihist, forecasting, bars, mapview, drilldown, etc)
 * user roles and per table permissions
+* advanced views: forecasting, drilldown, weco
+* graph views: cyto and datamaps
 
 ### unknown
 
