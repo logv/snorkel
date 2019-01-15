@@ -5,6 +5,8 @@
 {{ add_stylesheet("main.css") }}
 {{ add_stylesheet("box.css") }}
 
+
+
 <div class='pageheader'>
   <div class='clearfix'>
     <h3 class='lfloat'><a href='{{ url_for('get_index') }}'>snorkelite</a></h3>
@@ -22,6 +24,17 @@
 
 <div class='body_spacer'>
 </div>
+
+{% with messages = get_flashed_messages() %}
+  {% if messages %}
+    <ul class=flashes>
+    {% for message in messages %}
+      <li>{{ message }}</li>
+    {% endfor %}
+    </ul>
+  {% endif %}
+{% endwith %}
+
 
 {% block body %}
 
