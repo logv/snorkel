@@ -339,6 +339,15 @@ module.exports = {
           var details = "<pre class='sample_details'>" + JSON.stringify(e.point.result, null, 2) + "</pre>";
           $C("modal", {title: "Sample details", body: details}, function(modal) {
             modal.show();
+
+            _.defer(function() {
+              $("body").one("click", function(e) {
+                if ($(e.target).parents(".modal").length == 0) {
+                  modal.hide();
+                }
+              });
+            });
+
           });
         });
 
