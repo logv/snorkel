@@ -9,7 +9,7 @@ import pudgy
 import sys
 
 MSYBIL_BIN="snorkel.msybil"
-SYBIL_BIN="sybil"
+SYBIL_BIN="bin/sybil"
 
 # TODO: dont hardcode this
 MSYBIL_INPUT = """
@@ -35,7 +35,7 @@ from ..util import time_to_seconds, time_delta_to_seconds
 import re
 
 def enquote(s):
-    return '"%s"' % s
+    return '%s' % s
 
 def get_time_col(md):
     for c in ["time", "integer_time", "timestamp"]:
@@ -316,18 +316,28 @@ class SybilQuery(object):
         return run_query_command(cmd_args)
 
 
+@pudgy.util.memoize
+def list_tables():
+    return run_query_command(["-tables"])
+
+@pudgy.util.memoize
+def get_table_info(table, ts=None):
+    from ..views import get_column_types
+    meta = run_query_command(["-table",  table, "-info"])
+    fields, types = get_column_types(meta)
+    meta["col_types"] = types
+    return meta
+
 class SybilBackend(Backend):
-    @pudgy.util.memoize
+    def clear_cache(self):
+        get_table_info.cache.clear()
+        list_tables.cache.clear()
+
     def list_tables(self):
         return run_query_command(["-tables"])
 
-    @pudgy.util.memoize
     def get_table_info(self, table):
-        from ..views import get_column_types
-        meta = run_query_command(["-table",  table, "-info"])
-        fields, types = get_column_types(meta)
-        meta["col_types"] = types
-        return meta
+        return get_table_info(table)
 
     def run_query(self, table, query_spec, metadata):
         q = SybilQuery()

@@ -1,5 +1,6 @@
 import pudgy
 import flask
+import time
 
 from .views import get_view_by_name
 from .components import QuerySidebar, UserButton, UserModal
@@ -95,6 +96,7 @@ class QueryPage(Page, pudgy.SassComponent, pudgy.BackboneComponent, pudgy.Server
         pr = presenter.GetPresenter(table)
 
         bs = backend.SybilBackend()
+        bs.clear_cache()
 
         try:
             table_info = bs.get_table_info(table)
