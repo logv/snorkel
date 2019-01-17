@@ -12,6 +12,7 @@ def install(app):
     # TODO: these get configured via config file
     app.config['SECRET_KEY'] = 'vsaitheencretkeoisabtalle'
     app.config['SECURITY_PASSWORD_SALT'] = b"3xdoiwqkvcsusy9i145ujhypoi1nj2ez8vyu"
+    app.config['SECURITY_CHANGEABLE'] = True
 
 
     db = userdb
