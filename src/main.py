@@ -6,6 +6,7 @@
 # from snorkel.presenter import DatasetPresenter, RegisterPresenter
 
 
+import os
 from . import web
 from .presenter import DatasetPresenter, RegisterPresenter
 
@@ -34,20 +35,7 @@ def configure_presenters():
     ])
     RegisterPresenter(".*", default_presenter)
 
-#    nginx_presenter = DatasetPresenter()
-#    nginx_presenter.set_views([
-#        TableView,
-#        TimeView,
-#        DistView,
-#        SamplesView,
-#        TimelineView,
-#        OverviewView,
-#        ViewSeparator,
-#        AreaView,
-#        ScatterView,
-#    ])
-#    RegisterPresenter(".*", nginx_presenter)
 
 if __name__ == "__main__":
     configure_presenters()
-    web.app.run(port=2333, use_reloader=False)
+    web.app.run(port=os.environ.get("PORT", 2333), use_reloader=False)

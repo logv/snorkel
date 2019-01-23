@@ -2,6 +2,7 @@ from peewee import *
 from playhouse.sqlite_ext import *
 
 from flask_security import RoleMixin, UserMixin
+
 import os
 
 from playhouse.sqliteq import SqliteQueueDatabase
@@ -51,6 +52,7 @@ class User(UserModel, UserMixin):
     password = TextField()
     active = BooleanField(default=True)
     confirmed_at = DateTimeField(null=True)
+    oauth_token = JSONField(null=True)
 
 class UserRoles(UserModel):
     # Because peewee does not come with built-in many-to-many
@@ -60,6 +62,8 @@ class UserRoles(UserModel):
     role = ForeignKeyField(Role, related_name='users')
     name = property(lambda self: self.role.name)
     description = property(lambda self: self.role.description)
+
+
 
 
 def create_db_if_not():

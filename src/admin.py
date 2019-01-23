@@ -4,7 +4,7 @@ from flask_admin import Admin, AdminIndexView
 from flask_admin.contrib.peewee import ModelView
 
 from flask_security.core import current_user
-from flask_security import login_required
+from .auth import needs_login
 from flask_admin import expose
 
 from . import models
@@ -35,7 +35,7 @@ class AdminModelView(ModelView):
 
 class MyAdminIndexView(AdminIndexView):
     @expose('/')
-    @login_required
+    @needs_login
     def index(self):
         if current_user.has_role('superuser'):
             return super(MyAdminIndexView,self).index()

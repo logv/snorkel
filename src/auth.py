@@ -1,17 +1,26 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, redirect, url_for
 from werkzeug import Response
 from flask_peewee.db import Database
 from peewee import *
 from flask_security import Security, PeeweeUserDatastore
-from flask_security import login_required
+from flask_security import login_required, login_user, logout_user
+
+from flask_security.core import current_user
+from flask_dance.contrib.google import make_google_blueprint, google
+
 
 from .models import User, Role, UserRoles, userdb
+from . import oauth, config
+
+import random, sys
 
 import flask
 def install(app):
+    oauth.install(app)
+
     # TODO: these get configured via config file
-    app.config['SECRET_KEY'] = 'vsaitheencretkeoisabtalle'
-    app.config['SECURITY_PASSWORD_SALT'] = b"3xdoiwqkvcsusy9i145ujhypoi1nj2ez8vyu"
+    app.config['SECRET_KEY'] = config.SECRET_KEY
+    app.config['SECURITY_PASSWORD_SALT'] = config.SECURITY_PASSWORD_SALT
     app.config['SECURITY_CHANGEABLE'] = True
 
 
@@ -34,14 +43,43 @@ def install(app):
 
     # Views
     @app.route('/')
-    @login_required
+    @needs_login
     def home():
         return render_template('index.html')
+
+
+def needs_login(func):
+    def wrapped_func(*args, **kwargs):
+
+        auth = False
+        if current_user.is_authenticated:
+            auth = True
+        else:
+            if google.authorized:
+                err = False
+                try:
+                    resp_json = google.get("/oauth2/v2/userinfo").json()
+                    print "RESP JSON", resp_json
+                    if "error" in resp_json:
+                        err = True
+                except Exception, e:
+                    err = True
+
+                if err:
+                    oauth.logout_oauth()
+
+        if not auth:
+            return redirect(url_for("security.login"))
+
+        return func(*args, **kwargs)
+
+    wrapped_func.__name__ = func.__name__
+    return wrapped_func
 
 # if our login_required returns a Response with code 300, we know to reload the
 # page
 def rpc_login_required(func):
-    f = login_required(func)
+    f = needs_login(func)
     def wrapped_func(*args, **kwargs):
 
         r = f(*args, **kwargs)

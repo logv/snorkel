@@ -18,10 +18,13 @@ def get_for_user(user, table, limit=30):
         .select(
             SavedQuery.created,
             SavedQuery.parsed,
-            SavedQuery.hashid
+            SavedQuery.hashid,
+            SavedQuery.user
         ).limit(limit) \
         .order_by(-SavedQuery.created) \
-        .where(SavedQuery.user == user.id and SavedQuery.table == table).dicts()
+        .where(SavedQuery.user == user.id, SavedQuery.table == table)
+
+    res = res.dicts()
 
     return list(reversed(res))
 

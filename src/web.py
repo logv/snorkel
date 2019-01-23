@@ -3,8 +3,9 @@ import flask
 import os
 
 from .pages import QueryPage, DatasetsPage, HomePage
-from . import auth, components, results, admin
-from flask_security import login_required, core
+from . import auth, components, results, admin, config
+from flask_security import core
+from .auth import needs_login
 
 
 app = flask.Flask(__name__)
@@ -21,12 +22,12 @@ def get_index():
 
 
 @app.route('/datasets')
-@login_required
+@needs_login
 def get_datasets():
     return DatasetsPage(template="datasets.html").render()
 
 @app.route('/query')
-@login_required
+@needs_login
 def get_view():
     query = flask.request.args
 
