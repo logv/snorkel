@@ -96,7 +96,7 @@ class QueryPage(Page, pudgy.SassComponent, pudgy.BackboneComponent, pudgy.Server
         pr = presenter.GetPresenter(table)
 
         bs = backend.SybilBackend()
-        bs.clear_cache()
+        bs.clear_cache(table=table)
 
         try:
             table_info = bs.get_table_info(table)

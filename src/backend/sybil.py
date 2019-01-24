@@ -8,7 +8,7 @@ import pudgy
 
 import sys
 
-MSYBIL_BIN="snorkel.msybil"
+MSYBIL_BIN = os.path.join(os.path.dirname(__file__), "msybil.py")
 SYBIL_BIN="bin/sybil"
 
 # TODO: dont hardcode this
@@ -329,9 +329,13 @@ def get_table_info(table, ts=None):
     return meta
 
 class SybilBackend(Backend):
-    def clear_cache(self):
-        get_table_info.cache.clear()
+    def clear_cache(self, table=None):
         list_tables.cache.clear()
+        if table:
+            if table in get_table_info.cache:
+                del get_table_info.cache[table]
+        else:
+            get_table_info.cache.clear()
 
     def list_tables(self):
         return run_query_command(["-tables"])

@@ -12,7 +12,7 @@ from flask_dance.contrib.google import make_google_blueprint, google
 from .models import User, Role, UserRoles, userdb
 from . import oauth, config
 
-import random, sys
+import random, sys, os
 
 import flask
 def install(app):
@@ -33,13 +33,11 @@ def install(app):
     # Create a user to test with
     @app.before_first_request
     def create_user():
-        for Model in (Role, User, UserRoles):
-            Model.drop_table(fail_silently=True)
-            Model.create_table(fail_silently=True)
-        user_datastore.create_user(email='okay', password='test')
-        user_datastore.create_role(name='superuser')
-        user_datastore.create_user(username='admin', email='admin',
-                                   password='nottheadmin', roles=['superuser'])
+        if "RESET" in os.environ:
+            for Model in (Role, User, UserRoles):
+                Model.drop_table(fail_silently=True)
+                Model.create_table(fail_silently=True)
+            user_datastore.create_role(name='superuser')
 
     # Views
     @app.route('/')
