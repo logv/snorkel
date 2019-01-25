@@ -52,7 +52,6 @@ class User(UserModel, UserMixin):
     password = TextField()
     active = BooleanField(default=True)
     confirmed_at = DateTimeField(null=True)
-    oauth_token = JSONField(null=True)
 
 class UserRoles(UserModel):
     # Because peewee does not come with built-in many-to-many

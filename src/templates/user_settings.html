@@ -1,0 +1,23 @@
+{% extends "layout.html" %}
+
+{% block body %}
+<div class='container'>
+
+  <div class='mtl' style='width: 600px; margin: auto; margin-top: 50px;'>
+    Welcome! This page is used to configure your user settings. For now,
+    all you can do is access your auth token or <a href='/change'>change your password.</a>
+
+    <br />
+
+    <h3>&nbsp;</h3>
+    Your user's auth token is <pre>{{ auth_token }}</pre>
+
+    You can supply this as a URL parameter by adding ?auth_token= to a URL.
+    This auth token will allow you to programmatically issue queries or ingest
+    data without using a browser.
+
+    <br />
+    NOTE: if your password changes, your auth token will be changed. You must update
+    all apps to use the new auth token after changing your password
+  </div>
+{% endblock %}

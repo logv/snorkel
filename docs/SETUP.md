@@ -46,5 +46,7 @@ the symbolic link step.
 
 ### From slite
 
-Currently, slite is not setup to accept data over any endpoints - all data must
-be ingested through the sybil CLI.
+To ingest data, first create a user. Then go to /user and get that user's auth
+token. Now, to submit data to sybil, post it to
+/data/ingest?auth_token=<token>.  Make sure that you have slite behind HTTPS
+because the auth token can be sniffed otherwise.

@@ -18,7 +18,6 @@ import flask
 def install(app):
     oauth.install(app)
 
-    # TODO: these get configured via config file
     app.config['SECRET_KEY'] = config.SECRET_KEY
     app.config['SECURITY_PASSWORD_SALT'] = config.SECURITY_PASSWORD_SALT
     app.config['SECURITY_CHANGEABLE'] = True

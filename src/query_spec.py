@@ -12,8 +12,7 @@ except:
 
 class QuerySpec(object):
     def __init__(self, query):
-        # TODO: we list all attributes of a query spec up front so others know
-        # what to expect
+        # TODO: list all attributes of a query spec up front so others know what to expect
 
         md = werkzeug.MultiDict()
         for q in query:

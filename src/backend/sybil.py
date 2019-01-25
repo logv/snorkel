@@ -8,13 +8,11 @@ import pudgy
 
 import sys
 
+USING_MSYBIL = False
 MSYBIL_BIN = os.path.join(os.path.dirname(__file__), "msybil.py")
 SYBIL_BIN="bin/sybil"
 
-# TODO: dont hardcode this
-MSYBIL_INPUT = """
-"""
-
+MSYBIL_INPUT = ""
 SYBIL_INPUT = ""
 
 if "MSYBIL" in os.environ:
@@ -24,6 +22,7 @@ if "MSYBIL" in os.environ:
 
     SYBIL_BIN = MSYBIL_BIN
     SYBIL_INPUT = MSYBIL_INPUT
+    USING_MSYBIL = True
 
 
 
@@ -56,21 +55,21 @@ def extract_field(col):
 
 def run_query_command(cmd_args):
     init_cmd_args = [SYBIL_BIN, "query", "-json"]
-    init_cmd_args.extend(["-read-log"])
-    init_cmd_args.extend(["-cache-queries"])
+    init_cmd_args.extend(["--read-log"])
+    init_cmd_args.extend(["--cache-queries"])
     init_cmd_args.extend(["--field-separator=%s" % FIELD_SEPARATOR])
     init_cmd_args.extend(["--filter-separator=%s" % FILTER_SEPARATOR])
     init_cmd_args.extend(cmd_args)
 
     init_cmd_args = [a.encode('ascii', errors='replace') for a in init_cmd_args]
 
-    ret = run_command(init_cmd_args)
+    ret = run_command(init_cmd_args, stdin=SYBIL_INPUT)
     return json.loads(ret)
 
-def run_command(cmd_args):
+def run_command(cmd_args, stdin=""):
     print "RUNNING COMMAND", " ".join(cmd_args)
     p = Popen(cmd_args, stdin=PIPE, stdout=PIPE, stderr=PIPE)
-    stdout, stderr = p.communicate(SYBIL_INPUT)
+    stdout, stderr = p.communicate(stdin)
     print stderr
 
     return stdout
@@ -201,8 +200,6 @@ class SybilQuery(object):
 
         time_col = get_time_col(md)
 
-        # TODO: use proper field separators (\r and \t)
-        # put all filters into a list and collapse later
         filters = query_spec.get('filters')['query']
 
         int_filters = defaultdict(list)
@@ -233,7 +230,6 @@ class SybilQuery(object):
         int_filters[time_col].append(("gt", start_s))
         int_filters[time_col].append(("lt", end_s))
 
-        # TODO: add filters from query here
         filter_strs = []
         for col in int_filters:
             for f in int_filters[col]:
@@ -251,8 +247,7 @@ class SybilQuery(object):
             cmd_args.extend(["-str-filter", enquote(FIELD_SEPARATOR.join(map(str, filter_strs)))])
 
     def add_limit(self, query_spec, cmd_args):
-        # TODO: limit should depend on the view. time series limit defaults to
-        # 10 or 20
+        # TODO: limit should depend on the view. time series limit defaults to 10 or 20
         limit = query_spec.get("limit", 100)
         cmd_args.extend(["-limit", limit])
 
@@ -271,8 +266,6 @@ class SybilQuery(object):
         self.add_metrics(query_spec, cmd_args)
         self.add_limit(query_spec, cmd_args)
 
-        # TODO: pull metric off query and determine whether to build hist or not
-
         return run_query_command(cmd_args)
 
 
@@ -285,8 +278,6 @@ class SybilQuery(object):
         self.add_filters(query_spec, cmd_args)
 #        self.add_hist_buckets(query_spec, cmd_args)
         self.add_metrics(query_spec, cmd_args)
-
-        # TODO: pull metric off query and determine whether to build hist or not
 
         return run_query_command(cmd_args)
 
@@ -347,6 +338,15 @@ class SybilBackend(Backend):
         q = SybilQuery()
         return q.run_query(table, query_spec, metadata)
 
+    # TODO: for msybil, randomly pick a server and send samples to it
+    # TODO: this should also log to our slite/ingest table
+    def ingest(self, table, samples):
+        if USING_MSYBIL:
+            raise Exception("Ingesting through msybil is not supported yet")
+
+        print "INGESTING %s SAMPLES INTO %s" % (len(samples), table)
+        cmd_args = [SYBIL_BIN, "ingest", "-table", table]
+        run_command(cmd_args, stdin=json.dumps(samples))
 
 
 if __name__ == "__main__":

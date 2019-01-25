@@ -16,7 +16,6 @@ def setup_google_blueprint(app):
     if not USE_GOOGLE_AUTH:
         return
 
-    # TODO: put these in a config file
     google_bp = make_google_blueprint(
         client_id=config.GOOGLE_CLIENT_ID,
         client_secret=config.GOOGLE_SECRET,
@@ -41,7 +40,6 @@ def setup_google_blueprint(app):
 
         pw = "%x" % int(random.random() * sys.maxint)
         user, found = User.get_or_create(email=email,defaults={"password" : pw})
-        user.oauth_token = google.token
         user.save()
 
         login_user(user)
