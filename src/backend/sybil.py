@@ -11,13 +11,18 @@ import time
 import sys
 
 USING_MSYBIL = False
+
+# TODO: enable REMOTE_INGEST via config variable
+ENABLE_REMOTE_INGEST=False
 MSYBIL_BIN = os.path.join(os.path.dirname(__file__), "msybil.py")
+MSYBIL_INGEST_BIN = os.path.join(os.path.dirname(__file__), "msybil_ingest.py")
 SYBIL_BIN="bin/sybil"
 
 MSYBIL_INPUT = ""
 SYBIL_INPUT = ""
 
 if "MSYBIL" in os.environ:
+    # TODO: make msybil.py read off MSYBIL environment variable instead of stdin
     print >> sys.stderr,  " s Using Multisybil"
     with open(os.environ["MSYBIL"]) as f:
         MSYBIL_INPUT = f.read()
@@ -343,23 +348,25 @@ class SybilBackend(Backend):
     # TODO: for msybil, randomly pick a server and send samples to it
     def ingest(self, table, samples, log_ingest=True):
         if USING_MSYBIL:
-            raise Exception("Ingesting through msybil is not supported yet")
+            if ENABLE_REMOTE_INGEST:
+                # TODO: save the samples locally. if the ingestion succeeds
+                # remove the file. else we need to re-enqueue for ingestion
+                cmd_args = [MSYBIL_INGEST_BIN, table]
+            else:
+                raise Exception("REMOTE INGESTION NOT ENABLED FOR MSYBIL")
+        else:
+            cmd_args = [SYBIL_BIN, "ingest", "-table", table]
 
         print "INGESTING %s SAMPLES INTO %s" % (len(samples), table)
-        cmd_args = [SYBIL_BIN, "ingest", "-table", table]
         run_command(cmd_args, stdin=json.dumps(samples))
 
         if log_ingest:
-            self.ingest("slite@ingest", {
+            self.ingest("slite@ingest", [{
                 "table": table,
                 "count" : len(samples),
                 "time" : int(time.time()),
                 "user" : current_user.email
-            }, log_ingest=False)
-
-
-
-
+            }], log_ingest=False)
 
 if __name__ == "__main__":
     print time_to_seconds('-1 week')

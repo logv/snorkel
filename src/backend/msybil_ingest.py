@@ -96,17 +96,7 @@ def ingest_on_host(host, working_dir, bin, table, samples):
     print("DEBUG", err)
 
     debug("%s finished" % host)
-    debug("Ingest %s samples")
-
-def print_remote_results():
-    for line in HOSTINFO:
-        host = line[0]
-
-        log_file = os.path.join(OUTPUT_DIR, "%s.log" % host)
-        result_file = os.path.join(RESULT_DIR, "%s.results" % host)
-
-        debug_file(log_file, "*** %s output" % host)
-        debug_file(result_file, "*** %s output" % host)
+    debug("Ingested %s samples" % len(samples.split('\n')))
 
 def read_host_info():
     global HOSTINFO
@@ -131,7 +121,6 @@ def read_host_info():
 
 def read_samples():
     return sys.stdin.read()
-
 
 def _main():
     global CMD
