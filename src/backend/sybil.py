@@ -1,10 +1,12 @@
 import os
 from subprocess import Popen, PIPE, check_output
+from flask_security import current_user
 
 import subprocess
 import shlex
 import json
 import pudgy
+import time
 
 import sys
 
@@ -339,14 +341,24 @@ class SybilBackend(Backend):
         return q.run_query(table, query_spec, metadata)
 
     # TODO: for msybil, randomly pick a server and send samples to it
-    # TODO: this should also log to our slite/ingest table
-    def ingest(self, table, samples):
+    def ingest(self, table, samples, log_ingest=True):
         if USING_MSYBIL:
             raise Exception("Ingesting through msybil is not supported yet")
 
         print "INGESTING %s SAMPLES INTO %s" % (len(samples), table)
         cmd_args = [SYBIL_BIN, "ingest", "-table", table]
         run_command(cmd_args, stdin=json.dumps(samples))
+
+        if log_ingest:
+            self.ingest("slite@ingest", {
+                "table": table,
+                "count" : len(samples),
+                "time" : int(time.time()),
+                "user" : current_user.email
+            }, log_ingest=False)
+
+
+
 
 
 if __name__ == "__main__":
