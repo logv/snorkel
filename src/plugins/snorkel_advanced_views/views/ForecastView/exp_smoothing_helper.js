@@ -495,7 +495,7 @@ module.exports = {
     var seconds_in_week = seconds_in_day * 7;
     var time_bucket = query.parsed.time_bucket;
 
-    var custom_params = query.parsed.custom || {};
+    var custom_params = query.parsed || {};
     var model_type = custom_params.model_type;
     if (custom_params) {
       console.log("CUSTOM PARAMS ARE", custom_params);
