@@ -5,7 +5,6 @@ from snorkel.components import Selector, ControlRow
 from snorkel.views import ViewBase
 
 import sys
-print sys.path
 
 from src.plugins.snorkel_basic_views import TimeView
 
