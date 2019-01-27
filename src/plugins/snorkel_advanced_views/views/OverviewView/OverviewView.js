@@ -1,7 +1,7 @@
 "use strict";
 
-var helpers = require("common/sf_helpers.js");
-var sf_shim = require("common/sf_shim.js");
+var helpers = require("snorkel$common/sf_helpers.js");
+var sf_shim = require("snorkel$common/sf_shim.js");
 
 var OverView = {
   initialize: function(ctx) {

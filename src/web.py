@@ -3,13 +3,15 @@ import flask
 import os
 import json
 
-from .pages import QueryPage, DatasetsPage, HomePage, UserPage
-from . import auth, components, results, admin, config
-from flask_security import core, current_user
 from flask import redirect, url_for
-from .auth import needs_login
+from flask_security import core, current_user
 
+from . import auth, components, results, admin, config
+from .pages import QueryPage, DatasetsPage, HomePage, UserPage
+from .auth import needs_login
 from .backend.sybil import SybilBackend
+
+
 
 
 app = flask.Flask(__name__)

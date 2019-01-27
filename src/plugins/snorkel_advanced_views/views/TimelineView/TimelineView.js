@@ -1,8 +1,8 @@
 
 "use strict";
 
-var helpers = require("common/sf_helpers.js");
-var sf_shim = require("common/sf_shim.js");
+var helpers = require("snorkel$common/sf_helpers.js");
+var sf_shim = require("snorkel$common/sf_shim.js");
 
 var colors = ['#7cb5ec', '#434348', '#90ed7d', '#f7a35c', '#8085e9', '#f15c80', '#e4d354', '#8085e8', '#8d4653', '#91e8e1'];
 

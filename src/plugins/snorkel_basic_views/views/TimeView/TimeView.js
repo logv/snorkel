@@ -2,7 +2,6 @@ var time_helper = require("common/time_helper.js");
 var helpers = require("common/sf_helpers.js");
 var sf_shim = require("common/sf_shim.js");
 var sf_marshal = require("common/marshal.js");
-var backbone = require("backbone");
 
 
 var presenter = {};

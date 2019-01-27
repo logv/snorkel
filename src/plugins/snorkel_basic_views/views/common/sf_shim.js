@@ -3,6 +3,27 @@ var helpers = require("common/sf_helpers.js");
 var filters = require("common/filters.js");
 
 module.exports = {
+  initialize: function(ctx) {
+    helpers.set_metadata(ctx.metadata);
+    this.graph_component = "nvd3";
+    var parsed = ctx.query;
+    parsed.custom = parsed.custom || {};
+
+    this.metadata = ctx.metadata;
+    module.exports.add_old_params(parsed);
+    console.log("CTX", ctx);
+
+    var rows;
+    if (this.marshall_rows) { rows = this.marshall_rows(parsed, ctx.results);
+    } else { rows = ctx.results; }
+
+    this.query = { results: rows, parsed: parsed};
+    this.data = this.prepare(this.query);
+    console.log("THIS DATA", this.data);
+
+    this.render();
+
+  },
   add_old_params: function(parsed) {
     if (!parsed) {
       return;
