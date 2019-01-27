@@ -220,8 +220,14 @@ var DrillView = _.extend({}, {
           rows[group].push(formatter(stats.values[group]));
         }
 
-        rows[group].push((stats.greater - stats.deltas[group]).toFixed(2));
-        rows[group].push(stats.deltas[group].toFixed(2));
+        if (agg_is(agg, "avg")) {
+          rows[group].push(stats.deltas[group].toFixed(2));
+          rows[group].push((stats.greater - stats.deltas[group]).toFixed(2));
+        } else {
+          rows[group].push((stats.greater - stats.deltas[group]).toFixed(2));
+          rows[group].push(stats.deltas[group].toFixed(2));
+        }
+
         rows[group].push(diff.toFixed(4));
 
       }
@@ -420,7 +426,7 @@ var DrillView = _.extend({}, {
           group_val = counts[group];
         }
 
-        deltas[group] = col_val - group_val;
+        deltas[group] = col_val - (col_val - group_val);
         diffs[group] = deltas[group] / col_val;
       });
 

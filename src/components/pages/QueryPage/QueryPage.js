@@ -1,6 +1,6 @@
 var $ = $require("jquery");
 
-var sf_shim = require("views::common/sf_shim.js");
+var sf_shim = require("snorkel$common/sf_shim.js");
 var Throbber = require("views::QuerySidebar/Throbber.js");
 
 function insert_query_tiles(container, queries, in_order) {
