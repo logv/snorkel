@@ -311,7 +311,7 @@ var DrillView = _.extend({}, {
             new_val = subtracted + (stats.counts[group] || 0);
           }
 
-          delta = old_val- new_val;
+          delta = new_val - old_val;
           frac = delta / old_val * 100;
 
           if (!delta_rows[group]) {
