@@ -50,3 +50,21 @@ To ingest data, first create a user. Then go to /user and get that user's auth
 token. Now, to submit data to sybil, post it to
 /data/ingest?auth_token=<token>.  Make sure that you have slite behind HTTPS
 because the auth token can be sniffed otherwise.
+
+The data posted should look like:
+
+```
+{
+  table: "foobar",
+  samples: [ {}, {}, {} ]
+}
+```
+
+
+An example of posting data with jquery:
+
+```
+
+$.ajax("/data/ingest", { data: JSON.stringify({ table: "foobar", samples: [ { test: "baz" } ]}), contentType: "application/json", method: "POST"})
+
+```
