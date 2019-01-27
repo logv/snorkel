@@ -1,6 +1,6 @@
 ## guide to setting up slite
 
-slite has a snorkel clone written in python. This doc describes how to
+slite is a snorkel clone written in python. This doc describes how to
 configure slite.
 
 ## User Management
@@ -27,7 +27,7 @@ https://console.developers.google.com/apis/credentials
 New users can be added from the admin interface or by modifying the
 `sdb/users.db` with sqlite.
 
-You can also use `scripts/add_user.py` and `scripts/add_superuser.py` for CLI
+You can also use `scripts/add_user.sh` and `scripts/add_superuser.sh` for CLI
 administration.
 
 ## Adding data
