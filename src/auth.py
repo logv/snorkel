@@ -10,7 +10,7 @@ from flask_dance.contrib.google import make_google_blueprint, google
 
 
 from .models import User, Role, UserRoles, userdb
-from . import oauth, config
+from . import oauth, config, rbac
 
 import random, sys, os
 

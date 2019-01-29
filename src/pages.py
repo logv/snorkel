@@ -6,7 +6,7 @@ from .views import get_view_by_name
 from .components import QuerySidebar, UserButton, UserModal
 from .auth import rpc_login_required
 
-from . import backend, results, presenter
+from . import backend, results, presenter, rbac
 from .components import UIComponent, Selector
 
 import werkzeug
@@ -35,7 +35,9 @@ class UserPage(Page):
 class DatasetsPage(Page, pudgy.BackboneComponent, pudgy.SassComponent):
     def __prepare__(self):
         bs = backend.SybilBackend()
-        self.context.tables = bs.list_tables()
+        self.context.tables = filter(lambda t: rbac.check("query", t), bs.list_tables())
+
+
         self.context.tables = list(self.context.tables)
         self.context.tables.sort()
         groups = defaultdict(list)
@@ -103,7 +105,7 @@ class QueryPage(Page, pudgy.SassComponent, pudgy.BackboneComponent, pudgy.Server
 
         try:
             table_info = bs.get_table_info(table)
-            tables = bs.list_tables()
+            tables = filter(lambda t: rbac.check("query", t), bs.list_tables())
         except Exception as e:
             self.context.error = "Couldn't read table info for table %s" % (table)
 	    return
@@ -167,6 +169,11 @@ class QueryPage(Page, pudgy.SassComponent, pudgy.BackboneComponent, pudgy.Server
 @QuerySidebar.api
 @rpc_login_required
 def run_query(cls, table=None, query=None, viewarea=None, filters=[]):
+    if not rbac.check("query", table):
+        return {
+            "error" : "You don't have access to this table"
+        }
+
     # this is a name/value encoded array, unfortunately
     query = QuerySpec(query)
     query.add('table', table)
@@ -186,8 +193,6 @@ def run_query(cls, table=None, query=None, viewarea=None, filters=[]):
     cmp = None
     against = query.get('against', '')
     filters = query.get('filters')
-#    op = query.get('metric', '')
-#    print "OP IS", op
 
     compare_filters = filters['compare']
     if against or len(compare_filters):

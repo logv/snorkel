@@ -10,6 +10,7 @@ from getpass import getpass
 from .web import app
 from .models import User
 
+from flask_security.utils import encrypt_password, verify_password
 
 
 @app.cli.command()
@@ -27,7 +28,8 @@ def create_user(name):
         print "User '%s' already exists" % name
     except User.DoesNotExist:
         pw = getpass()
-        user = User.create(email=name, password=pw)
+
+        user = User.create(email=name, password=encrypt_password(pw))
         user.save()
         print "Created user", name
 
