@@ -1,0 +1,10 @@
+# role definitions looks like
+# role:perms:tables:users
+# which can be expressed as
+# role:perm1,perm2,:table1,table2,:user1,user2,:
+
+# supergroup (which contains admin) can do anything
+superuser:*:*:admin
+
+# anyone can query any tables
+guest:query:*:*
