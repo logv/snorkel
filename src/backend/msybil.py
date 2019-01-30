@@ -170,7 +170,9 @@ def aggregate_remote_results():
 def read_host_info():
     global HOSTINFO
     global HOST_FILE
-    hostinfo = sys.stdin.readlines()
+    host_file = os.environ.get("MSYBIL")
+    with open(host_file) as f:
+        hostinfo = f.readlines()
 
     hosts = []
     for line in hostinfo:
