@@ -17,6 +17,7 @@ ENABLE_REMOTE_INGEST=False
 MSYBIL_BIN = os.path.join(os.path.dirname(__file__), "msybil.py")
 MSYBIL_INGEST_BIN = os.path.join(os.path.dirname(__file__), "msybil_ingest.py")
 SYBIL_BIN="bin/sybil"
+DEBUG=False
 
 if "MSYBIL" in os.environ:
     # TODO: make msybil.py read off MSYBIL environment variable instead of stdin
@@ -62,7 +63,7 @@ def run_query_command(cmd_args):
     init_cmd_args.extend(["--filter-separator=%s" % FILTER_SEPARATOR])
     init_cmd_args.extend(cmd_args)
 
-    init_cmd_args = [a.encode('ascii', errors='replace') for a in init_cmd_args]
+    init_cmd_args = [str(a).encode('ascii', errors='replace') for a in init_cmd_args]
 
     ret = run_command(init_cmd_args)
     return json.loads(ret)
@@ -71,7 +72,8 @@ def run_command(cmd_args, stdin=""):
     print "RUNNING COMMAND", " ".join(cmd_args)
     p = Popen(cmd_args, stdin=PIPE, stdout=PIPE, stderr=PIPE)
     stdout, stderr = p.communicate(stdin)
-    print stderr
+    if DEBUG:
+        print stderr
 
     return stdout
 

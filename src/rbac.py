@@ -76,11 +76,14 @@ def read_rbac_file(fname):
         lines = f.readlines()
 
     return parse_perms(lines)
-    
+
 def check(role, table, user=None):
     # we aren't using RBAC check
     if not config.AUTHORIZED_USERS:
         return True
+
+    if not user and current_user.is_anonymous:
+        return False
 
     user = user or current_user.email
     print "CHECKING", role, table, user

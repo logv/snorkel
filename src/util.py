@@ -1,4 +1,5 @@
 import subprocess
+import json
 
 
 # time translation command is:
@@ -17,3 +18,19 @@ def time_delta_to_seconds(timedelta):
 
     return now - then
 
+def return_json(d):
+    return json.dumps(d), 200, {"ContentType" : "application/json"}
+
+# from https://stackoverflow.com/questions/1254454/fastest-way-to-convert-a-dicts-keys-values-from-unicode-to-str
+import collections
+def convert(data):
+    if isinstance(data, basestring):
+        return str(data)
+    elif isinstance(data, collections.Mapping):
+        return dict(map(convert, data.iteritems()))
+    elif isinstance(data, collections.Iterable):
+        return type(data)(map(convert, data))
+    else:
+        return data
+
+string_dict = convert

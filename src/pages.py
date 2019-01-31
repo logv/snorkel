@@ -17,7 +17,10 @@ import flask_security
 
 from .query_spec import QuerySpec
 
-from .util import time_to_seconds
+from .util import time_to_seconds, string_dict
+
+from urllib import unquote_plus
+import json
 
 class ViewArea(UIComponent, pudgy.JinjaComponent, pudgy.BackboneComponent, pudgy.ClientBridge):
     pass
@@ -177,7 +180,7 @@ def run_query(cls, table=None, query=None, viewarea=None, filters=[]):
     # this is a name/value encoded array, unfortunately
     query = QuerySpec(query)
     query.add('table', table)
-    query.add('filters', filters)
+    query.add('filters', string_dict(filters))
     d = query.__makedict__()
 
     bs = backend.SybilBackend()
@@ -237,8 +240,10 @@ def run_query(cls, table=None, query=None, viewarea=None, filters=[]):
         # viewarea.call("set_view", v)
 
 
+    d['filters'] = json.dumps(d['filters'])
+    queryUrl = unquote_plus(flask.url_for('get_view', **d))
     return {
-        "queryUrl": flask.url_for('get_view', **d),
+        "queryUrl": queryUrl,
         "res" : res,
         "cmp" : cmp,
         "query" : d

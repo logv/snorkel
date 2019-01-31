@@ -6,10 +6,11 @@ import json
 from flask import redirect, url_for
 from flask_security import core, current_user
 
-from . import auth, components, results, admin, config
+from . import auth, components, results, admin, config, grafana
 from .pages import QueryPage, DatasetsPage, HomePage, UserPage
 from .auth import needs_login
 from .backend.sybil import SybilBackend
+from .util import return_json
 
 
 
@@ -56,9 +57,14 @@ def get_view():
 
     return QueryPage(template="query.html", table=table, view=view, saved=sq).pipeline()
 
+@app.route('/pkg/status')
+def get_status():
+    return "OK", 200
 
-def return_json(d):
-    return json.dumps(d), 200, {"ContentType" : "application/json"}
+@app.route('/query/grafana')
+def get_grafana():
+    query = flask.request.args
+    return grafana.run_query(query)
 
 # this route expects JSON data
 # table = the table to import into
