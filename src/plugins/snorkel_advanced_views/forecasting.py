@@ -19,13 +19,6 @@ class ForecastView(TimeView, pudgy.JSComponent, pudgy.SassComponent):
     DISPLAY_NAME="Forecasting"
     BASE_DIR=os.path.dirname(__file__)
 
-    @classmethod
-    def get_defines(cls):
-        reqs = TimeView.get_requires()
-        ret = TimeView.render_requires(reqs)
-        ret["TimeView/TimeView"] = TimeView.get_js()
-        return ret
-
     def add_forecast_controls(self, controls):
         groups = make_dict(self.context.metadata["columns"]["strs"])
         model_type = Selector(
