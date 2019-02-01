@@ -69,7 +69,6 @@ def run_query_command(cmd_args):
     return json.loads(ret)
 
 def run_command(cmd_args, stdin=""):
-    print "RUNNING COMMAND", " ".join(cmd_args)
     p = Popen(cmd_args, stdin=PIPE, stdout=PIPE, stderr=PIPE)
     stdout, stderr = p.communicate(stdin)
     if DEBUG:

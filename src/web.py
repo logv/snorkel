@@ -29,6 +29,10 @@ def get_index():
         return redirect(url_for('get_datasets'))
     return HomePage(template="home.html").render()
 
+@app.route('/pkg/status')
+def get_status():
+    return "OK", 200
+
 @app.route('/user')
 @needs_login
 def get_user_settings():
@@ -57,10 +61,6 @@ def get_view():
 
     return QueryPage(template="query.html", table=table, view=view, saved=sq).pipeline()
 
-@app.route('/pkg/status')
-def get_status():
-    return "OK", 200
-
 @app.route('/query/grafana')
 def get_grafana():
     query = flask.request.args
@@ -69,17 +69,38 @@ def get_grafana():
 # this route expects JSON data
 # table = the table to import into
 # samples = the samples to import
-@app.route('/data/ingest', methods=['POST'])
+@app.route('/data/import', methods=['POST'])
 @needs_login
 def post_data():
     bs = SybilBackend()
-    table = flask.request.json.get("table", None)
+
+    # data can either be sent as form data or as JSON data
+    # so we first try reading the JSON
+    args = flask.request.json
+    if not args:
+        args = flask.request.form
+
+    table = args.get("table", None)
+
+    if not table:
+        dataset = args.get("dataset")
+        subset = args.get("subset")
+        if dataset and subset:
+            table = '%s@%s' % (dataset, subset)
+
     if not table:
         return return_json({'error' : "No table specified"})
 
-    samples = flask.request.json.get("samples", None)
+    samples = args.get("samples", None)
+    if isinstance(samples, (str, unicode)):
+        try:
+            samples = json.loads(samples)
+        except:
+            samples = None
+
     if not samples:
         return return_json({'error' : "No samples specified"})
+
     bs.ingest(table, samples)
 
     return return_json({'success':True, "num_samples" : len(samples)})

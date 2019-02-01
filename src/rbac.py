@@ -86,7 +86,6 @@ def check(role, table, user=None):
         return False
 
     user = user or current_user.email
-    print "CHECKING", role, table, user
 
     for p in PERMS:
         pg = PERMS[p]
