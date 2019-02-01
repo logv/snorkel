@@ -23,12 +23,12 @@ def extract_agg(col):
     return col
 
 def extract_field_aggs(query):
-    cols = query.getlist('fields[]')
+    cols = query.get_fields()
 
     custom_fields = query.getlist('custom_fields[]')
 
     col_aggs = {};
-    agg = query.get('metric');
+    agg = query.get_metric()
     for col in cols:
       col_agg = agg + "(" + col + ")"
       col_aggs[col_agg] = col_agg
@@ -50,8 +50,12 @@ def run_query(query):
 
     from urllib import unquote
     filters = unquote(query.get("filters", ""))
-    filters = json.loads(unquote(filters))
-    query.set('filters', filters)
+    if isinstance(filters, (str, unicode)):
+        try:
+            filters = json.loads(unquote(filters))
+            query.set('filters', filters)
+        except:
+            query.set('filters', { "query" : [], "compare" : []})
 
     view = query.get('view')
     VwClass = get_view_by_name(view)
@@ -65,7 +69,7 @@ def run_query(query):
     # datapoints: [ [val, timestamp], [val, timestamp], ... ] }
 
     ret = {}
-    groupby = query.getlist('groupby[]', [])
+    groupby = query.get_groupby()
     col_aggs = extract_field_aggs(query)
     if not col_aggs:
         col_aggs = [ "Count" ]

@@ -167,14 +167,14 @@ class ViewBase(pudgy.BackboneComponent):
         groupby = MultiSelect(
             name="groupby[]",
             options=groups,
-            selected=self.context.query.getlist('groupby[]'))
+            selected=self.context.query.get_groupby())
 
         controls.append(ControlRow("groupby[]", "Group By", groupby))
 
     def add_metric_selector(self, controls):
 
         has_custom = False
-        if self.context.query.getlist('custom_fields[]'):
+        if self.context.query.get_custom_fields():
             has_custom=True
 
         metric_selector = Selector(
@@ -196,7 +196,7 @@ class ViewBase(pudgy.BackboneComponent):
     def add_fields_selector(self, controls):
         has_custom = False
         custom_str = "use custom fields"
-        if self.context.query.getlist('custom_fields[]'):
+        if self.context.query.get_custom_fields():
             custom_str = "quick select fields"
             has_custom = True
 
@@ -204,7 +204,7 @@ class ViewBase(pudgy.BackboneComponent):
         fields = MultiSelect(
             name="fields[]",
             options=fields,
-            selected=self.context.query.getlist('fields[]'))
+            selected=self.context.query.get_fields())
         controls.append(ControlRow("fields[]", "Fields", fields, hidden=has_custom))
 
 
@@ -221,7 +221,7 @@ class ViewBase(pudgy.BackboneComponent):
         cf_selector = MultiSelect(
             name="custom_fields[]",
             options=custom_fields,
-            selected=self.context.query.getlist('custom_fields[]'))
+            selected=self.context.query.get_custom_fields())
         controls.append(ControlRow("custom_fields[]", "Custom Fields", cf_selector, hidden=not has_custom))
 
         custom_toggler = "<div class='' style='text-align: center'><a href='#' class='custom_field_inputs mrl'>%s</a></div>" % custom_str

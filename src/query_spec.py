@@ -39,8 +39,8 @@ class QuerySpec(object):
         self.md = md
 
         # we will need to put together an exported interface
-        self.fields = md.getlist('fields[]')
-        self.groupby = md.getlist('groupby[]')
+        self.fields = self.get_fields()
+        self.groupby = self.get_groupby()
 
     def __makedict__(self):
         ret = {
@@ -78,4 +78,33 @@ class QuerySpec(object):
 
     def get(self, k, d=None):
         return self.md.get(k, d)
+
+    def get_metric(self):
+        op = self.md.get('metric')
+        if not op:
+            op = self.md.get('agg', '')
+            op = op.lstrip("$")
+
+        return op
+
+    def get_groupby(self):
+        g = self.md.getlist('groupby[]')
+        if not g:
+            g = self.md.getlist('group_by')
+
+        return g
+
+    def get_fields(self):
+        g = self.md.getlist('fields[]')
+        if not g:
+            g = self.md.getlist('fields')
+
+        return g
+
+    def get_custom_fields(self):
+        g = self.md.getlist('custom_fields[]')
+        if not g:
+            g = self.md.getlist('custom_fields')
+
+        return g
 

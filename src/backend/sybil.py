@@ -69,6 +69,7 @@ def run_query_command(cmd_args):
     return json.loads(ret)
 
 def run_command(cmd_args, stdin=""):
+    print "RUNNING COMMAND", " ".join(cmd_args)
     p = Popen(cmd_args, stdin=PIPE, stdout=PIPE, stderr=PIPE)
     stdout, stderr = p.communicate(stdin)
     if DEBUG:
@@ -120,14 +121,18 @@ class SybilQuery(object):
 
 
     def add_op(self, query_spec, cmd_args):
-        op = query_spec.get('metric')
+        op = query_spec.get_metric()
+        print "OP IS", op
         if op == "Distinct":
             cmd_args.extend(["-op", "distinct"])
-        else:
+        elif op[0].lower() == "p": # p25, p50, etc
             cmd_args.extend(["-op", "hist"])
+        else: # we are doing an avg, sum or count query
+            pass
+
 
     def add_group_by(self, query_spec, cmd_args):
-        groupby = query_spec.getlist("groupby[]")
+        groupby = query_spec.get_groupby()
         if groupby:
             cmd_args.append("-group")
             cmd_args.append(FIELD_SEPARATOR.join(groupby))
@@ -253,10 +258,6 @@ class SybilQuery(object):
         limit = query_spec.get("limit", 100)
         cmd_args.extend(["-limit", limit])
 
-    def add_metrics(self, query_spec, cmd_args):
-        pass
-
-
 
     def run_table_query(self, table, query_spec):
         cmd_args = [ "-table", table ]
@@ -265,7 +266,6 @@ class SybilQuery(object):
         self.add_group_by(query_spec, cmd_args)
         self.add_fields(query_spec, cmd_args)
         self.add_filters(query_spec, cmd_args)
-        self.add_metrics(query_spec, cmd_args)
         self.add_limit(query_spec, cmd_args)
 
         return run_query_command(cmd_args)
@@ -279,7 +279,6 @@ class SybilQuery(object):
         self.add_fields(query_spec, cmd_args)
         self.add_filters(query_spec, cmd_args)
 #        self.add_hist_buckets(query_spec, cmd_args)
-        self.add_metrics(query_spec, cmd_args)
 
         return run_query_command(cmd_args)
 
@@ -293,7 +292,6 @@ class SybilQuery(object):
         self.add_group_by(query_spec, cmd_args)
         self.add_fields(query_spec, cmd_args)
         self.add_filters(query_spec, cmd_args)
-        self.add_metrics(query_spec, cmd_args)
         self.add_limit(query_spec, cmd_args)
 
         time_bucket = query_spec.get("time_bucket", 300)
