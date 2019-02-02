@@ -210,7 +210,7 @@ var DrillView = BaseView.extend({
         }
 
         if (agg_is(agg, "avg")) {
-          rows[group].push(formatter(stats.avgs[group]));
+          rows[group].push(formatter(stats.values[group]));
         } else if (agg_is(agg, "count")) {
           rows[group].push(formatter(stats.counts[group]));
         } else if (agg_is(agg, "sum")) {

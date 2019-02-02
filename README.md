@@ -7,7 +7,12 @@ in adjusting failed queries.
 future plans
 ------------
 
-**2018 Q4 Update**: After 5 years in the node ecosystem, I will be moving
+**02/02/2019**: [Snorkel.lite](https://github.com/logv/snorkel/tree/slite) is a
+re-write of snorkel's backend into python, maintaining compatibility with most
+of snorkel. Try out the snorkel.lite branch to see how it works for you. It is
+now in alpha status, but I've been using it for several months on my machines.
+
+**11/28/2018**: After 5 years in the node ecosystem, I will be moving
 snorkel to a python backend. Expect a new release in Q1 2019. I feel that the
 node ecosystem has too much churn - it is difficult for me to make a package
 that can be installed without problems or security issues and I would like
@@ -31,8 +36,7 @@ documents
 
 [usage guide](https://github.com/logV/snorkel/wiki/Guide)
 
-
-[grafana snorkel datasource](https://github.com/logV/grafana-snorkel-datasource) is a plugin for grafana (3.0) to query snorkel. While this plugin is in early stages, grafana is quite amazing.
+[grafana snorkel datasource](https://github.com/logV/grafana-snorkel-datasource) is a plugin for grafana (3.0+) to query snorkel. While this plugin is in early stages, grafana is quite amazing.
 
 in action
 ---------
