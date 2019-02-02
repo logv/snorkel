@@ -1,13 +1,13 @@
-## snorkel.pudgy
+## snorkel.lite
 
-snorkel.pudgy is a re-implementation of [snorkel](https://github.com/logv/snorkel) in python
+snorkel.lite is a re-implementation of [snorkel](https://github.com/logv/snorkel) in python
 
 
 ### installation
 
 ```
-git clone https://git.kthxb.ai/okay/snorkel.pudgy
-cd snorkel.pudgy
+git clone -b slite git@github.com:logv/snorkel.git
+cd snorkel
 make build
 make run
 ```
@@ -15,6 +15,19 @@ make run
 ### configuration
 
 see docs/SETUP.md
+
+
+### status
+
+
+**Feb 2nd 2019**
+
+snorkel.lite is now in Alpha status. All but two views have been ported over
+from snorkel, data ingestion works and grafana endpoints are compatible. I have
+switched over from using the original snorkel to using snorkel.lite for several
+months now.
+
+
 
 ### motivation
 
@@ -29,13 +42,14 @@ the reasons for moving to python are severalfold:
 * write an easy to deploy UI for browsing data kept in sybil
 * make it easy to extend and write new views
 * make an app that is easy to white label (and self host inside organizations)
-* re-use as much work from original snorkel while keeping the implementation clean (ish)
+* re-use as much work from original snorkel while keeping the implementation clean
 * minimize external dependencies: use sqlite for data store, flask for web, etc
-
-## screengifs
-
-<img src="https://git.kthxb.ai/okay/snorkel.pudgy/raw/docs/images/table.gif" width="800"/>
 
 ## features
 
 see docs/FEATURES.md
+
+## screengifs
+
+Coming Soon
+

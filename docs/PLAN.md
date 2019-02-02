@@ -2,7 +2,7 @@
 
 goal: create a version of snorkel that is easy to customize and extend
 
-pieces: 
+pieces:
 
 * snorkel is called from the outside from its owner application
 * the owner application configures datasets for snorkel
@@ -17,5 +17,3 @@ pieces:
 
 * write a prestodb adapter
 * write tests against what an adapter does
-
-### 

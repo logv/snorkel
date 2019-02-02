@@ -7,6 +7,7 @@
 * filters and filter helpers
 * saved query dialog
 * custom time inputs
+* advanced views: forecasting, drilldown, weco
 
 ### re-implemented in snorkel.pudgy
 
@@ -20,23 +21,22 @@
 * customize which views a dataset uses
 * no samples view
 * user roles
+* data ingestion that passes data from slite to sybil
+* dataset presenters
+* per table user permissions
+* dashboards endpoint (grafana compatible, ideally)
 
 
 ### planned
 
-* data ingestion that passes data from slite to sybil
 * robust error handling
-* dataset presenters
 * dataset settings page
-* per table user permissions
-* advanced views: forecasting, drilldown, weco
 * graph views: cyto and datamaps
 
 ### unknown
 
 * rss feed support in time series views
 * presto or other backend adapters
-* dashboards endpoint (grafana compatible, ideally)
 * favorite queries
 * query audit log
 
