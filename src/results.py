@@ -1,6 +1,6 @@
 from .models import SavedQuery
 from pudgy.util  import getrandhash
-import json
+from . import fastjson as json
 
 def save_for_user(user, params, results, compare={}):
     table = params.get('table')

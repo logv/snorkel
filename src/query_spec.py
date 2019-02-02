@@ -1,5 +1,4 @@
 import werkzeug
-import json
 try:
     import dotmap
 except:
@@ -88,23 +87,23 @@ class QuerySpec(object):
         return op
 
     def get_groupby(self):
-        g = self.md.getlist('groupby[]')
+        g = self.getlist('groupby[]')
         if not g:
-            g = self.md.getlist('group_by')
+            g = self.getlist('group_by')
 
         return g
 
     def get_fields(self):
-        g = self.md.getlist('fields[]')
+        g = self.getlist('fields[]')
         if not g:
-            g = self.md.getlist('fields')
+            g = self.getlist('fieldset')
 
         return g
 
     def get_custom_fields(self):
-        g = self.md.getlist('custom_fields[]')
+        g = self.getlist('custom_fields[]')
         if not g:
-            g = self.md.getlist('custom_fields')
+            g = self.getlist('custom_fields')
 
         return g
 

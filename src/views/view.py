@@ -169,6 +169,7 @@ class ViewBase(pudgy.BackboneComponent):
             options=groups,
             selected=self.context.query.get_groupby())
 
+        print "GROUPS", self.context.query.get_groupby()
         controls.append(ControlRow("groupby[]", "Group By", groupby))
 
     def add_metric_selector(self, controls):

@@ -5,14 +5,35 @@ from peewee import *
 from flask_security import Security, PeeweeUserDatastore
 from flask_security import login_required, login_user, logout_user
 
-from flask_security.core import current_user
+from flask_security.core import current_user, _security
 from flask_dance.contrib.google import make_google_blueprint, google
 
 
-from .models import User, Role, UserRoles, userdb
+from .models import User, Role, UserRoles, UserToken, userdb
 from . import oauth, config, rbac
 
 import random, sys, os
+
+# Uses our own authentication tokens instead of the signed ones from
+# flask_security because the verification of signatures takes too long
+def _request_loader(request):
+    header_key = _security.token_authentication_header
+    args_key = _security.token_authentication_key
+    header_token = request.headers.get(header_key, None)
+    token = request.args.get(args_key, header_token)
+    if request.is_json:
+        data = request.get_json(silent=True) or {}
+        if isinstance(data, dict):
+            token = data.get(args_key, token)
+
+    try:
+        token = UserToken.select().where(UserToken.token == token).first()
+        user = token.user
+        login_user(user)
+        return user
+    except Exception as e:
+        pass
+    return _security.login_manager.anonymous_user()
 
 import flask
 def install(app):
@@ -22,21 +43,13 @@ def install(app):
     app.config['SECURITY_PASSWORD_SALT'] = config.SECURITY_PASSWORD_SALT
     app.config['SECURITY_CHANGEABLE'] = True
 
-
     db = userdb
 
     # Setup Flask-Security
     user_datastore = PeeweeUserDatastore(db, User, Role, UserRoles)
     security = Security(app, user_datastore)
+    app.login_manager.request_loader(_request_loader)
 
-    # Create a user to test with
-    @app.before_first_request
-    def create_user():
-        if "RESET" in os.environ:
-            for Model in (Role, User, UserRoles):
-                Model.drop_table(fail_silently=True)
-                Model.create_table(fail_silently=True)
-            user_datastore.create_role(name='superuser')
 
     # Views
     @app.route('/')
@@ -45,25 +58,35 @@ def install(app):
         return render_template('index.html')
 
 
+def check_auth():
+    auth = False
+    if current_user.is_authenticated:
+        auth = True
+    else:
+        if google.authorized:
+            err = False
+            try:
+                resp_json = google.get("/oauth2/v2/userinfo").json()
+                if "error" in resp_json:
+                    err = True
+            except Exception, e:
+                err = True
+
+            if err:
+                oauth.logout_oauth()
+
+    return auth
+
 def needs_login(func):
     def wrapped_func(*args, **kwargs):
 
-        auth = False
-        if current_user.is_authenticated:
-            auth = True
-        else:
-            if google.authorized:
-                err = False
-                try:
-                    resp_json = google.get("/oauth2/v2/userinfo").json()
-                    print "RESP JSON", resp_json
-                    if "error" in resp_json:
-                        err = True
-                except Exception, e:
-                    err = True
+        try:
+            auth = check_auth()
+        except Exception as e:
+            print "EXC", e
+            auth = False
 
-                if err:
-                    oauth.logout_oauth()
+        print "HAS AUTH?", auth
 
         if not auth:
             return redirect(url_for("security.login"))

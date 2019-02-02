@@ -20,7 +20,7 @@ from .query_spec import QuerySpec
 from .util import time_to_seconds, string_dict
 
 from urllib import unquote_plus
-import json
+from . import fastjson as json
 
 class ViewArea(UIComponent, pudgy.JinjaComponent, pudgy.BackboneComponent, pudgy.ClientBridge):
     pass

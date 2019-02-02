@@ -1,5 +1,5 @@
 import subprocess
-import json
+from . import fastjson as json
 
 
 # time translation command is:

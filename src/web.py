@@ -1,12 +1,13 @@
 import pudgy
 import flask
 import os
-import json
 
 from flask import redirect, url_for
 from flask_security import core, current_user
 
 from . import auth, components, results, admin, config, grafana
+from . import fastjson as json
+
 from .pages import QueryPage, DatasetsPage, HomePage, UserPage
 from .auth import needs_login
 from .backend.sybil import SybilBackend
@@ -16,6 +17,7 @@ from .util import return_json
 
 
 app = flask.Flask(__name__)
+
 pudgy.register_blueprint(app)
 
 app.config.update({

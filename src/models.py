@@ -33,7 +33,7 @@ class SavedQuery(QueryModel):
     parsed = JSONField()
 
     def toObject(self):
-        return { 
+        return {
             "results" : self.results,
             "parsed" : self.parsed,
             "created" : self.created
@@ -53,6 +53,30 @@ class User(UserModel, UserMixin):
     active = BooleanField(default=True)
     confirmed_at = DateTimeField(null=True)
 
+    def get_auth_token(self):
+        tokens = list(self.get_tokens())
+        if not tokens:
+            UserToken.create_for_user(self)
+
+        return self.tokens[0].token
+
+    def get_tokens(self):
+        return self.tokens
+
+class UserToken(UserModel):
+    user = ForeignKeyField(User, related_name='tokens')
+    token = TextField(unique=True)
+    active = BooleanField(default=True)
+
+    @classmethod
+    def create_for_user(cls, user):
+        import uuid
+        randid = uuid.uuid4()
+        token = UserToken.create(token=randid, user=user)
+        return token
+
+
+
 class UserRoles(UserModel):
     # Because peewee does not come with built-in many-to-many
     # relationships, we need this intermediary class to link
@@ -62,17 +86,14 @@ class UserRoles(UserModel):
     name = property(lambda self: self.role.name)
     description = property(lambda self: self.role.description)
 
-
-
-
 def create_db_if_not():
     try:
         os.makedirs(DB_DIR)
     except Exception, e:
         pass
 
-    for c in [SavedQuery, User]:
-        c._meta.database.connect()
+    User._meta.database.connect()
+    for c in [SavedQuery, User, UserToken]:
         c._meta.database.create_tables([c])
 
     # query DB migrations

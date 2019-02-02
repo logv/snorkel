@@ -1,10 +1,12 @@
 import flask
 from . import backend, rbac
 
-import json
+from . import fastjson as json
+
 from .query_spec import QuerySpec
 from .views import get_view_by_name
 from .util import return_json
+import time
 
 
 import re
@@ -61,6 +63,7 @@ def run_query(query):
     VwClass = get_view_by_name(view)
     query.set('viewbase', VwClass.BASE)
 
+    start = time.time()
     res = bs.run_query(table, query, ti)
 
     # need to marshall the series to the format grafana is expecting:
@@ -74,6 +77,7 @@ def run_query(query):
     if not col_aggs:
         col_aggs = [ "Count" ]
 
+    start = time.time()
     series = {}
     for ts in res:
         row = res[ts]
@@ -91,7 +95,13 @@ def run_query(query):
 
                 d = obj.get(field, None)
                 if isinstance(d, dict):
-                    val = d.get(agg)
+                    if agg[0] == "p":
+                        try:
+                            val = d["percentiles"][int(agg[1:])]
+                        except:
+                            val = None
+                    else:
+                        val = d.get(agg)
                 else:
                     val = d
 
@@ -106,4 +116,4 @@ def run_query(query):
     for k in series:
         series[k]["datapoints"].sort(key=lambda w: w[1])
 
-    return json.dumps(series.values());
+    return return_json(series.values())

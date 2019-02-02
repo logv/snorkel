@@ -42,4 +42,11 @@ def configure_presenters():
 
 if __name__ == "__main__":
     configure_presenters()
-    web.app.run(port=os.environ.get("PORT", 2333), use_reloader=False)
+
+    PROFILE="PROFILE" in os.environ
+    if PROFILE:
+        from werkzeug.contrib.profiler import ProfilerMiddleware
+        web.app.config['PROFILE'] = True
+        web.app.wsgi_app = ProfilerMiddleware(web.app.wsgi_app, restrictions = [30])
+
+    web.app.run(port=os.environ.get("PORT", 2333), use_reloader=False, debug=PROFILE)

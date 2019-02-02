@@ -4,11 +4,12 @@ from flask_security import current_user
 
 import subprocess
 import shlex
-import json
 import pudgy
 import time
 
 import sys
+
+from .. import fastjson as json
 
 USING_MSYBIL = False
 
@@ -122,7 +123,6 @@ class SybilQuery(object):
 
     def add_op(self, query_spec, cmd_args):
         op = query_spec.get_metric()
-        print "OP IS", op
         if op == "Distinct":
             cmd_args.extend(["-op", "distinct"])
         elif op[0].lower() == "p": # p25, p50, etc
@@ -140,7 +140,7 @@ class SybilQuery(object):
     def add_fields(self, query_spec, cmd_args):
         all_fields = []
 
-        fields = query_spec.getlist("fields[]")
+        fields = query_spec.get_fields()
         if fields:
             all_fields.extend(fields)
 
@@ -221,6 +221,10 @@ class SybilQuery(object):
                 continue
 
             op = op[1:]
+
+            if op == "regex":
+                # this is for compatibility with snorkelv1 filters
+                op = "re"
 
             if col in types:
                 tp = types[col]

@@ -8,7 +8,7 @@ from flask import Flask
 from getpass import getpass
 
 from .web import app
-from .models import User
+from .models import User, UserToken
 
 from flask_security.utils import encrypt_password, verify_password
 
@@ -69,12 +69,13 @@ def add_superuser(name):
         user.save()
         print "Created user", name
 
+
 @app.cli.command()
 @click.argument('name')
 def get_user_token(name):
     try:
         user = User.get(User.email == name)
-        print "User token for '%s' is:" % name
         print user.get_auth_token()
+
     except User.DoesNotExist:
         print "No such user '%s'" % name
