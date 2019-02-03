@@ -46,17 +46,20 @@ def setup_google_blueprint(app):
 
 def logout_oauth():
     logout_user()
-    if google.authorized:
-        try:
-            token = google.token["access_token"]
-            resp = google.post(
-                "https://accounts.google.com/o/oauth2/revoke",
-                params={"token": token},
-                headers={"Content-Type": "application/x-www-form-urlencoded"}
-            )
-            print resp.ok, resp.text
-        except Exception, e:
-            print e
+    try:
+        if google.authorized:
+            try:
+                token = google.token["access_token"]
+                resp = google.post(
+                    "https://accounts.google.com/o/oauth2/revoke",
+                    params={"token": token},
+                    headers={"Content-Type": "application/x-www-form-urlencoded"}
+                )
+                print resp.ok, resp.text
+            except Exception, e:
+                print e
+    except:
+        pass
 
 def install(app):
     app.jinja_env.globals.update(google_auth=USE_GOOGLE_AUTH)
