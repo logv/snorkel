@@ -2,3 +2,7 @@
   width: 40px;
   display: inline-block;
 }
+
+&.query_details .alert {
+  z-index: -1;
+}

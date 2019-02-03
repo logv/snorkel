@@ -29,7 +29,11 @@ app.config.update({
 def get_index():
     if current_user.is_authenticated:
         return redirect(url_for('get_datasets'))
-    return HomePage(template="home.html").render()
+    return HomePage(template="welcome.html").render()
+
+@app.route('/tour')
+def get_tour():
+    return HomePage(template="tour.html").render()
 
 @app.route('/pkg/status')
 def get_status():

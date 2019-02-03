@@ -1,3 +1,11 @@
+.pageheader h3 {
+  margin-top: 0.5em !important;
+}
+
+.pageheader .superscript {
+  top: 0px !important;
+}
+
 .container-fluid, .container {
   margin: auto;
   margin-left: 0px;

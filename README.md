@@ -28,7 +28,6 @@ switched over from using the original snorkel to using snorkel.lite for several
 months now.
 
 
-
 ### motivation
 
 the reasons for moving to python are severalfold:

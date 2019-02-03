@@ -1,0 +1,79 @@
+{% extends "layout.html" %}
+
+{% block body %}
+<div id= "page-top">
+  <div class="container">
+    <div class="row">
+      <div class="col-md-12 clearfix centered">
+        <img src="/static/images/no-diving.png"> </img>
+        <img src="/static/images/yes-snorkeling.png"> </img>
+      </div>
+    </div>
+    <h1>
+      <span>use <b><a href="/datasets">snorkel</a> </b>
+        and stop data <b>mishaps</b></span>
+    </h1>
+  </div>
+</div>
+
+<div class ="container-wrapper">
+  <div class="container-fluid">
+    <div class="row" >
+      <div class="col-md-12">
+        <h2>Overview</h2>
+        <div>
+            <p>
+              <b>snorkel</b> is a time based data analysis UI that is
+              <b>complementary</b> to your monitoring software. After you spot an
+              anomaly in a time series graph, snorkel helps you create, refine
+              and compare queries on your data that explain <b>why</b> your
+              graphs are changing.  </p> 
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-12 centered clearfix mbl mtl" style="padding:20px">
+        <a style="zoom: 2;" class="btn btn-success mtl" href="http://github.com/logv/snorkel/wiki/Guide">read the guide</a>
+        <a style="zoom: 2;" class="btn btn-info mtl" href="{{ url_for('get_datasets') }}">get started</a>
+
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-4">
+        <h2>Example Uses</h2>
+        <ul>
+          <li>monitor push and deployment health</li>
+          <li>track and diagnose client errors</li>
+          <li>diagnose performance regressions</li>
+          <li>locate optimization opportunities</li>
+          <li>analyze performance experiments</li>
+        </ul>
+      </div>
+    
+      
+      <div class="col-md-4">
+        <h2>Features</h2>
+        <ul>
+          <li>Tables, Time Series, Histograms and Raw Sample Views</li>
+          <li>Realtime drilldowns</li>
+          <li>Powerful comparison queries</li>
+          <li><a href="http://github.com/logv/grafana-snorkel-datasource" target="_blank">
+            Dashboarding with Grafana</a></li>
+        </ul>
+      </div>
+      <div class="col-md-4">
+        <h2>Built With</h2>
+        <ul>
+          <li>nodejs, backbone and underscore</li>
+          <li><a href="https://github.com/logv/sybil">sybil datastore</a></li>
+          <li><a href="http://getbootstrap.com">twitter bootstrap</a></li>
+          <li>charting with <a href="http://nvd3.org">nvd3</a> or <a href="http://highcharts.com">highcharts</a></li>
+        </ul>
+      </div>
+
+    </div>
+
+  </div>
+</div>
+
+{% endblock %}
