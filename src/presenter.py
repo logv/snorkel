@@ -54,3 +54,46 @@ def GetPresenter(dataset):
         if re.search(r, dataset):
             print "P", p
             return p
+
+
+HIDDEN_TABLES = {}
+TABLE_NAMES = {}
+def SetTableName(realname, name):
+    TABLE_NAMES[realname] = name
+
+def SetTableNames(name_lookup):
+    for name in name_lookup:
+        SetTableName(name, name_lookup[name])
+
+def GetTableName(name):
+    if name in TABLE_NAMES:
+        return TABLE_NAMES[name]
+
+    return name
+
+def GetRealTable(name):
+    for n in TABLE_NAMES:
+        if TABLE_NAMES[n] == name:
+            return n
+
+    return name
+
+def HideTables(*names):
+    for n in names:
+        HIDDEN_TABLES[n] = True
+
+def IsTableHidden(name):
+    return name in HIDDEN_TABLES
+
+def IsTableVisible(name):
+    return not IsTableHidden(name)
+
+# PARAMETERS:
+# name=<str> - name to display when showing the table
+# hidden=<bool> - whether to hide the table or not
+def ConfigureTable(table, **kwargs):
+    if "name" in kwargs:
+        SetTableName(table, kwargs.get("name"))
+
+    if kwargs.get('hidden', False):
+        HideTables(table)

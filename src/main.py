@@ -8,7 +8,7 @@
 
 import os
 from . import web
-from .presenter import DatasetPresenter, RegisterPresenter
+from .presenter import DatasetPresenter, RegisterPresenter, ConfigureTable
 
 from .views import ViewSeparator
 
@@ -39,6 +39,9 @@ def configure_presenters():
     ])
     RegisterPresenter(".*", default_presenter)
 
+
+    ConfigureTable("snorkle@queries", name="snorkel@queries")
+    ConfigureTable("plt", hidden=True)
 
 if __name__ == "__main__":
     configure_presenters()

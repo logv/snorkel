@@ -1,9 +1,12 @@
 from .models import SavedQuery
 from pudgy.util  import getrandhash
 from . import fastjson as json
+from . import presenter
 
 def save_for_user(user, params, results, compare={}):
     table = params.get('table')
+
+    table = presenter.GetRealTable(table)
 
     params = params.__json__()
     hashid = getrandhash(json.dumps(params))
@@ -14,6 +17,7 @@ def save_for_user(user, params, results, compare={}):
     return sq
 
 def get_for_user(user, table, limit=30):
+    table = presenter.GetRealTable(table)
     res = SavedQuery \
         .select(
             SavedQuery.created,

@@ -11,6 +11,8 @@ import sys
 
 from .. import fastjson as json
 
+from .. import presenter
+
 USING_MSYBIL = False
 
 # TODO: enable REMOTE_INGEST via config variable
@@ -103,6 +105,8 @@ def estimate_time_buckets(query_interval, buckets):
 class SybilQuery(object):
     def run_query(self, table, query_spec, metadata):
         self.metadata = metadata
+        table = presenter.GetRealTable(table)
+
         self.table = table
         self.query = query_spec
 
@@ -312,12 +316,9 @@ class SybilQuery(object):
 
 
 @pudgy.util.memoize
-def list_tables():
-    return run_query_command(["-tables"])
-
-@pudgy.util.memoize
 def get_table_info(table, ts=None):
     from ..views import get_column_types
+    table = presenter.GetRealTable(table)
     meta = run_query_command(["-table",  table, "-info"])
     fields, types = get_column_types(meta)
     meta["col_types"] = types
@@ -325,7 +326,6 @@ def get_table_info(table, ts=None):
 
 class SybilBackend(Backend):
     def clear_cache(self, table=None):
-        list_tables.cache.clear()
         if table:
             if table in get_table_info.cache:
                 del get_table_info.cache[table]
@@ -333,7 +333,11 @@ class SybilBackend(Backend):
             get_table_info.cache.clear()
 
     def list_tables(self):
-        return run_query_command(["-tables"])
+        tables = run_query_command(["-tables"])
+        tables = map(presenter.GetTableName, tables)
+        tables = filter(presenter.IsTableVisible, tables)
+        return tables
+
 
     def get_table_info(self, table):
         return get_table_info(table)
