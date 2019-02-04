@@ -8,7 +8,7 @@ except NameError as e:
     eval('exec(open("./src/version.py").read())')
 
 setup(
-    name='snorkel',
+    name='snorkel-lite',
     version=__version__,
     author='okay',
     author_email='okayzed+slite@gmail.com',

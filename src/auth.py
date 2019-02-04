@@ -83,10 +83,7 @@ def needs_login(func):
         try:
             auth = check_auth()
         except Exception as e:
-            print "EXC", e
             auth = False
-
-        print "HAS AUTH?", auth
 
         if not auth:
             return redirect(url_for("security.login"))

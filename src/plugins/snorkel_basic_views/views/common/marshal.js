@@ -1,5 +1,4 @@
 var helpers = require("common/sf_helpers.js");
-console.log("HELPERS", helpers);
 
 var extract_agg = helpers.extract_agg;
 var extract_field = helpers.extract_field;
