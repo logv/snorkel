@@ -18,8 +18,8 @@ module.exports = {
 
     if (view == "table" || view == "time" || view == "dist") {
       _.each(results, function(row) {
-        count += row.count || row.Count;
-        w_count += row.weight || row.Weight;
+        count += row.samples || row.count;
+        w_count += row.weighted_count || row.samples;
       });
 
     }

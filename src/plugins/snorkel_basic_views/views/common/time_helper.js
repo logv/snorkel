@@ -131,7 +131,7 @@ function time_prepare(data, options) {
       var pt = {
         x: result._id.time_bucket * 1000,
         y: parseInt(value, 10),
-        samples: result.count,
+        samples: result.samples,
         compare: is_compare
       };
 

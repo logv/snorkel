@@ -124,8 +124,8 @@ class SybilQuery(object):
         else:
             raise Exception("unrecognized view", view)
 
-
     def add_op(self, query_spec, cmd_args):
+        # if only one metric is specified:
         op = query_spec.get_metric()
         if op == "Distinct":
             cmd_args.extend(["-op", "distinct"])
@@ -133,6 +133,17 @@ class SybilQuery(object):
             cmd_args.extend(["-op", "hist"])
         else: # we are doing an avg, sum or count query
             pass
+
+
+    def add_weight_col(self, query_spec, cmd_args):
+        weight_col = None
+        for c in [ "weight" ]:
+            if c in self.metadata["col_types"]:
+                weight_col = c
+
+        if weight_col:
+            cmd_args.extend(["-weight-col", weight_col])
+            query_spec.set('weight_col', weight_col)
 
 
     def add_group_by(self, query_spec, cmd_args):
@@ -151,6 +162,7 @@ class SybilQuery(object):
         custom_fields = query_spec.getlist("custom_fields[]")
         if custom_fields:
             all_fields.extend([extract_field(c) for c in custom_fields])
+            cmd_args.extend(['-op', 'hist'])
             cmd_args.extend(["-loghist"])
 
         field = query_spec.get("field")
@@ -161,6 +173,8 @@ class SybilQuery(object):
         if all_fields:
             cmd_args.append("-int")
             cmd_args.append(FIELD_SEPARATOR.join(all_fields))
+
+        query_spec.set('all_fields', all_fields)
 
     def add_filters(self, query_spec, cmd_args):
         from ..views import get_column_types
@@ -271,6 +285,7 @@ class SybilQuery(object):
         cmd_args = [ "-table", table ]
 
         self.add_op(query_spec, cmd_args)
+        self.add_weight_col(query_spec, cmd_args)
         self.add_group_by(query_spec, cmd_args)
         self.add_fields(query_spec, cmd_args)
         self.add_filters(query_spec, cmd_args)
@@ -282,7 +297,9 @@ class SybilQuery(object):
     def run_dist_query(self, table, query_spec):
         cmd_args = [ "-table", table ]
 
-        self.add_op(query_spec, cmd_args)
+        cmd_args.extend(['-op', 'hist', '-loghist'])
+
+        self.add_weight_col(query_spec, cmd_args)
         self.add_group_by(query_spec, cmd_args)
         self.add_fields(query_spec, cmd_args)
         self.add_filters(query_spec, cmd_args)
@@ -297,6 +314,7 @@ class SybilQuery(object):
         cmd_args = [ "-table", table, "-time-col", time_col, "-time"]
 
         self.add_op(query_spec, cmd_args)
+        self.add_weight_col(query_spec, cmd_args)
         self.add_group_by(query_spec, cmd_args)
         self.add_fields(query_spec, cmd_args)
         self.add_filters(query_spec, cmd_args)

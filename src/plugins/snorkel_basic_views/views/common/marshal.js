@@ -111,6 +111,7 @@ function marshall_time_rows(query_spec, time_buckets) {
 
       row._id.time_bucket = parseInt(time_bucket, 10);
 
+      row.samples = r.Samples || r.Count;
       row.count = r.Count || r.Samples;
       row.weighted_count = r.Count || r.Samples;
       if (typeof r.Distinct != "undefined") {
@@ -131,8 +132,6 @@ function marshall_table_rows(query_spec, rows) {
   var dims = query_spec.opts.dims;
   var agg = query_spec.opts.agg;
   var custom_fields = query_spec.opts["custom_fields[]"] || [];
-
-
 
   var ret = [];
   _.each(rows, function(r) {
@@ -156,6 +155,7 @@ function marshall_table_rows(query_spec, rows) {
     });
 
     row.count = r.Samples || r.Count;
+    row.samples = r.Samples;
 
     row.distinct = r.Distinct || r.distinct;
     if (typeof row.distinct == "undefined") {
