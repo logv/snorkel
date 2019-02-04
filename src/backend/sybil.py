@@ -360,6 +360,24 @@ class SybilBackend(Backend):
     def get_table_info(self, table):
         return get_table_info(table)
 
+    def log_query(self, user, query_spec):
+        sample_data = {
+          "start_time": query_spec.get('start_ms'),
+          "end_time": query_spec.get('end_ms'),
+
+          "weight_col": query_spec.get('weight_col') or "unspecified",
+          "view": query_spec.get('view'),
+          "start": query_spec.get('start') or query_spec.get('custom_start'),
+          "end": query_spec.get('end') or query_spec.get('custom_end'),
+          "table": query_spec.get('table'),
+          "user": user,
+          "time" : time.time(),
+          "cols": query_spec.get_fields(),
+          "dims": query_spec.get_groupby() }
+
+        if not USING_MSYBIL or ENABLE_REMOTE_INGEST:
+            self.ingest("slite@queries", [ sample_data ], log_ingest=False)
+
     def run_query(self, table, query_spec, metadata):
         q = SybilQuery()
         return q.run_query(table, query_spec, metadata)

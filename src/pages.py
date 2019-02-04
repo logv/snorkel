@@ -177,6 +177,7 @@ def run_query(cls, table=None, query=None, viewarea=None, filters=[]):
             "error" : "You don't have access to this table"
         }
 
+    user = flask_security.core.current_user.email
     # this is a name/value encoded array, unfortunately
     query = QuerySpec(query)
     query.add('table', table)
@@ -192,6 +193,7 @@ def run_query(cls, table=None, query=None, viewarea=None, filters=[]):
     query.set('viewbase', VwClass.BASE)
 
     res = bs.run_query(table, query, ti)
+    bs.log_query(user, query)
 
     cmp = None
     against = query.get('against', '')
@@ -222,6 +224,8 @@ def run_query(cls, table=None, query=None, viewarea=None, filters=[]):
 
         cmp = bs.run_query(table, compare_spec, ti)
         query.set('compare_mode', 1)
+
+        bs.log_query(user, compare_spec)
 
     sq = results.save_for_user(flask_security.core.current_user, query, res, cmp)
 
