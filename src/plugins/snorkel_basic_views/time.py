@@ -6,8 +6,6 @@ import os
 
 import numbers
 
-import dotmap
-
 TIME_SLICE_OPTIONS = [
     "auto",
     ("1 min", 60),

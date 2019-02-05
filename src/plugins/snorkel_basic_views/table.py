@@ -3,7 +3,6 @@ from snorkel.views import ViewBase, get_column_types
 from snorkel.components import Table
 import os
 
-import dotmap
 import numbers
 
 class TableView(ViewBase, pudgy.BackboneComponent, pudgy.SassComponent):

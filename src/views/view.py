@@ -4,7 +4,6 @@ from .. import backend
 
 from ..components import OldSnorkelComponent
 
-import dotmap
 import werkzeug
 import os
 import jinja2
