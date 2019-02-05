@@ -50,5 +50,4 @@ see docs/FEATURES.md
 
 ## screengifs
 
-Coming Soon
-
+<img src="https://i.imgur.com/7E4vKK2.gif" width="800"/>
