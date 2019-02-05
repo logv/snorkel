@@ -1,1 +1,1 @@
-FLASK_APP=src.cli:app flask add_superuser $*
+FLASK_APP=src.cli:app flask add-superuser $*

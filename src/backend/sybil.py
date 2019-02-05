@@ -405,6 +405,9 @@ class SybilBackend(Backend):
                 "user" : current_user.email
             }], log_ingest=False)
 
+if not os.path.exists(SYBIL_BIN):
+    SYBIL_BIN = run_command(["which", "sybil"]).strip()
+
 if __name__ == "__main__":
     print time_to_seconds('-1 week')
     print time_delta_to_seconds('-1 week')

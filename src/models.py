@@ -93,14 +93,18 @@ def create_db_if_not():
         pass
 
     User._meta.database.connect()
-    for c in [SavedQuery, User, UserToken]:
+    for c in [SavedQuery, User, UserToken, UserRoles]:
         c._meta.database.create_tables([c])
 
     # query DB migrations
+    # not necessarily needed
     migrator = SqliteMigrator(querydb)
-    migrate(
-        migrator.add_column('savedquery', 'compare', JSONField(default='')),
-    )
+    try:
+        migrate(
+            migrator.add_column('savedquery', 'compare', JSONField(default='')),
+        )
+    except Exception as e:
+        print e
 
 if __name__ == "__main__":
     if "RESET" in os.environ:

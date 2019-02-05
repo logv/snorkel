@@ -6,8 +6,8 @@ snorkel.lite is a re-implementation of [snorkel](https://github.com/logv/snorkel
 ### installation
 
 ```
-git clone -b slite git@github.com:logv/snorkel.git
-cd snorkel
+git clone --single-branch -b slite git@github.com:logv/snorkel.git slite
+cd slite
 make build
 make run
 ```
