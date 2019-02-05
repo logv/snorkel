@@ -1,5 +1,8 @@
 default: tags cscope
 
+package:
+				python setup.py sdist build
+
 run:
 				python -m src.main
 
