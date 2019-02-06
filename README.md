@@ -22,10 +22,10 @@ see docs/SETUP.md
 
 **Feb 2nd 2019**
 
-snorkel.lite is now in Alpha status. All but two views have been ported over
-from snorkel, data ingestion works and grafana endpoints are compatible. I have
-switched over from using the original snorkel to using snorkel.lite for several
-months now.
+snorkel.lite is now in Alpha status. All but two views (digraph and map view)
+have been ported over from snorkel, data ingestion works and grafana endpoints
+are compatible. I have switched over from using the original snorkel to using
+snorkel.lite for several months now.
 
 
 ### motivation

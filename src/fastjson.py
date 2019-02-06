@@ -5,5 +5,5 @@ try:
 except:
     import json
     loads = json.loads
-    dumps = json.loads
+    dumps = json.dumps
 
