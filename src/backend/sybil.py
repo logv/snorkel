@@ -20,7 +20,7 @@ ENABLE_REMOTE_INGEST=False
 MSYBIL_BIN = os.path.join(os.path.dirname(__file__), "msybil.py")
 MSYBIL_INGEST_BIN = os.path.join(os.path.dirname(__file__), "msybil_ingest.py")
 SYBIL_BIN="bin/sybil"
-DEBUG=False
+DEBUG="DEBUG" in os.environ
 
 if "MSYBIL" in os.environ:
     # TODO: make msybil.py read off MSYBIL environment variable instead of stdin

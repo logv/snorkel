@@ -72,7 +72,7 @@ def parse_perms(lines):
     return perm_lookups
 
 def read_rbac_file(fname):
-    with open("config/users.rbac") as f:
+    with open(fname) as f:
         lines = f.readlines()
 
     return parse_perms(lines)
