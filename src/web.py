@@ -30,6 +30,9 @@ def get_index():
     if current_user.is_authenticated:
         return redirect(url_for('get_datasets'))
 
+    if not config.SHOW_TOUR:
+        return redirect(url_for('get_datasets'))
+
     return HomePage(template="welcome.html").render()
 
 @app.route('/tour')
