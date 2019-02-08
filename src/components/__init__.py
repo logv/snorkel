@@ -6,6 +6,10 @@ from user_button import UserButton, UserModal
 # old snorkel components are prefixed with sf
 from . import sf_components as sf
 
+class TourCarousel(pudgy.BackboneComponent, pudgy.JinjaComponent):
+    def __prepare__(self):
+        from . import tour
+        self.context.slides = tour.slides
 
 def install(app):
     pudgy.use_jquery()

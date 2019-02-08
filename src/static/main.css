@@ -21,6 +21,7 @@ body {
   position: fixed;
   left: 0px;
   top: 0px;
+  z-index: 10;
 
   select {
     width: 148px;

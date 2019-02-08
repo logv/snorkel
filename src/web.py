@@ -29,11 +29,13 @@ app.config.update({
 def get_index():
     if current_user.is_authenticated:
         return redirect(url_for('get_datasets'))
+
     return HomePage(template="welcome.html").render()
 
 @app.route('/tour')
 def get_tour():
-    return HomePage(template="tour.html").render()
+    carousel = components.TourCarousel()
+    return HomePage(template="tour.html", carousel=carousel).render()
 
 @app.route('/pkg/status')
 def get_status():

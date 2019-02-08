@@ -1,0 +1,16 @@
+<div id="CakeCarousel" class="carousel" data-ride="carousel">
+  <!-- Carousel items -->
+  <div class="carousel-inner">
+    {% for s in slides %}
+        <div class="item slide {{ "active" if loop.counter == 0 else "" }}" data-id="{{  s.title  }}" style='height: 100%'>
+            <h1 class='mbl' style='text-align: center'>{{ s.title }}</h1>
+            <hr />
+            <img style='max-width: 1000px; width: 90%; ' class='mtl' src="{{ s.src }}" > </img>
+            <div class="caption">{{ s.caption or "" }}</div>
+        </div>
+      {% endfor %}
+  </div>
+  <!-- Carousel nav -->
+</div>
+  <a class="carousel-control left" role="button" href="#CakeCarousel" data-slide="prev">&lsaquo;</a>
+  <a class="carousel-control right" role="button" href="#CakeCarousel" data-slide="next">&rsaquo;</a>
