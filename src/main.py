@@ -43,7 +43,7 @@ def configure_presenters():
     ConfigureTable("snorkle@queries", name="snorkel@queries")
     ConfigureTable("plt", hidden=True)
 
-if __name__ == "__main__":
+def main():
     configure_presenters()
 
     PROFILE="PROFILE" in os.environ
@@ -53,3 +53,6 @@ if __name__ == "__main__":
         web.app.wsgi_app = ProfilerMiddleware(web.app.wsgi_app, restrictions = [30])
 
     web.app.run(port=os.environ.get("PORT", 2333), use_reloader=False, debug=PROFILE)
+
+if __name__ == "__main__":
+    main()

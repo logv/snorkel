@@ -8,7 +8,7 @@ snorkel.lite is a re-implementation of [snorkel](https://github.com/logv/snorkel
 ```
 git clone --single-branch -b slite git@github.com:logv/snorkel.git slite
 cd slite
-make build
+make setup
 make run
 ```
 
@@ -25,7 +25,7 @@ see docs/SETUP.md
 snorkel.lite is now in Alpha status. All but two views (digraph and map view)
 have been ported over from snorkel, data ingestion works and grafana endpoints
 are compatible. I have switched over from using the original snorkel to using
-snorkel.lite for several months now.
+snorkel.lite since November of 2018.
 
 
 ### motivation

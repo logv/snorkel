@@ -33,10 +33,9 @@ window.onpopstate = function(event) {
 module.exports = {
   events: {
     "change .selector[name='view']" : "handle_view_changed",
-    "click .btn.go" : "handle_go_clicked",
     "click .custom_time_inputs" : "handle_custom_time_inputs",
     "click .compare_filter" : "handle_compare_toggle",
-    "click .custom_field_inputs" : "handle_custom_fields_input"
+    "click .custom_field_inputs" : "handle_custom_fields_input",
   },
   initialize: function(ctx) {
     var self = this;
@@ -323,4 +322,34 @@ module.exports = {
     }
 
   }, 50),
+
+  hide_results: function() {
+    console.log("SHOWING RESULTS");
+
+    var btn = $(".toggle_viewarea");
+    var sidebar_pane = this.$el.parents(".sidebar_pane");
+    btn.text("Show Results");
+    sidebar_pane.addClass("active");
+    this.viewarea.$el.parents(".results").removeClass("active");
+
+  },
+
+  show_results: function() {
+    var btn = $(".toggle_viewarea");
+    var sidebar_pane = this.$el.parents(".sidebar_pane");
+    btn.text("Show Query");
+    sidebar_pane.removeClass("active");
+    this.viewarea.$el.parents(".results").addClass("active");
+  },
+
+  handle_toggle_viewarea: function(e) {
+    var to_hide = this.$el.find(".sidebar").is(":visible");
+
+    // if we are to_hide the sidebar, we show_results
+    if (to_hide) {
+      this.show_results();
+    } else {
+      this.hide_results();
+    }
+  },
 }

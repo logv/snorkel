@@ -3,6 +3,13 @@
   padding-top: 20px;
 
   display: block;
+  overflow-y: auto;
+  z-index: 10;
+}
+
+.query_sidebar {
+
+  min-height: 100%;
   width: 350px;
 }
 
@@ -17,6 +24,12 @@
   &:hover {
     background-color: #225;
     color: white;
+  }
+}
+
+@media #{$mobile} {
+  .go.btn {
+    display: none;
   }
 }
 
@@ -49,6 +62,34 @@
     min-height: 30px;
   }
 }
+
+@media #{$mobile} {
+
+  .control-row label {
+    width: 100%;
+    text-align: left;
+  }
+
+  .control-row .control-input {
+    display: block;
+    width: 95%;
+  }
+
+//  .control-row, .filter_row {
+//    zoom: 1.5;
+//  }
+
+  .control-input {
+    select, input {
+      padding: 5px;
+    }
+    select, input, .multiselect-container {
+      width: 100%;
+      min-height: 30px;
+    }
+  }
+}
+
 
 .spinner {
   width: 20px;

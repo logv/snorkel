@@ -5,12 +5,15 @@
 {{ add_stylesheet("main.css") }}
 {{ add_stylesheet("box.css") }}
 
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 
 
 <div class='pageheader'>
   <div class='clearfix'>
-    <h3 class='lfloat'><a href='{{ url_for('get_index') }}'>snorkel<small class='superscript'>lite</small></a></h3>
-    <img class='lfloat snorkel_icon' src='/static/images/snorkle_icon.png'>  </img>
+    <h3 class='lfloat logo'><a href='{{ url_for('get_index') }}'>snorkel<small class='superscript'>lite</small></a></h3>
+    <a href='{{ url_for('get_index') }}'><img class='lfloat snorkel_icon mll' src='/static/images/snorkle_icon.png'></img></a>
 
     <div class='lfloat clearfix'>
       {{ table_selector }}

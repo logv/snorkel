@@ -22,7 +22,9 @@ module.exports = {
   events: {
     "change select[name='table']": "handle_table_changed",
     "click .logout" : "handle_logout",
-    "click .username" : "handle_user_history"
+    "click .username" : "handle_user_history",
+    "click .toggle_viewarea" : "handle_toggle_viewarea",
+    "click .btn.go" : "handle_go_clicked",
   },
   initialize: function(ctx) {
     this.sidebar = ctx.sidebar;
@@ -39,6 +41,9 @@ module.exports = {
     $.post("/logout", function() {
       $(window.location).attr("href", "/");
     });
+  },
+  handle_toggle_viewarea: function(e) {
+    this.sidebar.handle_toggle_viewarea(e);
   },
 
   handle_user_history: function() {
@@ -63,5 +68,13 @@ module.exports = {
 
       });
   },
+
+  handle_go_clicked: function(e) {
+    e.stopPropagation();
+    e.preventDefault();
+    this.sidebar.handle_go_clicked();
+
+    this.sidebar.show_results();
+  }
 
 }
