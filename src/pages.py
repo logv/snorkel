@@ -94,8 +94,10 @@ class QueryPage(Page, pudgy.SassComponent, pudgy.BackboneComponent, pudgy.Server
         # locate the potential views
         query = QuerySpec(flask.request.args)
         self.context.error = None
+        has_saved = False
         if "saved" in self.context and self.context.saved:
             query = QuerySpec(self.context.saved.parsed)
+            has_saved = True
 
 
         table = self.context.table
@@ -148,6 +150,8 @@ class QueryPage(Page, pudgy.SassComponent, pudgy.BackboneComponent, pudgy.Server
             qs.call('show_compare_filters')
 
         qs.call("supports_compare_filters", view.SUPPORT_COMPARE_QUERIES)
+        if has_saved:
+            qs.call("show_results")
 
         qs.set_ref("sidebar")
         qs.marshal(table=table, viewarea=viewarea, metadata=table_info)
