@@ -15,7 +15,7 @@ from flask_security.utils import encrypt_password, verify_password
 
 @app.cli.command()
 @click.argument('name')
-def create_user(name):
+def add_user(name):
     dir = os.path.join(os.path.dirname(__file__), "..", "src")
     sys.path.append(dir)
 

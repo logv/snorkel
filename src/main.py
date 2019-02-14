@@ -12,8 +12,8 @@ from .presenter import DatasetPresenter, RegisterPresenter, ConfigureTable
 
 from .views import ViewSeparator
 
-from plugins.snorkel_basic_views import TableView, TimeView, DistView, SamplesView
-from plugins.snorkel_basic_views import AreaView, ScatterView, BarView, GroupedDist
+from .plugins.snorkel_basic_views import TableView, TimeView, DistView, SamplesView
+from .plugins.snorkel_basic_views import AreaView, ScatterView, BarView, GroupedDist
 
 from plugins.snorkel_advanced_views import TimelineView, OverviewView, ForecastView, DrilldownView, WecoView
 
@@ -39,9 +39,6 @@ def configure_presenters():
     ])
     RegisterPresenter(".*", default_presenter)
 
-
-    ConfigureTable("snorkle@queries", name="snorkel@queries")
-    ConfigureTable("plt", hidden=True)
 
 def main():
     configure_presenters()

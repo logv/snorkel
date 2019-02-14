@@ -1,7 +1,10 @@
+VERSION=`cat src/version.py | sed 's/__version__=//;s/"//g'`
+
 default: tags cscope
 
 package:
 				python setup.py sdist build
+				cp dist/snorkel-lite-${VERSION}.tar.gz dist/snorkel-lite-current.tar.gz
 
 run:
 				python -m src.main
@@ -21,6 +24,12 @@ tags:
 
 cscope:
 				pycscope -R -S src/
+
+sybil:
+				mkdir -p build/go
+				GOPATH=`readlink -f build/go` go get github.com/logv/sybil
+				mkdir -p src/backend/bin/
+				cp build/go/bin/sybil src/backend/bin/sybil
 
 
 build-package:

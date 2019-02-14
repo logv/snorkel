@@ -1,1 +1,1 @@
-FLASK_APP=src.cli:app flask create-user $*
+FLASK_APP=src.cli:app flask add-user $*

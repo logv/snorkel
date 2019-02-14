@@ -6,7 +6,7 @@ from snorkel.views import ViewBase
 
 import sys
 
-from src.plugins.snorkel_basic_views import TimeView
+from ..snorkel_basic_views import TimeView
 
 def make_dict(arr):
     return dict([(w,w) for w in arr])

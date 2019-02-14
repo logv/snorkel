@@ -216,10 +216,11 @@ def _main():
 if "DEBUG" in os.environ:
     KEEP_RESULTS=True
 
-SYBIL_BIN=None
+SYBIL_BIN = os.path.join(os.path.dirname(__file__), "bin", "sybil")
 def main():
     global SYBIL_BIN
-    SYBIL_BIN, _ = run_subprocess("which sybil")
+    if not os.path.exists(SYBIL_BIN):
+        SYBIL_BIN, _ = run_subprocess("which sybil")
 
     try:
         _main()

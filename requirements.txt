@@ -1,3 +1,4 @@
+addict
 bcrypt
 flask
 flask-admin
