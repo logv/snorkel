@@ -126,7 +126,7 @@ class SybilQuery(object):
 
     def add_op(self, query_spec, cmd_args):
         # if only one metric is specified:
-        op = query_spec.get_metric()
+        op = query_spec.get_metric() or "count"
         if op == "Distinct":
             cmd_args.extend(["-op", "distinct"])
         elif op[0].lower() == "p": # p25, p50, etc

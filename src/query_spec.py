@@ -61,6 +61,9 @@ class QuerySpec(object):
     def __json__(self):
         return self.__makedict__()
 
+    def setlist(self, k, v):
+        self.md.setlist(k, v)
+
     def set(self, k, v):
         if k in self.md:
             self.md.pop(k)
@@ -74,6 +77,8 @@ class QuerySpec(object):
             return self.md.getlist(k)
 
         return self.md.get(k) or []
+
+
 
     def get(self, k, d=None):
         return self.md.get(k, d)

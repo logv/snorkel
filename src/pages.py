@@ -194,6 +194,10 @@ def run_query(cls, table=None, query=None, viewarea=None, filters=[]):
 
     view = query.get('view')
     VwClass = get_view_by_name(view)
+
+    # this lets a class modify the parameters to a query using
+    # its own custom params
+    VwClass.add_custom_params(query)
     query.set('viewbase', VwClass.BASE)
 
     res = bs.run_query(table, query, ti)

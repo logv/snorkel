@@ -95,6 +95,11 @@ class ViewBase(pudgy.BackboneComponent):
     def get_name(self):
         return "%s" % (self.NAME)
 
+    @classmethod
+    def add_custom_params(self, query_spec):
+        return
+
+
     def add_time_controls(self, controls):
 
         has_custom = False

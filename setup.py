@@ -15,7 +15,7 @@ class BuildSybilCommand(build_py):
     def run(self):
         gopath = "build/go"
         os.environ["GOPATH"] = os.path.abspath("build/go")
-        check_call("/usr/bin/go install -ldflags='-s -w' github.com/logv/sybil", shell=True)
+        check_call("/usr/bin/go get -ldflags='-s -w' github.com/logv/sybil", shell=True)
 
         try:
             os.makedirs("src/backend/bin/")
@@ -27,13 +27,6 @@ class BuildSybilCommand(build_py):
 
 # TODO: fix permissions for msybil.py and msybil_ingest.py
 # from https://stackoverflow.com/questions/20288711/post-install-script-with-python-setuptools
-class PostDevelopCommand(develop):
-    """Post-installation for development mode."""
-    def run(self):
-        # PUT YOUR POST-INSTALL SCRIPT HERE or CALL A FUNCTION
-        check_call("/usr/bin/go install github.com/logv/sybil", shell=True)
-        develop.run(self)
-
 class PostInstallCommand(install):
     """Post-installation for installation mode."""
     def run(self):
