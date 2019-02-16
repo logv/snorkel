@@ -1,10 +1,6 @@
 VERSION=`cat src/version.py | sed 's/__version__=//;s/"//g'`
-
+ARCH="linux-x86_64"
 default: tags cscope
-
-package:
-				python setup.py sdist build
-				cp dist/snorkel-lite-${VERSION}.tar.gz dist/snorkel-lite-current.tar.gz
 
 run:
 				python -m src.main
@@ -31,8 +27,14 @@ sybil:
 				mkdir -p src/backend/bin/
 				cp build/go/bin/sybil src/backend/bin/sybil
 
-
-build-package:
+binary-package:
 				python setup.py sdist build
+				cp dist/snorkel-lite-${VERSION}.${ARCH}.tar.gz dist/snorkel-lite-current.${ARCH}.tar.gz
+
+source-package:
+				python setup.py sdist build
+				cp dist/snorkel-lite-${VERSION}.tar.gz dist/snorkel-lite-current.tar.gz
+
+
 
 .PHONY: tags clean build cscope run dev
