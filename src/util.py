@@ -23,11 +23,17 @@ def return_json(d):
 
 # from https://stackoverflow.com/questions/1254454/fastest-way-to-convert-a-dicts-keys-values-from-unicode-to-str
 import collections
+
+try:
+  basestring
+except NameError:
+  basestring = str
+
 def convert(data):
     if isinstance(data, basestring):
         return str(data)
     elif isinstance(data, collections.Mapping):
-        return dict(map(convert, data.iteritems()))
+        return dict(map(convert, data.items()))
     elif isinstance(data, collections.Iterable):
         return type(data)(map(convert, data))
     else:

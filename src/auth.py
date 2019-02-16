@@ -69,7 +69,7 @@ def check_auth():
                 resp_json = google.get("/oauth2/v2/userinfo").json()
                 if "error" in resp_json:
                     err = True
-            except Exception, e:
+            except Exception as e:
                 err = True
 
             if err:

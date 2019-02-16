@@ -1,9 +1,10 @@
+from __future__ import absolute_import
 import pudgy
 
 from snorkel.views import ViewBase
 from snorkel.components import *
 
-from dist import DistView
+from .dist import DistView
 import os
 
 class GroupedDist(DistView):

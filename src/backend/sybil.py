@@ -1,3 +1,4 @@
+from __future__ import print_function
 import os
 from subprocess import Popen, PIPE, check_output
 from flask_security import current_user
@@ -24,7 +25,7 @@ DEBUG="DEBUG" in os.environ
 
 if "MSYBIL" in os.environ:
     # TODO: make msybil.py read off MSYBIL environment variable instead of stdin
-    print >> sys.stderr,  " s Using Multisybil"
+    print(" s Using Multisybil", file=sys.stderr)
 
     SYBIL_BIN = MSYBIL_BIN
     USING_MSYBIL = True
@@ -71,14 +72,19 @@ def run_query_command(cmd_args):
     ret = run_command(init_cmd_args)
     return json.loads(ret)
 
-def run_command(cmd_args, stdin=""):
-    print "RUNNING COMMAND", " ".join(cmd_args)
+def run_command(cmd_args, stdin=b""):
+    cmd_args = list(map(lambda w: w.decode("utf-8"), cmd_args))
+    print("RUNNING COMMAND", " ".join(cmd_args))
+
+    if isinstance(stdin, str):
+        stdin = stdin.encode("utf-8")
+
     p = Popen(cmd_args, stdin=PIPE, stdout=PIPE, stderr=PIPE)
     stdout, stderr = p.communicate(stdin)
     if DEBUG:
-        print stderr
+        print(stderr)
 
-    return stdout
+    return stdout.decode("utf-8")
 
 FIELD_SEPARATOR=chr(30)
 FILTER_SEPARATOR=chr(31)
@@ -394,7 +400,8 @@ class SybilBackend(Backend):
         else:
             cmd_args = [SYBIL_BIN, "ingest", "-table", table]
 
-        print "INGESTING %s SAMPLES INTO %s" % (len(samples), table)
+        print("INGESTING %s SAMPLES INTO %s" % (len(samples), table))
+        cmd_args = map(lambda w: w.encode("utf-8"), cmd_args)
         run_command(cmd_args, stdin=json.dumps(samples))
 
         if log_ingest:
@@ -414,5 +421,5 @@ if not os.path.exists(SYBIL_BIN):
     SYBIL_BIN = run_command(["which", "sybil"]).strip()
 
 if __name__ == "__main__":
-    print time_to_seconds('-1 week')
-    print time_delta_to_seconds('-1 week')
+    print(time_to_seconds('-1 week'))
+    print(time_delta_to_seconds('-1 week'))

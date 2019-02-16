@@ -1,7 +1,8 @@
+from __future__ import absolute_import
 import pudgy
 from .components import *
-from query_sidebar import QuerySidebar
-from user_button import UserButton, UserModal
+from .query_sidebar import QuerySidebar
+from .user_button import UserButton, UserModal
 
 # old snorkel components are prefixed with sf
 from . import sf_components as sf

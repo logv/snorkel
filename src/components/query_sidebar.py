@@ -15,9 +15,9 @@ def sizeof_fmt(num, suffix='B'):
 
 def count_fmt(num, suffix=''):
     for unit in ['','K','M','B','T']:
-	if abs(num) < 1000.0:
-	    return "%3.1f%s%s" % (num, unit, suffix)
-	num /= 1000.0
+        if abs(num) < 1000.0:
+            return "%3.1f%s%s" % (num, unit, suffix)
+        num /= 1000.0
     return "%.1f%s%s" % (num, 'Z', suffix)
 
 def format_bytes(w):

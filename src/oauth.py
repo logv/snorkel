@@ -1,3 +1,4 @@
+from __future__ import print_function
 from flask import session, abort, redirect
 from flask_dance.consumer import oauth_authorized
 from flask_dance.contrib.google import make_google_blueprint, google
@@ -29,7 +30,7 @@ def setup_google_blueprint(app):
         resp_json = google.get("/oauth2/v2/userinfo").json()
         email = resp_json["email"]
         hd = email.split("@")[-1]
-        print "HD IS", hd
+        print("HD IS", hd)
         if AUTHORIZED_DOMAIN and hd != AUTHORIZED_DOMAIN:
             requests.post(
                 "https://accounts.google.com/o/oauth2/revoke",
@@ -38,7 +39,7 @@ def setup_google_blueprint(app):
             session.clear()
             abort(403)
 
-        pw = "%x" % int(random.random() * sys.maxint)
+        pw = "%x" % int(random.random() * sys.maxsize)
         user, found = User.get_or_create(email=email,defaults={"password" : pw})
         user.save()
 
@@ -55,9 +56,9 @@ def logout_oauth():
                     params={"token": token},
                     headers={"Content-Type": "application/x-www-form-urlencoded"}
                 )
-                print resp.ok, resp.text
-            except Exception, e:
-                print e
+                print(resp.ok, resp.text)
+            except Exception as e:
+                print(e)
     except:
         pass
 

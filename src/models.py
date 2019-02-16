@@ -1,3 +1,4 @@
+from __future__ import print_function
 from peewee import *
 from playhouse.sqlite_ext import *
 
@@ -89,7 +90,7 @@ class UserRoles(UserModel):
 def create_db_if_not():
     try:
         os.makedirs(DB_DIR)
-    except Exception, e:
+    except Exception as e:
         pass
 
     User._meta.database.connect()
@@ -104,7 +105,7 @@ def create_db_if_not():
             migrator.add_column('savedquery', 'compare', JSONField(default='')),
         )
     except Exception as e:
-        print e
+        print(e)
 
 if __name__ == "__main__":
     if "RESET" in os.environ:

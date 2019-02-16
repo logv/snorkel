@@ -1,9 +1,10 @@
+from __future__ import absolute_import
 import pudgy
 
 from snorkel.views import ViewBase
 from snorkel.components import *
 
-from time import TimeView
+from .time import TimeView
 import os
 
 class AreaView(TimeView):

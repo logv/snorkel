@@ -56,6 +56,8 @@ def print_file(filename, title="", fd=sys.stdout, force=False):
     filetype,err = run_subprocess("file '%s'" % filename)
     filetype = filetype.lower()
 
+    filetype = filetype.decode("utf-8")
+
     if filetype.find("ascii") != -1 or filetype.find("unicode") != -1 or force:
         with open(filename) as f:
             filedata = f.read().strip()
@@ -67,8 +69,8 @@ def debug_file(filename, title):
     return print_file(filename, title, fd=sys.stderr)
 
 def write_to_file(filename, data):
-    with open(filename, "w") as f:
-        f.write(data or "")
+    with open(filename, "wb") as f:
+        f.write(data or b"")
 
 def run_local_commands(cmd):
     out,err = run_subprocess("%s %s" % (SYBIL_BIN, cmd))
@@ -78,6 +80,7 @@ def run_local_commands(cmd):
 def check_connection(host):
     full_cmd = "ssh -O check %s " % (host)
     out, err = run_subprocess(full_cmd)
+    err = err.decode("utf-8")
     if err.find("running") != -1:
         return
 
@@ -90,7 +93,7 @@ def check_connection(host):
     # establishing it
     incr = 0.1
     steps = int(1 / incr)
-    for _ in xrange(steps):
+    for _ in range(steps):
         time.sleep(incr)
         out, err = run_subprocess(full_cmd)
         if err.find("running") != -1:
@@ -101,7 +104,7 @@ def run_command_on_host(host, working_dir, bin):
     check_connection(host)
 
     query_flag_file = os.path.join(BASEDIR, "query_flags.gob")
-    with open(query_flag_file) as f:
+    with open(query_flag_file, "rb") as f:
         query_flag_data = f.read()
 
     full_cmd = "ssh -C %s \"cd \"%s\" && \"%s\" query -decode-flags\"" % (host, working_dir, bin)
@@ -154,7 +157,7 @@ def print_remote_results():
 def aggregate_remote_results():
     full_cmd = "%s aggregate \"%s\"" % (SYBIL_BIN, RESULT_DIR)
     query_flag_file = os.path.join(BASEDIR, "query_flags.gob")
-    with open(query_flag_file) as f:
+    with open(query_flag_file, "rb") as f:
         query_flag_data = f.read()
 
     out, err = run_subprocess(full_cmd, query_flag_data)

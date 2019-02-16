@@ -1,3 +1,4 @@
+from __future__ import print_function
 import re
 
 METRIC_OPTIONS = [
@@ -52,7 +53,6 @@ def RegisterPresenter(rule, presenter):
 def GetPresenter(dataset):
     for r, p in reversed(PRESENTERS):
         if re.search(r, dataset):
-            print "P", p
             return p
 
 

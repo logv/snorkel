@@ -20,6 +20,9 @@ def debug_file(filename, title):
     return print_file(filename, title, fd=sys.stderr)
 
 def write_to_file(filename, data):
+    if isinstance(data, bytes):
+        data = data.decode("utf-8")
+
     with open(filename, "w") as f:
         f.write(data or "")
 
@@ -32,6 +35,11 @@ def run_subprocess(cmd, stdin=None, wait=True):
 
     if wait:
         print("WAITING FOR SUBPROCESS", cmd)
+        if stdin:
+            print("STDIN IS", stdin)
+        if isinstance(stdin, str):
+            stdin = stdin.encode("utf-8")
+
         stdout,stderr = process.communicate(stdin)
         return stdout.strip(), stderr
     else:
@@ -47,6 +55,8 @@ def cleanup():
 def check_connection(host):
     full_cmd = "ssh -O check %s " % (host)
     out, err = run_subprocess(full_cmd)
+    err = err.decode("utf-8")
+
     if err.find("running") != -1:
         return
 

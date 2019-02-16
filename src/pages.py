@@ -1,3 +1,4 @@
+from __future__ import print_function
 import pudgy
 import flask
 import time
@@ -19,7 +20,11 @@ from .query_spec import QuerySpec
 
 from .util import time_to_seconds, string_dict
 
-from urllib import unquote_plus
+try:
+    from urllib import unquote_plus
+except:
+    from urllib.parse import unquote_plus
+
 from . import fastjson as json
 
 class ViewArea(UIComponent, pudgy.JinjaComponent, pudgy.BackboneComponent, pudgy.ClientBridge):
@@ -80,7 +85,7 @@ def read_filters(query, i='query'):
 
         filters = filters[i]
     except Exception as e:
-        print "FILTER ERR", e
+        print("FILTER ERR", e)
 
     return filters
 
@@ -113,7 +118,7 @@ class QueryPage(Page, pudgy.SassComponent, pudgy.BackboneComponent, pudgy.Server
             tables = filter(lambda t: rbac.check("query", t), bs.list_tables())
         except Exception as e:
             self.context.error = "Couldn't read table info for table %s" % (table)
-	    return
+            return
 
 
         table_selector = Selector(name="table", selected=table, options=tables)
