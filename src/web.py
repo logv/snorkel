@@ -1,6 +1,9 @@
 import pudgy
 import flask
 import os
+import time
+
+import addict
 
 from flask import redirect, url_for
 from flask_security import core, current_user
@@ -18,11 +21,51 @@ from .util import return_json
 
 app = flask.Flask(__name__)
 
+from werkzeug.contrib.fixers import ProxyFix
+app.wsgi_app = ProxyFix(app.wsgi_app)
+
+
 pudgy.register_blueprint(app)
 
 app.config.update({
     "SESSION_COOKIE_NAME" : "slite"
 })
+
+@app.before_request
+def start_logger():
+    flask.request._sample = addict.Dict()
+    flask.request._sample.time = time.time()
+
+@app.after_request
+def send_logs(req):
+    if not flask.request._sample:
+        return
+
+    url = flask.request.url
+    route = 'unknown'
+    if flask.request.url_rule:
+        route = flask.request.url_rule.rule
+    duration = time.time() - flask.request._sample.time
+    flask.request._sample.duration = duration
+    flask.request._sample.route = route
+    flask.request._sample.url = url
+    ua = flask.request.user_agent
+
+    flask.request._sample.user_agent = {
+        "browser" : ua.browser,
+        "platform" : ua.platform,
+        "version" : ua.version,
+        "language" : ua.language,
+        "ip" : flask.request.remote_addr
+    }
+
+    bs = SybilBackend()
+    try:
+        bs.ingest("slite@pagestats", [flask.request._sample])
+    except:
+        pass
+
+    return req
 
 
 @app.route('/')

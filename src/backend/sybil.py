@@ -398,11 +398,16 @@ class SybilBackend(Backend):
         run_command(cmd_args, stdin=json.dumps(samples))
 
         if log_ingest:
+            user = "anonymous"
+            try:
+                user = current_user.email
+            except:
+                pass
             self.ingest("slite@ingest", [{
                 "table": table,
                 "count" : len(samples),
                 "time" : int(time.time()),
-                "user" : current_user.email
+                "user" : user
             }], log_ingest=False)
 
 if not os.path.exists(SYBIL_BIN):
