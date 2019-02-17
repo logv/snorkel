@@ -359,7 +359,8 @@ class SybilBackend(Backend):
     def list_tables(self):
         tables = run_query_command(["-tables"])
         tables = map(presenter.GetTableName, tables)
-        tables = filter(presenter.IsTableVisible, tables)
+        tables = list(filter(presenter.IsTableVisible, tables))
+        tables.sort()
         return tables
 
 
