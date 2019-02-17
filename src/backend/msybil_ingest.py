@@ -34,9 +34,6 @@ def run_subprocess(cmd, stdin=None, wait=True):
     process = subprocess.Popen(shlex.split(cmd), stdout=subprocess.PIPE, stdin=subprocess.PIPE, stderr=subprocess.PIPE)
 
     if wait:
-        print("WAITING FOR SUBPROCESS", cmd)
-        if stdin:
-            print("STDIN IS", stdin)
         if isinstance(stdin, str):
             stdin = stdin.encode("utf-8")
 
