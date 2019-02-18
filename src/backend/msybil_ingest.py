@@ -66,9 +66,10 @@ def check_connection(host):
     # establishing it
     incr = 0.1
     steps = int(1 / incr)
-    for _ in xrange(steps):
+    for _ in range(steps):
         time.sleep(incr)
         out, err = run_subprocess(full_cmd)
+        err = err.decode("utf-8")
         if err.find("running") != -1:
             break
 

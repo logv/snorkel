@@ -34,7 +34,7 @@ class PostInstallCommand(install):
         for fn in self.get_outputs():
             if fn.find("msybil"):
                 # copied from distutils source - make the binaries executable
-                mode = ((os.stat(fn).st_mode) | 0555) & 07777
+                mode = ((os.stat(fn).st_mode) | 0o555) & 0o7777
                 os.chmod(fn, mode)
 
 
