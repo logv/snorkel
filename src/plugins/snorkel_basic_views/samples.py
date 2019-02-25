@@ -25,7 +25,7 @@ class SamplesView(ViewBase, pudgy.JSComponent):
         fields, types = get_column_types(md)
 
         query = self.context.query
-        headers = fields.keys()
+        headers = list(fields.keys())
         headers.sort()
 
         table = []
