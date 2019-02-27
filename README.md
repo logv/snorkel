@@ -1,9 +1,43 @@
 ## snorkel.lite
 
-snorkel.lite is a re-implementation of [snorkel](https://github.com/logv/snorkel) in python
+snorkel is a real time data analysis tool, meant to answer questions about the
+now. At its heart, snorkel is built on the idea that iterative analysis is key
+to understanding. In other words - when graphs move, it should be easy to drill
+down on what is happening and why, not a frustrating exercise in adjusting
+failed queries.
 
+Using [sybil](https://github.com/logv/sybil) as a backend, snorkel can support
+querying datasets with tens of millions of samples in realtime.
+
+snorkel.lite is a re-implementation of snorkel in python, to read more
+about why we moved to python from nodejs, [see the motivation
+docs](https://raw.githubusercontent.com/logv/snorkel/slite/docs/MOTIVATION.md)
+
+### status
+
+**Feb 2019**
+
+snorkel.lite is now in Alpha status. All but one view (map view) has been
+ported over from snorkel, data ingestion works and grafana endpoints are
+compatible. I have switched over from using the original snorkel to using
+snorkel.lite since November of 2018.
+
+**Sept. 2018**
+
+Development has started on porting snorkel to python.
 
 ### installation
+
+#### Deployment
+
+The simplest way to deploy snorkel will be to use the
+[snorkel-deploy](https://github.com/logv/snorkel.deploy) repository. The deploy
+repository uses the snorkel-lite pypi package and lets you configure
+snorkel separately from its code.
+
+#### Development
+
+To develop on snorkel, clone snorkel and get going:
 
 ```
 git clone --single-branch -b slite git@github.com:logv/snorkel.git slite
@@ -14,39 +48,21 @@ make run
 
 ### configuration
 
-see docs/SETUP.md
+[see docs/SETUP.md](https://raw.githubusercontent.com/logv/snorkel/slite/docs/SETUP.md)
 
+## documents
 
-### status
+[motivation](https://raw.githubusercontent.com/logv/snorkel/slite/docs/MOTIVATION.md)
 
+[features](https://raw.githubusercontent.com/logv/snorkel/slite/docs/FEATURES.md)
 
-**Feb 2nd 2019**
+[try a demo](https://github.com/logV/snorkel/wiki/Demo)
 
-snorkel.lite is now in Alpha status. All but two views (digraph and map view)
-have been ported over from snorkel, data ingestion works and grafana endpoints
-are compatible. I have switched over from using the original snorkel to using
-snorkel.lite since November of 2018.
+[read the quick start](https://github.com/logV/snorkel/wiki/QuickStart)
 
+[usage guide](https://github.com/logV/snorkel/wiki/Guide)
 
-### motivation
-
-the reasons for moving to python are severalfold:
-
-* nodejs apps are annoying to maintain and deploy, as there is too much churn in the nodejs ecosystem
-* backend devs don't like writing javascript, but don't seem to mind writing python
-* writing an app just for sybil lets us move past old baggage of supporting mongodb and postgres
-
-### goals
-
-* write an easy to deploy UI for browsing data kept in sybil
-* make it easy to extend and write new views
-* make an app that is easy to white label (and self host inside organizations)
-* re-use as much work from original snorkel while keeping the implementation clean
-* minimize external dependencies: use sqlite for data store, flask for web, etc
-
-## features
-
-see docs/FEATURES.md
+[grafana snorkel datasource](https://github.com/logV/grafana-snorkel-datasource) is a plugin for grafana (3.0+) to query snorkel. While this plugin is in early stages, grafana is quite amazing.
 
 ## screengifs
 

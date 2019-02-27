@@ -24,14 +24,14 @@
 * data ingestion that passes data from slite to sybil
 * dataset presenters
 * per table user permissions
-* dashboards endpoint (grafana compatible, ideally)
+* dashboards endpoint for use with grafana
 
 
 ### planned
 
 * robust error handling
 * dataset settings page
-* graph views: cyto and datamaps
+* graph views: datamaps
 
 ### unknown
 
