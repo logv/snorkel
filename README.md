@@ -1,4 +1,4 @@
-## snorkel.lite
+## snorkel
 
 snorkel is a real time data analysis tool, meant to answer questions about the
 now. At its heart, snorkel is built on the idea that iterative analysis is key
@@ -9,24 +9,24 @@ failed queries.
 Using [sybil](https://github.com/logv/sybil) as a backend, snorkel can support
 querying datasets with tens of millions of samples in realtime.
 
-snorkel.lite is a re-implementation of snorkel in python, to read more
+snorkel-lite is a re-implementation of snorkel in python, to read more
 about why we moved to python from nodejs, [see the motivation
 docs](https://github.com/logv/snorkel/blob/slite/docs/MOTIVATION.md)
 
-### status
+### Status
 
 **Feb 2019**
 
-snorkel.lite is now in Alpha status. All but one view (map view) has been
+snorkel-lite is now in Alpha status. All but one view (map view) has been
 ported over from snorkel, data ingestion works and grafana endpoints are
 compatible. I have switched over from using the original snorkel to using
-snorkel.lite since November of 2018.
+snorkel-lite since November of 2018.
 
 **Sept. 2018**
 
 Development has started on porting snorkel to python.
 
-### installation
+### Installation
 
 #### Deployment
 
