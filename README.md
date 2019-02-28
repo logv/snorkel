@@ -11,7 +11,7 @@ querying datasets with tens of millions of samples in realtime.
 
 snorkel.lite is a re-implementation of snorkel in python, to read more
 about why we moved to python from nodejs, [see the motivation
-docs](https://raw.githubusercontent.com/logv/snorkel/slite/docs/MOTIVATION.md)
+docs](https://github.com/logv/snorkel/blob/slite/docs/MOTIVATION.md)
 
 ### status
 
@@ -48,13 +48,12 @@ make run
 
 ### configuration
 
-[see docs/SETUP.md](https://raw.githubusercontent.com/logv/snorkel/slite/docs/SETUP.md)
+[see docs/SETUP.md](https://github.com/logv/snorkel/blob/slite/docs/SETUP.md)
 
 ## documents
 
-[motivation](https://raw.githubusercontent.com/logv/snorkel/slite/docs/MOTIVATION.md)
-
-[features](https://raw.githubusercontent.com/logv/snorkel/slite/docs/FEATURES.md)
+[motivation](https://github.com/logv/snorkel/blob/slite/docs/MOTIVATION.md) and
+[features](https://github.com/logv/snorkel/blob/slite/docs/FEATURES.md)
 
 [try a demo](https://github.com/logV/snorkel/wiki/Demo)
 
