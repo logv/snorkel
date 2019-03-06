@@ -28,7 +28,7 @@ sybil:
 				cp build/go/bin/sybil src/backend/bin/sybil
 
 binary-package:
-				python setup.py sdist build
+				python setup.py bdist_wheel
 				cp dist/snorkel-lite-${VERSION}.${ARCH}.tar.gz dist/snorkel-lite-current.${ARCH}.tar.gz
 
 source-package:
