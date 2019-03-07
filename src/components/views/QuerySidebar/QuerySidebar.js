@@ -324,20 +324,24 @@ module.exports = {
   }, 50),
 
   hide_results: function() {
-    console.log("SHOWING RESULTS");
+    console.log("HIDING RESULTS");
 
     var btn = $(".toggle_viewarea");
     var sidebar_pane = this.$el.parents(".sidebar_pane");
     btn.text("Show Results");
+    $(".btn.go").addClass("display");
     sidebar_pane.addClass("active");
     this.viewarea.$el.parents(".results").removeClass("active");
 
   },
 
   show_results: function() {
+    console.log("SHOWING RESULTS");
     var btn = $(".toggle_viewarea");
     var sidebar_pane = this.$el.parents(".sidebar_pane");
     btn.text("Show Query");
+
+    $(".btn.go").removeClass("display");
     sidebar_pane.removeClass("active");
     this.viewarea.$el.parents(".results").addClass("active");
   },
