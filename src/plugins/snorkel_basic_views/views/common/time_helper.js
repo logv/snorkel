@@ -29,13 +29,15 @@ function add_missing_values(serie, time_bucket, start, end, is_compare) {
   // fills in the missing values at the end of the series
   while (!is_compare && expected < end) {
     expected += time_bucket * 1000;
-    missing += 1;
-    pt = {
-      x: expected,
-      y: 0
-    };
+    if (expected < end) {
+      missing += 1;
+      pt = {
+        x: expected,
+        y: 0
+      };
 
-    new_serie.push(pt);
+      new_serie.push(pt);
+    }
   }
 
   return new_serie;
