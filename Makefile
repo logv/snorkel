@@ -27,14 +27,32 @@ sybil:
 				mkdir -p src/backend/bin/
 				cp build/go/bin/sybil src/backend/bin/sybil
 
-binary-package:
+virtualenv:
+				virtualenv dev2 -p python2
+				virtualenv dev3 -p python3
+
+binary2:
+				bash dev2/bin/activate
 				python setup.py bdist_wheel
-				cp dist/snorkel-lite-${VERSION}.${ARCH}.tar.gz dist/snorkel-lite-current.${ARCH}.tar.gz
+
+binary3:
+				bash dev3/bin/activate
+				python setup.py bdist_wheel
+
+binary-package: binary2 binary3
+
+upload2:
+				bash dev2/bin/activate
+				python setup.py bdist_wheel upload
+
+upload3:
+				bash dev3/bin/activate
+				python setup.py bdist_wheel upload
+
+upload-package: upload2 upload3
 
 source-package:
 				python setup.py sdist build
 				cp dist/snorkel-lite-${VERSION}.tar.gz dist/snorkel-lite-current.tar.gz
-
-
 
 .PHONY: tags clean build cscope run dev
