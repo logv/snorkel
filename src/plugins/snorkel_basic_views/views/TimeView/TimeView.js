@@ -102,9 +102,6 @@ var TimeView = {
                           .html(helpers.number_format(point.y));
             ptDiv.append(valDiv);
 
-            el.append(ptDiv);
-
-
             var samples = point.point.samples;
             if (samples) {
               var sampleDiv = $("<div class='mlm' />").html("(" + samples + "samples)");
@@ -112,6 +109,12 @@ var TimeView = {
               valDiv.append(sampleDiv);
 
             }
+
+            if (samples > 0) {
+              el.append(ptDiv);
+            }
+
+
           });
 
           return el.html();
