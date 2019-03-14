@@ -191,13 +191,13 @@ class SybilQuery(object):
         end_ms = query_spec.get('end_ms', '')
 
         if start_ms:
-            start_s = int(start_ms) / 1000
+            start_s = int(start_ms / 1000)
         else:
             start = query_spec.get('start', "-1 week")
             start_s = time_to_seconds(start)
 
         if end_ms:
-            end_s = int(end_ms) / 1000
+            end_s = int(end_ms / 1000)
         else:
             end = query_spec.get('end', "now")
             end_s = time_to_seconds(end)
