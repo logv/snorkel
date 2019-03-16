@@ -32,22 +32,22 @@ virtualenv:
 				virtualenv dev3 -p python3
 
 binary2:
-				bash dev2/bin/activate
-				python setup.py bdist_wheel
+				. dev2/bin/activate; \
+				python setup.py bdist_wheel; \
 
 binary3:
-				bash dev3/bin/activate
-				python setup.py bdist_wheel
+				. dev3/bin/activate; \
+				python setup.py bdist_wheel; \
 
 binary-package: binary2 binary3
 
 upload2:
-				bash dev2/bin/activate
-				python setup.py bdist_wheel upload
+				. dev2/bin/activate; \
+				python setup.py bdist_wheel upload; \
 
 upload3:
-				bash dev3/bin/activate
-				python setup.py bdist_wheel upload
+				. dev3/bin/activate; \
+				python setup.py bdist_wheel upload; \
 
 upload-package: upload2 upload3
 
