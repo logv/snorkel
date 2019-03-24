@@ -19,7 +19,7 @@ var TimeView = {
     var is_compare = this.compare_query === data;
     this.max_x = data.end_ms || "";
     var fill_missing = "zero";
-    var custom_params = {};
+    var custom_params = this.query.query;
 
     var series = time_helper.prepare(data, {
       dataset: dataset,
@@ -154,7 +154,7 @@ var TimeView = {
     var self = this;
 
 //    var custom_params = this.query.parsed.custom;
-    var custom_params = {};
+    var custom_params = this.query.query;
 
     options.series = data;
 

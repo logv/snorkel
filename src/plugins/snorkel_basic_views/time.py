@@ -50,6 +50,21 @@ class TimeView(ViewBase, pudgy.JSComponent):
         controls.append(ControlRow("time_divisor", "Normalize", normalize))
 
 
+    def add_time_series_controls_suppl(self, controls):
+        separate_by = Selector(
+            name="separate_series",
+            options=[("None", ""), ("By Field", "agg"), ("By Group", "group")],
+            selected=self.context.query.get("separate_series"))
+        controls.append(ControlRow("separate_series", "Separate Charts", separate_by))
+
+        fill_missing = Selector(
+            name="fill_missing",
+            options=[("Ignore", "ignore"), ("Treat as Zero", "zero")],
+            selected=self.context.query.get("fill_missing"))
+        controls.append(ControlRow("fill_missing", "Missing Data", fill_missing))
+
+
+
 
     def get_controls(self):
         controls = []
@@ -64,6 +79,7 @@ class TimeView(ViewBase, pudgy.JSComponent):
 
         self.add_metric_selector(controls)
         self.add_fields_selector(controls)
+        self.add_time_series_controls_suppl(controls)
         self.add_go_button(controls)
 
         return controls
