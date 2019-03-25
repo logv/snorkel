@@ -9,6 +9,22 @@ from subprocess import check_call
 
 import os
 import shutil
+import tokenize
+
+# https://github.com/habnabit/passacre/commit/2ea05ba94eab2d26951ae7b4b51abf53132b20f0
+try:
+    _detect_encoding = tokenize.detect_encoding
+except AttributeError:
+    pass
+else:
+    def detect_encoding(readline):
+        try:
+            return _detect_encoding(readline)
+        except SyntaxError:
+            return 'latin-1', []
+
+    tokenize.detect_encoding = detect_encoding
+
 
 # this builds and installs sybil into the package
 class BuildSybilCommand(build_py):
@@ -21,7 +37,14 @@ class BuildSybilCommand(build_py):
             os.makedirs("src/backend/bin/")
         except:
             pass
+
+        try:
+            os.makedirs("bin/")
+        except:
+            pass
+
         shutil.copy("build/go/bin/sybil", "src/backend/bin/")
+        shutil.copy("build/go/bin/sybil", "bin/snorkel.sybil")
 
         build_py.run(self)
 
@@ -66,6 +89,7 @@ setup(
         'snorkel.plugins.snorkel_basic_views',
         'snorkel.plugins.snorkel_advanced_views' ],
     package_dir= { "snorkel" : "src" },
+    scripts=[ "bin/snorkel.sybil" ],
     entry_points = {
         'flask.commands': [
             'add_user=snorkel.cli:add_user',
