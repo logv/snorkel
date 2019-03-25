@@ -4,6 +4,10 @@ module.exports = {
   tagName: "div",
   className: "",
   client: function(options) {
+    if (_.isNaN(options.created)) {
+      options.created = +new Date();
+    }
+
     var created_str = new Date(options.created).toISOString();
     var that = this;
 

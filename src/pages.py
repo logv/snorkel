@@ -254,7 +254,7 @@ def run_query(cls, table=None, query=None, viewarea=None, filters=[]):
                 "errmsg" : "No results found for this query"
             });
         viewarea.html(v.render())
-        # viewarea.call("set_view", v)
+        viewarea.call("set_view", v)
 
 
     d['filters'] = json.dumps(d['filters'])
