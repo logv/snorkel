@@ -12,6 +12,7 @@ module.exports = {
     var that = this;
 
     var view = options.query.parsed.baseview || options.query.parsed.viewbase || options.query.parsed.view;
+
     var count = 0;
     var w_count = 0;
     var results = options.query.results;
