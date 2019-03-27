@@ -1,0 +1,21 @@
+#!/usr/bin/env python
+from __future__ import print_function
+import os
+import sys
+
+import snorkel
+from snorkel.web import app
+
+snorkel.shared_mode()
+
+def main():
+    if len(sys.argv) <= 1:
+      print("Usage: snorkel.get_user_token <username>")
+
+    with app.app_context():
+        snorkel.cli._get_user_token(sys.argv[1])
+
+if __name__ == "__main__":
+    main()
+
+# vim syntax=python

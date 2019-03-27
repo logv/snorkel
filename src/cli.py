@@ -14,10 +14,7 @@ from .models import User, UserToken
 
 from flask_security.utils import encrypt_password, verify_password
 
-
-@app.cli.command()
-@click.argument('name')
-def add_user(name):
+def _add_user(name):
     dir = os.path.join(os.path.dirname(__file__), "..", "src")
     sys.path.append(dir)
 
@@ -35,10 +32,13 @@ def add_user(name):
         user.save()
         print("Created user", name)
 
-
 @app.cli.command()
 @click.argument('name')
-def add_superuser(name):
+def add_user(name):
+    _add_user(name)
+
+
+def _add_superuser(name):
     from flask_security.datastore import PeeweeUserDatastore
     from .models import User, Role, UserRoles, userdb
 
@@ -71,13 +71,20 @@ def add_superuser(name):
         user.save()
         print("Created user", name)
 
-
 @app.cli.command()
 @click.argument('name')
-def get_user_token(name):
+def add_superuser(name):
+    _add_superuser(name)
+
+def _get_user_token(name):
     try:
         user = User.get(User.email == name)
         print(user.get_auth_token())
 
     except User.DoesNotExist:
         print("No such user '%s'" % name)
+
+@app.cli.command()
+@click.argument('name')
+def get_user_token(name):
+    _get_user_token(name)

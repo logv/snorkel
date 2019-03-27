@@ -89,7 +89,13 @@ setup(
         'snorkel.plugins.snorkel_basic_views',
         'snorkel.plugins.snorkel_advanced_views' ],
     package_dir= { "snorkel" : "src" },
-    scripts=[ "bin/snorkel.sybil", "bin/snorkel.ingest", "bin/snorkel.query" ],
+    scripts=[
+        "bin/snorkel.add_user",
+        "bin/snorkel.frontend",
+        "bin/snorkel.ingest",
+        "bin/snorkel.query",
+        "bin/snorkel.sybil",
+    ],
     entry_points = {
         'flask.commands': [
             'add_user=snorkel.cli:add_user',
