@@ -1,0 +1,29 @@
+#!/usr/bin/env python
+from __future__ import print_function
+import os
+import sys
+from subprocess import Popen, PIPE
+
+DEBUG="DEBUG" in os.environ
+SYBIL_BIN = os.path.join(os.path.dirname(__file__), "snorkel.sybil")
+
+def run_command(cmd_args, stdin=b""):
+    cmd_args = list(map(lambda w: w.decode("utf-8"), cmd_args))
+    print("RUNNING COMMAND", " ".join(cmd_args))
+
+    if isinstance(stdin, str):
+        stdin = stdin.encode("utf-8")
+
+    p = Popen(cmd_args, stdin=PIPE, stdout=PIPE, stderr=PIPE)
+    stdout, stderr = p.communicate(stdin)
+    print(stderr)
+
+    return stdout.decode("utf-8")
+
+
+def main():
+    args = [SYBIL_BIN, "query"] + sys.argv[1:]
+    print(run_command(args))
+
+if __name__ == "__main__":
+    main()
