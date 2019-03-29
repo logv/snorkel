@@ -26,6 +26,7 @@ app.wsgi_app = ProxyFix(app.wsgi_app)
 
 
 pudgy.register_blueprint(app)
+pudgy.preload_components()
 
 app.config.update({
     "SESSION_COOKIE_NAME" : "slite"
@@ -77,6 +78,11 @@ def get_index():
         return redirect(url_for('get_datasets'))
 
     return HomePage(template="welcome.html").render()
+
+@app.route('/favicon.ico')
+def get_favicon():
+    with open(os.path.join(app.static_folder, "favicon.ico")) as f:
+        return f.read()
 
 @app.route('/tour')
 def get_tour():
