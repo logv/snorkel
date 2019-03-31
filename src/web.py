@@ -77,11 +77,14 @@ def get_index():
     if not config.SHOW_TOUR:
         return redirect(url_for('get_datasets'))
 
-    return HomePage(template="welcome.html").render()
+    carousel = components.TourCarousel()
+    login_button = components.LoginButton()
+    return HomePage(template="welcome.html",
+        carousel=carousel, login_button=login_button).render()
 
 @app.route('/favicon.ico')
 def get_favicon():
-    with open(os.path.join(app.static_folder, "favicon.ico")) as f:
+    with open(os.path.join(app.static_folder, "favicon.png")) as f:
         return f.read()
 
 @app.route('/tour')

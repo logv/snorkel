@@ -1,6 +1,7 @@
 {% extends "layout.html" %}
 
 {% block body %}
+
 <div id= "page-top">
   <div class="container">
     <div class="row">
@@ -16,64 +17,149 @@
   </div>
 </div>
 
-<div class ="container-wrapper">
+<div class ="">
   <div class="container-fluid">
-    <div class="row" >
+    <div class="row mtl overview" >
       <div class="col-md-12">
-        <h2>Overview</h2>
         <div>
             <p>
-              <b>snorkel</b> is a time based data analysis UI that is
-              <b>complementary</b> to your monitoring software. After you spot an
-              anomaly in a time series graph, snorkel helps you create, refine
-              and compare queries on your data that explain <b>why</b> your
-              graphs are changing.  </p> 
+              <b>snorkel</b> is a realtime exploratory data analysis tool that
+              is <b>complementary</b> to your monitoring software. After you
+              spot an anomaly in a time series graph, snorkel helps you create,
+              refine and compare queries on your data that explain <b>why</b>
+              your graphs are changing.  </p>
+
         </div>
       </div>
+
     </div>
     <div class="row">
       <div class="col-md-12 centered clearfix mbl mtl" style="padding:20px">
-        <a style="zoom: 2;" class="btn btn-info  mtl" href="/tour">take a tour</a>
-        <a style="zoom: 2;" class="btn btn-success mtl" href="http://github.com/logv/snorkel/wiki/Guide">read the guide</a>
-        <a style="zoom: 2;" class="btn btn-primary mtl" href="{{ url_for('get_datasets') }}">get started</a>
+        <a style="zoom: 2;" class="col-md-4 btn btn-success mtl" href="http://github.com/logv/snorkel/wiki/Guide">read the guide</a>
+        <a style="zoom: 2;" class="col-md-4 btn btn-primary mtl" href="{{ url_for('get_datasets') }}">get started</a>
 
       </div>
     </div>
-    <div class="row">
-      <div class="col-md-4">
-        <h2>Example Uses</h2>
-        <ul>
-          <li>monitor push and deployment health</li>
-          <li>track and diagnose client errors</li>
-          <li>diagnose performance regressions</li>
-          <li>locate optimization opportunities</li>
-          <li>analyze performance experiments</li>
-        </ul>
+
+    <div class="row section">
+      <div class='col-md-4 midsection'>
+        <img class='largeicon' src="/static/octicons/search.svg"> </img>
+        <h2>Interactive</h2>
+          Run and refine queries with Snorkel's easy to use query builder.
       </div>
-    
-      
-      <div class="col-md-4">
-        <h2>Features</h2>
-        <ul>
-          <li>Tables, Time Series, Histograms and Raw Sample Views</li>
-          <li>Realtime drilldowns</li>
-          <li>Powerful comparison queries</li>
-          <li><a href="http://github.com/logv/grafana-snorkel-datasource" target="_blank">
-            Dashboarding with Grafana</a></li>
-        </ul>
+      <div class='col-md-4 midsection'>
+        <img class='largeicon' src="/static/octicons/watch.svg"> </img>
+        <h2>Fast</h2>
+          Run queries on millions of samples in seconds instead of minutes.
       </div>
-      <div class="col-md-4">
-        <h2>Built With</h2>
-        <ul>
-          <li>python, backbone and underscore</li>
-          <li><a href="https://github.com/logv/sybil">sybil datastore</a></li>
-          <li><a href="http://getbootstrap.com">twitter bootstrap</a></li>
-          <li>charting with <a href="http://nvd3.org">nvd3</a></li>
-        </ul>
+      <div class='col-md-4 midsection'>
+        <img class='largeicon' src="/static/octicons/gear.svg"> </img>
+        <h2>Customizable</h2>
+          Create your own datasets, views and flows that work for you
+          and your data.
       </div>
+    </div>
+
+    <div class="row whyusesnorkel">
+      <div class="col-lg-6 mtl section centered">
+        <img src="/static/images/screens/gif/time_to_table.gif"></img>
+        <h3>Zooming in on an anomaly</h3>
+      </div>
+
+      <div class="col-lg-6 section">
+        <p>
+        Ask and answer your questions in real time! Snorkel is an exploratory analysis
+        tool that lets you ask question after question, each one unlocking new insights
+        (and questions) about your running systems.  </p>
+
+        <p>
+        If you use a monitoring suite or TSDB, you probably know the familiar
+        pain of seeing a graph change and not knowing why. Unlike a TSDB,
+        Snorkel is meant for querying and browsing through raw samples.</p>
+
+        <p>
+        Normally, aggregating millions of raw samples would be slow
+        but Snorkel is fast because it uses a custom datastore, <a
+        href="https://github.com/logv/sybil">Sybil</a>, that is built for speed
+        and size.  With columnar compression, your samples take up less space
+        than believable.  Built from the ground up in Go for instrumentation,
+        Sybil is able to <a
+        href="https://github.com/logv/sybil/wiki/Performance">query millions of
+        samples in under a second on commodity hardware.</a></p>
+
+      </div>
+
 
     </div>
 
+
+      <div class='usecases row'>
+        <div class="col-lg-6 section">
+          <h2>How it works</h2>
+          <ul>
+            <li><a href="https://github.com/logv/snorkel/wiki/Installation">Install Snorkel</a></li>
+            <li><a href="https://github.com/logv/snorkel/wiki/Datasets">Log JSON Samples</a></li>
+            <li><a href="https://github.com/logv/snorkel/wiki/Guide">Explore your data</a></li>
+          </ul>
+
+          <h2 class='mtl'>Features</h2>
+          <ul>
+            <li>Easy to use time-based query builder</li>
+            <li>Over a dozen views for visualizing your data</li>
+            <li>Adjust queries on the fly with realtime drilldowns</li>
+            <li>Stores raw samples instead of pre-aggregating data</li>
+            <li>Write your own custom views and visualizations</li>
+            <li>Dashboarding with Grafana</li>
+          </ul>
+
+        </div>
+
+        <div class="col-lg-6 section centered">
+          <img src="/static/images/screens/006_barchart.png"></img>
+          <h3>Bar charts with comparison mode</h3>
+        </div>
+
+      </div>
+
+
+      <div class='row usecases'>
+
+        <div class="col-lg-6 section centered">
+          <img src="/static/images/screens/007_forecasting.png"></img>
+          <h3>Forecasting with multi-seasonal exponential smoothing</h3>
+        </div>
+
+        <div class="col-lg-6 section">
+          <h2>Example Uses</h2>
+          <ul>
+            <li>Monitor push and deployment health</li>
+            <li>Track and diagnose client errors</li>
+            <li>Diagnose performance regressions</li>
+            <li>Store browser history and page loads</li>
+            <li>Track and understand your slow DB queries</li>
+            <li>Analyze per process stats: RAM, CPU, etc </li>
+          </ul>
+          <h2 class='mtl'>Built with</h2>
+          <ul>
+            <li><a href="http://flask.pocoo.org/">Flask</a> with Pudgy Components</li>
+            <li><a href="https://github.com/logv/sybil">Sybil datastore</a></li>
+            <li><a href="http://getbootstrap.com">Twitter bootstrap</a></li>
+            <li>Charting with <a href="http://nvd3.org">nvd3</a></li>
+          </ul>
+        </div>
+
+      </div>
+
+    <div class='col-md-12 centered mtl'>
+      <small>Snorkel and Sybil are licensed under the MIT license - your software and
+      data should be owned and modifiable by you</small>
+    </div>
+
+    <div class='footer row'>
+      <a href="https://logv.org">LogV Homepage</a>
+      <a href="https://github.com/logv/snorkel">Snorkel on Github</a>
+      <a href="https://github.com/logv/sybil">Sybil on Github</a>
+    </div>
   </div>
 </div>
 

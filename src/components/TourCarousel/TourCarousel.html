@@ -1,12 +1,12 @@
-<div id="CakeCarousel" class="carousel" data-ride="carousel">
+<div id="CakeCarousel" class="carousel" data-ride="carousel" style="height: 500px; overflow: hidden; margin-bottom: 50px; border-radius: 25px; background-color: rgba(200,200,200,0.3); padding: 30px">
   <!-- Carousel items -->
   <div class="carousel-inner">
     {% for s in slides %}
         <div class="item slide {{ "active" if loop.counter == 0 else "" }}" data-id="{{  s.title  }}" style='height: 100%'>
-            <h1 class='mbl' style='text-align: center'>{{ s.title }}</h1>
-            <hr />
-            <img style='max-width: 1000px; width: 90%; ' class='mtl' src="{{ s.src }}" > </img>
-            <div class="caption">{{ s.caption or "" }}</div>
+          <div style='overflow: hidden;' >
+            <div style='max-height: 800px; height: 100%; width: 100%; background-image: url({{ s.src }})' > </div>
+          </div>
+          <div class="caption">{{ s.caption or "" }}</div>
         </div>
       {% endfor %}
   </div>
