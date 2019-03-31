@@ -19,12 +19,15 @@ var TimeView = {
     var is_compare = this.compare_query === data;
     this.max_x = data.end_ms || "";
     var fill_missing = "zero";
-    var custom_params = this.query.query;
+
+    var custom_params = {};
+    try {
+      var custom_params = this.query.query;
+    } catch(e) { }
 
     var series = time_helper.prepare(data, {
       dataset: dataset,
       helpers: helpers,
-//      presenter: presenter,
       is_compare: is_compare,
       fill_missing: custom_params.fill_missing || fill_missing
     });
@@ -37,7 +40,6 @@ var TimeView = {
 
   finalize: function() {
     var query = this.query;
-    console.log("QUERY IS", query);
     if (this.compare_data) {
       _.each(this.compare_data, function(series) {
         var new_data = [];
@@ -153,7 +155,6 @@ var TimeView = {
     var table = this.table;
     var self = this;
 
-//    var custom_params = this.query.parsed.custom;
     var custom_params = this.query.query;
 
     options.series = data;
