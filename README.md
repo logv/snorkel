@@ -13,6 +13,10 @@ snorkel-lite is a re-implementation of snorkel in python, to read more
 about why we moved to python from nodejs, [see the motivation
 docs](https://github.com/logv/snorkel/blob/slite/docs/MOTIVATION.md)
 
+## screengifs
+
+<img src="https://i.imgur.com/7E4vKK2.gif" width="800"/>
+
 ### Status
 
 **Feb 2019**
@@ -30,18 +34,16 @@ Development has started on porting snorkel to python.
 
 #### Deployment
 
-The simplest way to deploy snorkel will be to use the
-[snorkel-deploy](https://github.com/logv/snorkel.deploy) repository. The deploy
-repository uses the snorkel-lite pypi package and lets you configure
-snorkel separately from its code.
+The simplest way to deploy snorkel will be to use the snorkel-lite pypi package and
+[the instructions on the wiki](https://github.com/logv/snorkel/wiki/Installation).
 
 #### Development
 
 To develop on snorkel, clone snorkel and get going:
 
 ```
-git clone --single-branch -b slite git@github.com:logv/snorkel.git slite
-cd slite
+git clone git@github.com:logv/snorkel.git
+cd snorkel
 make setup
 make run
 ```
@@ -63,6 +65,3 @@ make run
 
 [grafana snorkel datasource](https://github.com/logV/grafana-snorkel-datasource) is a plugin for grafana (3.0+) to query snorkel. While this plugin is in early stages, grafana is quite amazing.
 
-## screengifs
-
-<img src="https://i.imgur.com/7E4vKK2.gif" width="800"/>
