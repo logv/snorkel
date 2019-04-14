@@ -3,7 +3,7 @@ import pudgy
 
 from snorkel.views import ViewBase
 
-class DistView(ViewBase, pudgy.JSComponent):
+class DistView(ViewBase, pudgy.JSComponent, pudgy.SassComponent):
     NAME="dist"
     BASE="dist"
     DISPLAY_NAME="Dist View"
