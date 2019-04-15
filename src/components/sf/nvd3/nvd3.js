@@ -138,18 +138,25 @@ function drawXLine(chart, svg, line) {
 function formatWithSampleCount(d, i, p) {
   if (p) {
     var samples = p.samples;
-    if (p.data && p.data.samples) {
-      samples = p.data.samples;
-    }
-    if (p.point && p.point.samples) {
-      samples = p.point.samples;
+    if (p.data && p.data.samples) { samples = p.data.samples; }
+    if (p.point && p.point.samples) { samples = p.point.samples; }
+
+    var count;
+    if (p.data) {
+      count = p.data.weighted_count || p.data.count;
     }
 
     if (_.isUndefined(samples)) {
       return parseInt(d) + " (no samples)";
     }
 
-    return "<b>" + d + "</b>" + " <i class='light'>(" + samples + " samples)</i>";
+    var sampleStr = samples + " samples";
+
+    if (count && count != samples) {
+      sampleStr +=  ", " + count + " count";
+    }
+
+    return "<b>" + d + "</b>" + " <i class='light'>(" + sampleStr + ")</i>";
   }
 
   return d;

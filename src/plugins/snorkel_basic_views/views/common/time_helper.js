@@ -133,6 +133,7 @@ function time_prepare(data, options) {
         x: result._id.time_bucket * 1000,
         y: parseInt(value, 10),
         samples: result.samples,
+        count: result.weighted_count || result.count,
         compare: is_compare
       };
 

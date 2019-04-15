@@ -78,49 +78,6 @@ var TimeView = {
       tooltip: {
         useHTML: true,
         hideDelay: 0,
-        formatter: function() {
-          $(".nvtooltip").remove();
-
-          var el = $("<div><b>" + Highcharts.dateFormat('%a %d %b %H:%M:%S', this.x) + "</b></div>");
-          _.each(this.points, function(point) {
-            var ptDiv = $("<div class='clearfix'>");
-            ptDiv.css("min-width", "400px");
-
-            var name = point.series.name;
-            if (point.point.compare) {
-              name += " (compare)";
-            }
-            ptDiv.append(
-              $("<span />")
-                .css("color", helpers.get_color(time_helper.labels[point.series.name]))
-                .html(name));
-
-            if (point.series.name === _hovered) {
-              ptDiv.css("font-weight", "bold");
-            }
-
-            ptDiv.append(":");
-            var valDiv = $("<div class='mlm rfloat' />")
-                          .html(helpers.number_format(point.y));
-            ptDiv.append(valDiv);
-
-            var samples = point.point.samples;
-            if (samples) {
-              var sampleDiv = $("<div class='mlm' />").html("(" + samples + "samples)");
-              sampleDiv.css("display", "inline-block");
-              valDiv.append(sampleDiv);
-
-            }
-
-            if (samples > 0) {
-              el.append(ptDiv);
-            }
-
-
-          });
-
-          return el.html();
-        }
       },
       xAxis: {
         max: this.max_x
