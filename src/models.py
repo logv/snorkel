@@ -5,6 +5,7 @@ from playhouse.sqlite_ext import *
 from flask_security import RoleMixin, UserMixin
 
 import os
+import zlib
 
 from playhouse.sqliteq import SqliteQueueDatabase
 from playhouse.migrate import SqliteMigrator, migrate
@@ -21,6 +22,24 @@ class UserModel(Model):
     class Meta:
         database = userdb
 
+class ZipJSONField(JSONField):
+    def db_value(self, value):
+        """Convert the python value for storage in the database."""
+        if value is not None:
+            value = buffer(zlib.compress(json.dumps(value)))
+
+        return value
+
+    def python_value(self, value):
+        """Convert the database value to a pythonic value."""
+        try:
+            value = zlib.decompress(value)
+        except:
+            pass
+
+        return value if value is None else json.loads(value)
+
+
 class SavedQuery(QueryModel):
     user = IntegerField(index=True)
     table = CharField(index=True)
@@ -28,10 +47,11 @@ class SavedQuery(QueryModel):
     hashid = CharField(index=True)
     created = TimestampField(index=True, utc=True)
     updated = TimestampField(utc=True)
+    zipped = BooleanField(default=False)
 
-    results = JSONField()
-    compare = JSONField()
-    parsed = JSONField()
+    results = ZipJSONField()
+    compare = ZipJSONField()
+    parsed = ZipJSONField()
 
     def toObject(self):
         return {
@@ -88,6 +108,7 @@ class UserRoles(UserModel):
     description = property(lambda self: self.role.description)
 
 def create_db_if_not():
+    print(' * Verifying database models')
     try:
         os.makedirs(DB_DIR)
     except Exception as e:
@@ -98,15 +119,22 @@ def create_db_if_not():
         c._meta.database.create_tables([c])
 
     # query DB migrations
-    # not necessarily needed
     migrator = SqliteMigrator(querydb)
-    try:
-        migrate(
-            migrator.add_column('savedquery', 'compare', JSONField(default='')),
-        )
-    except Exception as e:
-        print(e)
+    MIGRATIONS = []
 
-if __name__ == "__main__":
-    if "RESET" in os.environ:
-        create_db_if_not()
+    columns = [ c.name for c in SavedQuery._meta.database.get_columns('savedquery') ]
+    if not 'zipped' in columns:
+        m = migrator.add_column('savedquery', 'zipped', BooleanField(default=False))
+        MIGRATIONS.append(m)
+
+    if not 'compare' in columns:
+        m = migrator.add_column('savedquery', 'compare', JSONField(default=''))
+        MIGRATIONS.append(m)
+
+    for migration in MIGRATIONS:
+        try:
+            migrate(migration)
+        except Exception as e:
+            print(e)
+
+create_db_if_not()

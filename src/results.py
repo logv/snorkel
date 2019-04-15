@@ -32,5 +32,20 @@ def get_for_user(user, table, limit=30):
 
     return list(reversed(res))
 
+def zip_results():
+    while True:
+        ret = list(SavedQuery.select().where(SavedQuery.zipped == False).limit(10))
+        if not ret:
+            break
+
+        for r in ret:
+            r.zipped = True
+            print "ZIPPING", r.id
+            r.save()
+
+
 def get_by_hashid(hashid):
     return list(SavedQuery.select().where(SavedQuery.hashid == hashid).dicts())
+
+if __name__ == "__main__":
+    zip_results()
