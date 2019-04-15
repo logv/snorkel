@@ -6,8 +6,11 @@ module.exports = {
   tagName: "div",
   className: "",
   client: function(options) {
+    var newly_created;
     if (_.isNaN(options.created)) {
       options.created = +new Date();
+      newly_created = true;
+
     }
 
     var created_str = new Date(options.created).toISOString();
@@ -40,6 +43,10 @@ module.exports = {
     }
 
     $C("timeago", {time: created_str }, function(cmp) {
+      if (newly_created) {
+        that.$el.find(".historic").hide();
+      }
+
       that.$el.find(".timestamp").append(cmp.$el);
     });
   }
