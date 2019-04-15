@@ -79,9 +79,8 @@ function time_prepare(data, options) {
         if (field !== "count") { return; }
       } else {
         if (field === "count") { return; }
-        if (field === "weighted_count") {
-          return;
-        }
+        if (field === "weighted_count") { return; }
+        if (field === "samples") { return; }
       }
 
       if (data.parsed.agg === "$count" || data.parsed.agg === "$sum") {

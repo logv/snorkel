@@ -1,5 +1,7 @@
 "use strict";
 
+var helpers = require("timeview$common/sf_helpers.js");
+
 module.exports = {
   tagName: "div",
   className: "",
@@ -29,12 +31,12 @@ module.exports = {
 
     }
 
-    if (!_.isNaN(count)) {
-      that.$el.find(".count").text("Sample Count: " + count);
+    if (!_.isNaN(count) && count) {
+      that.$el.find(".count").text("Sample Count: " + helpers.count_format(count));
     }
 
-    if (!_.isNaN(w_count)) {
-      that.$el.find(".weight").text("Weighted Samples: " + w_count || count);
+    if (!_.isNaN(w_count) && w_count) {
+      that.$el.find(".weight").text("Weighted Samples: " + helpers.count_format(w_count || count));
     }
 
     $C("timeago", {time: created_str }, function(cmp) {
