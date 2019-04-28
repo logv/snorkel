@@ -14,7 +14,7 @@ from . import fastjson as json
 from .pages import QueryPage, DatasetsPage, HomePage, UserPage
 from .auth import needs_login
 from .backend.sybil import SybilBackend
-from .util import return_json
+from .util import return_json, add_cache_headers
 
 
 
@@ -85,7 +85,8 @@ def get_index():
 @app.route('/favicon.ico')
 def get_favicon():
     with open(os.path.join(app.static_folder, "favicon.png")) as f:
-        return f.read()
+        r = flask.Response(f.read())
+        return add_cache_headers(r)
 
 @app.route('/tour')
 def get_tour():

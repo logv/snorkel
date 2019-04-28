@@ -21,6 +21,11 @@ def time_delta_to_seconds(timedelta):
 def return_json(d):
     return json.dumps(d), 200, {"ContentType" : "application/json"}
 
+def add_cache_headers(r):
+    r.cache_control.max_age = 60 * 60 * 24 * 7 # one week cache
+
+    return r
+
 # from https://stackoverflow.com/questions/1254454/fastest-way-to-convert-a-dicts-keys-values-from-unicode-to-str
 import collections
 
