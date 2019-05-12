@@ -14,6 +14,14 @@ DB_DIR="sdb"
 userdb = SqliteDatabase(os.path.join(DB_DIR, 'users.db'))
 querydb = SqliteDatabase(os.path.join(DB_DIR, 'queries.db'))
 
+to_bytes = str
+try:
+    bytes("abc", "UTF-8")
+    buffer = memoryview
+    to_bytes = lambda s: bytes(s, "UTF-8")
+except:
+    pass
+
 class QueryModel(Model):
     class Meta:
         database = querydb
@@ -26,7 +34,8 @@ class ZipJSONField(JSONField):
     def db_value(self, value):
         """Convert the python value for storage in the database."""
         if value is not None:
-            value = buffer(zlib.compress(json.dumps(value)))
+            bts = to_bytes(json.dumps(value))
+            value = buffer(zlib.compress(bts))
 
         return value
 

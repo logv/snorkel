@@ -84,7 +84,7 @@ def get_index():
 
 @app.route('/favicon.ico')
 def get_favicon():
-    with open(os.path.join(app.static_folder, "favicon.png")) as f:
+    with open(os.path.join(app.static_folder, "favicon.png"), "rb") as f:
         r = flask.Response(f.read())
         return add_cache_headers(r)
 

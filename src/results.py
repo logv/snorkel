@@ -40,7 +40,6 @@ def zip_results():
 
         for r in ret:
             r.zipped = True
-            print "ZIPPING", r.id
             r.save()
 
 
