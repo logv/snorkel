@@ -1,12 +1,19 @@
-#!/usr/bin/env python
 from __future__ import print_function
 
 import os
+import sys
+from flask_security.utils import encrypt_password, verify_password
 
-import snorkel
-snorkel.shared_mode()
+SNORKEL_DIR=os.path.expanduser("~/.local/share/snorkel")
+def shared_mode():
+    print("SWITCHING TO SHARED DIR", SNORKEL_DIR, file=sys.stderr)
+    try:
+        os.makedirs(SNORKEL_DIR)
+    except:
+        pass
+    os.chdir(SNORKEL_DIR)
+shared_mode()
 
-from snorkel.web import app
 from snorkel.presenter import DatasetPresenter, RegisterPresenter
 
 from snorkel.views import ViewSeparator
@@ -42,17 +49,22 @@ def configure_presenters():
 
 
 configure_presenters()
-
 if __name__ == "__main__":
     print("STARTING SNORKEL FRONTEND")
     from snorkel import web
     from snorkel import models
 
+
     try:
         models.create_db_if_not()
-    except:
-        pass
+    except Exception as e:
+        print("COULDNT CREATE MODELS", e)
 
+    print(os.getcwd())
+    print(os.listdir("sdb"))
+
+    with web.app.app_context():
+        user = models.User.create(email="test", password=encrypt_password("me"))
     web.app.run(
         host=os.environ.get('HOST', '0.0.0.0'),
         port=os.environ.get('PORT', 2333),

@@ -123,7 +123,11 @@ def create_db_if_not():
     except Exception as e:
         pass
 
-    User._meta.database.connect()
+    try:
+        User._meta.database.connect()
+    except Exception as e:
+        print("E", e)
+
     for c in [SavedQuery, User, UserToken, UserRoles]:
         c._meta.database.create_tables([c])
 

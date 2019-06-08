@@ -27,17 +27,24 @@ sybil:
 				mkdir -p src/backend/bin/
 				cp build/go/bin/sybil src/backend/bin/sybil
 
-virtualenv:
+virtualenv2:
 				virtualenv dev2 -p python2
+virtualenv3:
 				virtualenv dev3 -p python3
+
+virtualenv: virtualenv2 virtualenv3
 
 binary2:
 				. dev2/bin/activate; \
 				python setup.py bdist_wheel; \
+				echo ${PWD}; \
+				mv dist/snorkel_lite*py2*whl dist/snorkel_lite-current-py2-none-any.whl
 
 binary3:
 				. dev3/bin/activate; \
 				python setup.py bdist_wheel; \
+				echo ${PWD}; \
+				mv dist/snorkel_lite*py3*whl dist/snorkel_lite-current-py3-none-any.whl
 
 binary-package: binary2 binary3
 
@@ -55,4 +62,17 @@ source-package:
 				python setup.py sdist build
 				cp dist/snorkel-lite-${VERSION}.tar.gz dist/snorkel-lite-current.tar.gz
 
-.PHONY: tags clean build cscope run dev
+docker2:
+				docker build . --tag e2e_snorkel2 -f dockers/Dockerfile.py2
+
+docker3:
+				docker build . --tag e2e_snorkel3 -f dockers/Dockerfile.py3
+
+dockercypress:
+				docker build . --tag e2e_cypress -f dockers/Dockerfile.cypress
+
+cypress:
+				. scripts/run_e2e_py2_tests.sh
+				. scripts/run_e2e_py3_tests.sh
+
+.PHONY: tags clean build cscope run dev docker2 docker3
