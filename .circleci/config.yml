@@ -1,0 +1,58 @@
+version: 2
+jobs:
+  buildpy2:
+    executor: docker
+    docker:
+      - image: circleci/golang:1.10.0-stretch
+
+    steps:
+      - checkout
+      - setup_remote_docker
+      - run:
+          name: Install Docker Compose
+          command: |
+            curl -L https://github.com/docker/compose/releases/download/1.19.0/docker-compose-`uname -s`-`uname -m` > ~/docker-compose
+            chmod +x ~/docker-compose
+            sudo mv ~/docker-compose /usr/local/bin/docker-compose
+      - run:
+          name: Build snorkel package
+          command: |
+            sudo apt update
+            sudo apt install python-pip golang
+            sudo pip install virtualenv
+            make virtualenv2
+            make binary2
+            make docker2
+            make dockercypress
+            ./scripts/run_e2e_py2_tests.sh
+
+  buildpy3:
+    executor: docker
+    docker:
+      - image: circleci/golang:1.10.0-stretch
+    steps:
+      - checkout
+      - setup_remote_docker
+      - run:
+          name: Install Docker Compose
+          command: |
+            curl -L https://github.com/docker/compose/releases/download/1.19.0/docker-compose-`uname -s`-`uname -m` > ~/docker-compose
+            chmod +x ~/docker-compose
+            sudo mv ~/docker-compose /usr/local/bin/docker-compose
+      - run:
+          name: Build snorkel package
+          command: |
+            sudo apt update
+            sudo apt install python-pip golang python3
+            sudo pip install virtualenv
+            make virtualenv3
+            make binary3
+            make docker3
+            make dockercypress
+            ./scripts/run_e2e_py3_tests.sh
+workflows:
+  version: 2
+  build_and_test:
+    jobs:
+      - buildpy2
+      - buildpy3

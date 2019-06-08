@@ -1,0 +1,15 @@
+version: '2'
+services:
+  snorkel2:
+    build: ../
+    working_dir: /e2e
+    environment:
+      - PORT=2333
+    entrypoint: "bash /e2e/run2.sh"
+  cypress:
+    build: ./
+    depends_on:
+      - snorkel2
+    environment:
+      - CYPRESS_baseUrl=http://snorkel2:2333
+    working_dir: /e2e

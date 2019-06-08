@@ -13,6 +13,10 @@ snorkel-lite is a re-implementation of snorkel in python, to read more
 about why we moved to python from nodejs, [see the motivation
 docs](https://github.com/logv/snorkel/blob/slite/docs/MOTIVATION.md)
 
+## build status
+
+[![CircleCI](https://circleci.com/gh/logv/snorkel/tree/slite.svg?style=svg)](https://circleci.com/gh/logv/snorkel/tree/slite)
+
 ## screengifs
 
 <img src="https://i.imgur.com/7E4vKK2.gif" width="800"/>

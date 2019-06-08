@@ -23,11 +23,17 @@ MSYBIL_INGEST_BIN = os.path.join(os.path.dirname(__file__), "msybil_ingest.py")
 SYBIL_BIN = os.path.join(os.path.dirname(__file__), "bin", "sybil")
 DEBUG="DEBUG" in os.environ
 
+try:
+    unicode
+    decode = lambda w: w.decode("utf-8")
+except:
+    decode = lambda w: w.decode("utf-8") if type(w) == bytes else str(w)
+
 if "MSYBIL" in os.environ:
     # TODO: make msybil.py read off MSYBIL environment variable instead of stdin
     print(" s Using Multisybil", file=sys.stderr)
 
-    SYBIL_BIN = MSYBIL_BIN
+    SYBIL_BIN = decode(MSYBIL_BIN)
     USING_MSYBIL = True
 
 
@@ -73,7 +79,7 @@ def run_query_command(cmd_args):
     return json.loads(ret)
 
 def run_command(cmd_args, stdin=b""):
-    cmd_args = list(map(lambda w: w.decode("utf-8"), cmd_args))
+    cmd_args = list(map(lambda w: decode(w), cmd_args))
     print("RUNNING COMMAND", " ".join(cmd_args))
 
     if isinstance(stdin, str):
@@ -84,7 +90,7 @@ def run_command(cmd_args, stdin=b""):
     if DEBUG:
         print(stderr)
 
-    return stdout.decode("utf-8")
+    return decode(stdout)
 
 FIELD_SEPARATOR=chr(30)
 FILTER_SEPARATOR=chr(31)
