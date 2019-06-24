@@ -5,3 +5,4 @@ from .forecasting import ForecastView
 from .drilldown import DrilldownView
 from .weco import WecoView
 from .digraph import DigraphView
+from .datamap import MapView

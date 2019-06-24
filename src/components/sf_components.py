@@ -13,6 +13,9 @@ class modal(OldSnorkelComponent):
     def add_display_rules(cls, data):
         return data
 
+class datamaps(OldSnorkelComponent):
+    pass
+
 class timeago(OldSnorkelComponent):
     pass
 

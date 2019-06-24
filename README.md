@@ -23,6 +23,13 @@ docs](https://github.com/logv/snorkel/blob/slite/docs/MOTIVATION.md)
 
 ### Status
 
+**June 2019**
+
+Initial E2E testing with cypress has been setup, now CircleCI will run e2e tests on snorkel.
+
+Map View has been added, but it is only python2 compatible for now.
+
+
 **Feb 2019**
 
 snorkel-lite is now in Alpha status. All but one view (map view) has been

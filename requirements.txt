@@ -6,5 +6,7 @@ flask_dance
 flask_peewee
 flask-security
 peewee
+python-geoip
+python-geoip-geolite2
 preparable
-pudgy>=0.1.4
+pudgy>=0.1.6

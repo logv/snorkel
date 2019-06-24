@@ -90,7 +90,7 @@ function get_field_value(result, col) {
     var ret = null;
     var pos = [fieldname(agg, field), col, field];
     for (var c in pos) {
-      if (result[pos[c]] !== null) {
+      if (typeof(result[pos[c]]) != "undefined"){
         ret = result[pos[c]];
         break;
       }

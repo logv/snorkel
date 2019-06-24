@@ -71,7 +71,7 @@ docker3:
 dockercypress:
 				docker build . --tag e2e_cypress -f dockers/Dockerfile.cypress
 
-cypress:
+cypress: docker2 docker3
 				. scripts/run_e2e_py2_tests.sh
 				. scripts/run_e2e_py3_tests.sh
 

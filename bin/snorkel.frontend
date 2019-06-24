@@ -14,7 +14,7 @@ from snorkel.views import ViewSeparator
 from snorkel.plugins.snorkel_basic_views import TableView, TimeView, DistView, SamplesView
 from snorkel.plugins.snorkel_basic_views import AreaView, ScatterView, BarView, GroupedDist
 from snorkel.plugins.snorkel_advanced_views import TimelineView, OverviewView, ForecastView, DrilldownView
-from snorkel.plugins.snorkel_advanced_views import DigraphView, WecoView
+from snorkel.plugins.snorkel_advanced_views import DigraphView, WecoView, MapView
 
 def configure_presenters():
     default_presenter = DatasetPresenter()
@@ -32,6 +32,7 @@ def configure_presenters():
         GroupedDist,
         ViewSeparator,
         DigraphView,
+        MapView,
         ViewSeparator,
         WecoView,
         ForecastView,
