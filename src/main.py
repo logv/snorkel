@@ -7,6 +7,7 @@
 
 
 import os
+import sys
 from . import web
 from .presenter import DatasetPresenter, RegisterPresenter, ConfigureTable
 
@@ -19,7 +20,7 @@ from .plugins.snorkel_advanced_views import DigraphView, WecoView, MapView
 
 def configure_presenters():
     default_presenter = DatasetPresenter()
-    default_presenter.set_views([
+    default_views = [
         TableView,
         TimeView,
         DistView,
@@ -39,7 +40,13 @@ def configure_presenters():
         ForecastView,
         DrilldownView
 
-    ])
+    ]
+
+    # geoip2 only works with python2 for now
+    if sys.version_info.major > 2:
+        default_views.remove(MapView)
+
+    default_presenter.set_views(default_views)
     RegisterPresenter(".*", default_presenter)
 
 
