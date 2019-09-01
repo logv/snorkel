@@ -51,9 +51,7 @@ def _add_superuser(name):
         while True:
             r = raw_input("Make user a superuser? [y/N]").lower()
             if r == "y":
-                role = user_datastore.find_role('superuser')
-                if not role:
-                    user_datastore.create_role('superuser')
+                role = user_datastore.find_or_create_role(name='superuser')
                 user_datastore.add_role_to_user(user, role)
                 user.save()
                 print("Set user '%s' to superuser" % name)
