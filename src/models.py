@@ -128,7 +128,7 @@ def create_db_if_not():
     except Exception as e:
         print("E", e)
 
-    for c in [SavedQuery, User, UserToken, UserRoles]:
+    for c in [Role, SavedQuery, User, UserToken, UserRoles]:
         c._meta.database.create_tables([c])
 
     # query DB migrations
