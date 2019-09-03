@@ -14,6 +14,17 @@ function serialized_array_to_str(arr) {
   return form_str;
 }
 
+function errorModal(err) {
+    console.log("Error", err);
+    $C("modal", {
+      title: "Error while running query",
+      body: err
+    }, function(cmp) {
+      cmp.$el.css("height", "600px").find(".modal").css("height", "600px");
+      cmp.show();
+    });
+}
+
 
 function swapUrl(url) {
   history.pushState({}, "", url);
@@ -109,6 +120,8 @@ module.exports = {
         throbber.stop();
         if (!err) {
           swapUrl(res.queryUrl);
+        } else {
+          errorModal(err);
         }
       });
   },
