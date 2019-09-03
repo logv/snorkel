@@ -5,6 +5,7 @@ flask-admin
 flask_dance
 flask_peewee
 flask-security
+parsedatetime
 peewee
 python-geoip
 python-geoip-geolite2

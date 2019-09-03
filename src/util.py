@@ -1,13 +1,20 @@
+from __future__ import print_function
+
 import subprocess
 from . import fastjson as json
 
+import parsedatetime
+import time
+cal = parsedatetime.Calendar()
 
 # time translation command is:
 # `date -d "<str>" +%s`
 def time_to_seconds(timestr):
-    cmd_args = ["date", "-d", timestr, "+%s"]
     try:
-        output = subprocess.check_output(cmd_args)
+        ts, parsed = cal.parse(timestr)
+        if not parsed:
+            raise Exception("Unknown time string: ", timestr)
+        return int(time.mktime(ts))
     except:
         raise Exception("Unknown time string: ", timestr)
     return int(output)
