@@ -2,6 +2,17 @@
 
 require("./jquery.tablesorter.min.js");
 
+$.tablesorter.addParser({
+	id: "float",
+	is: function(s, table) {
+			return parseFloat(s) != NaN;
+	},
+	format: function(s) {
+			return $.tablesorter.formatFloat(s);
+	},
+	type: "numeric"
+});
+
 module.exports = {
   tagName: "table",
   className: "",
