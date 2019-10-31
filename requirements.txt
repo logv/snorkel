@@ -6,7 +6,7 @@ flask_dance
 flask_peewee
 flask-security
 parsedatetime
-peewee
+peewee==3.9.2
 python-geoip
 python-geoip-geolite2
 preparable
