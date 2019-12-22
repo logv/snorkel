@@ -150,4 +150,5 @@ def create_db_if_not():
         except Exception as e:
             print(e)
 
-create_db_if_not()
+if __name__ == "__main__":
+    create_db_if_not()

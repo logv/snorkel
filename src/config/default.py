@@ -1,4 +1,5 @@
 # google auth settings
+NO_AUTH=False
 USE_GOOGLE_AUTH = False
 GOOGLE_CLIENT_ID=None
 GOOGLE_CLIENT_SECRET=None

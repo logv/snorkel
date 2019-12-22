@@ -8,7 +8,7 @@
 
 import os
 import sys
-from . import web
+from . import web, models
 from .presenter import DatasetPresenter, RegisterPresenter, ConfigureTable
 
 from .views import ViewSeparator
@@ -52,6 +52,7 @@ def configure_presenters():
 
 def main():
     configure_presenters()
+    models.create_db_if_not()
 
     PROFILE="PROFILE" in os.environ
     if PROFILE:

@@ -2,6 +2,7 @@ from __future__ import absolute_import
 from __future__ import print_function
 from . import main
 from . import cli
+from . import models
 
 import os
 import sys
@@ -14,6 +15,8 @@ def shared_mode():
     except:
         pass
     os.chdir(SNORKEL_DIR)
+
+    models.create_db_if_not()
 
 DEBUG="DEBUG" in os.environ
 def run_command(cmd_args, stdin=b""):

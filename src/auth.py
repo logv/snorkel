@@ -14,6 +14,8 @@ from . import oauth, config, rbac
 
 import random, sys, os
 
+NO_AUTH_USER,_ = User.get_or_create(email='anonymous', password='')
+
 # Uses our own authentication tokens instead of the signed ones from
 # flask_security because the verification of signatures takes too long
 def _request_loader(request):
@@ -33,6 +35,9 @@ def _request_loader(request):
         return user
     except Exception as e:
         pass
+
+    if config.NO_AUTH:
+        return NO_AUTH_USER
     return _security.login_manager.anonymous_user()
 
 import flask
@@ -79,6 +84,9 @@ def check_auth():
 
 def needs_login(func):
     def wrapped_func(*args, **kwargs):
+        # TODO: need a better way of doing this?
+        if config.NO_AUTH:
+            return func(*args, **kwargs)
 
         try:
             auth = check_auth()
