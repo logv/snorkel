@@ -14,11 +14,14 @@ from . import oauth, config, rbac
 
 import random, sys, os
 
-NO_AUTH_USER,_ = User.get_or_create(email='anonymous', password='')
+NO_AUTH_USER = None
 
 # Uses our own authentication tokens instead of the signed ones from
 # flask_security because the verification of signatures takes too long
 def _request_loader(request):
+    global NO_AUTH_USER
+    if not NO_AUTH_USER:
+        NO_AUTH_USER,_ = User.get_or_create(email='anonymous', password='')
     header_key = _security.token_authentication_header
     args_key = _security.token_authentication_key
     header_token = request.headers.get(header_key, None)

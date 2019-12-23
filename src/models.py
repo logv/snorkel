@@ -10,6 +10,7 @@ import zlib
 from playhouse.sqliteq import SqliteQueueDatabase
 from playhouse.migrate import SqliteMigrator, migrate
 
+DATA_DIR="db"
 DB_DIR="sdb"
 userdb = SqliteDatabase(os.path.join(DB_DIR, 'users.db'))
 querydb = SqliteDatabase(os.path.join(DB_DIR, 'queries.db'))
@@ -120,15 +121,24 @@ def create_db_if_not():
     print(' * Verifying database models')
     try:
         os.makedirs(DB_DIR)
+        os.makedirs(DATA_DIR)
     except Exception as e:
         pass
 
+    local_userdb = SqliteDatabase(os.path.join(DB_DIR, 'users.db'))
+    local_querydb = SqliteDatabase(os.path.join(DB_DIR, 'queries.db'))
     try:
-        User._meta.database.connect()
+        local_userdb.connect()
+        local_querydb.connect()
     except Exception as e:
         print("E", e)
 
     for c in [Role, SavedQuery, User, UserToken, UserRoles]:
+        if c._meta.database == querydb:
+            c._meta.database = local_querydb
+        if c._meta.database == userdb:
+            c._meta.database = local_userdb
+
         c._meta.database.create_tables([c])
 
     # query DB migrations
@@ -149,6 +159,3 @@ def create_db_if_not():
             migrate(migration)
         except Exception as e:
             print(e)
-
-if __name__ == "__main__":
-    create_db_if_not()

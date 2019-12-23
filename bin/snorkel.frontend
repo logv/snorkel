@@ -46,18 +46,18 @@ configure_presenters()
 
 if __name__ == "__main__":
     print("STARTING SNORKEL FRONTEND")
+    snorkel.models.create_db_if_not()
     from snorkel import web
     from snorkel import models
     from snorkel import config
 
+
+    no_auth = os.environ.get("SNORKEL_NO_AUTH", False)
+    config.NO_AUTH = no_auth
     try:
         models.create_db_if_not()
     except:
         pass
-
-
-    no_auth = os.environ.get("SNORKEL_NO_AUTH", False)
-    config.NO_AUTH = no_auth
 
     web.app.run(
         host=os.environ.get('HOST', '0.0.0.0'),
