@@ -36,6 +36,7 @@ virtualenv: virtualenv2 virtualenv3
 
 binary2:
 				rm dist/*whl; \
+				mkdir -p dist/current; \
 				. dev2/bin/activate; \
 				python setup.py bdist_wheel; \
 				echo ${PWD}; \
@@ -43,6 +44,7 @@ binary2:
 
 binary3:
 				rm dist/*whl; \
+				mkdir -p dist/current; \
 				. dev3/bin/activate; \
 				python setup.py bdist_wheel; \
 				echo ${PWD}; \
@@ -50,6 +52,7 @@ binary3:
 
 macosx2:
 				rm dist/*whl; \
+				mkdir -p dist/current; \
 				. dev2/bin/activate; \
 				MACOSX_BUILD=y python setup.py bdist_wheel -p macosx_10_11_x86_64; \
 				echo ${PWD}; \
@@ -57,6 +60,7 @@ macosx2:
 
 macosx3:
 				rm dist/*whl; \
+				mkdir -p dist/current; \
 				. dev3/bin/activate; \
 				MACOSX_BUILD=y python setup.py bdist_wheel -p macosx_10_11_x86_64; \
 				echo ${PWD}; \
@@ -100,5 +104,6 @@ dockercypress:
 cypress: docker2 docker3
 				. scripts/run_e2e_py2_tests.sh
 				. scripts/run_e2e_py3_tests.sh
+
 
 .PHONY: tags clean build cscope run dev docker2 docker3
