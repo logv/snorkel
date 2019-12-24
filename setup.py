@@ -7,6 +7,10 @@ from setuptools.command.develop import develop
 from setuptools.command.install import install
 from subprocess import check_call
 
+# Monkey-patch Distribution so it always claims to be platform-specific.
+from distutils.core import Distribution
+Distribution.has_ext_modules = lambda *args, **kwargs: True
+
 import os
 import shutil
 import tokenize
@@ -30,6 +34,18 @@ else:
 class BuildSybilCommand(build_py):
     def run(self):
         gopath = "build/go"
+        filepath = "build/go/bin/sybil"
+        if os.getenv('MACOSX_BUILD'):
+            os.environ["GOOS"] = "darwin"
+            filepath = "build/go/bin/darwin_amd64/sybil"
+
+
+
+        try:
+            os.remove(filepath)
+        except:
+            pass
+
         os.environ["GOPATH"] = os.path.abspath("build/go")
         check_call("/usr/bin/go get -ldflags='-s -w' github.com/logv/sybil", shell=True)
 
@@ -43,8 +59,8 @@ class BuildSybilCommand(build_py):
         except:
             pass
 
-        shutil.copy("build/go/bin/sybil", "src/backend/bin/")
-        shutil.copy("build/go/bin/sybil", "bin/snorkel.sybil")
+        shutil.copy(filepath, "src/backend/bin/")
+        shutil.copy(filepath, "bin/snorkel.sybil")
 
         build_py.run(self)
 

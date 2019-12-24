@@ -35,28 +35,54 @@ virtualenv3:
 virtualenv: virtualenv2 virtualenv3
 
 binary2:
+				rm dist/*whl; \
 				. dev2/bin/activate; \
 				python setup.py bdist_wheel; \
 				echo ${PWD}; \
-				mv dist/snorkel_lite*py2*whl dist/snorkel_lite-current-py2-none-any.whl
+				mv dist/snorkel_lite*whl dist/current/snorkel_lite-current-py2-none-any.whl
 
 binary3:
+				rm dist/*whl; \
 				. dev3/bin/activate; \
 				python setup.py bdist_wheel; \
 				echo ${PWD}; \
-				mv dist/snorkel_lite*py3*whl dist/snorkel_lite-current-py3-none-any.whl
+				mv dist/snorkel_lite*whl dist/current/snorkel_lite-current-py3-none-any.whl
 
-binary-package: binary2 binary3
+macosx2:
+				rm dist/*whl; \
+				. dev2/bin/activate; \
+				MACOSX_BUILD=y python setup.py bdist_wheel -p macosx_10_11_x86_64; \
+				echo ${PWD}; \
+				mv dist/snorkel_lite*whl dist/current/
+
+macosx3:
+				rm dist/*whl; \
+				. dev3/bin/activate; \
+				MACOSX_BUILD=y python setup.py bdist_wheel -p macosx_10_11_x86_64; \
+				echo ${PWD}; \
+				mv dist/snorkel_lite*whl dist/current/
+
+binary-package: binary2 binary3 macosx2 macosx3
+
+
 
 upload2:
 				. dev2/bin/activate; \
-				python setup.py bdist_wheel upload; \
+				python setup.py bdist_wheel -p manylinux1_x86_64 upload; \
 
 upload3:
 				. dev3/bin/activate; \
-				python setup.py bdist_wheel upload; \
+				python setup.py bdist_wheel -p manylinux1_x86_64 upload; \
 
-upload-package: upload2 upload3
+uploadosx2:
+				. dev2/bin/activate; \
+				MACOSX_BUILD=y python setup.py bdist_wheel -p macosx_10_11_x86_64 upload;
+
+uploadosx3:
+				. dev3/bin/activate; \
+				MACOSX_BUILD=y python setup.py bdist_wheel -p macosx_10_11_x86_64 upload;
+
+upload-package: upload2 upload3 uploadosx2 uploadosx3
 
 source-package:
 				python setup.py sdist build
