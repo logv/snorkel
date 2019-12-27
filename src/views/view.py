@@ -78,6 +78,10 @@ def get_column_types(md):
         fields[field] = field
         types[field] = 'integer'
 
+    for field in md['columns']['sets']:
+        fields[field] = field
+        types[field] = 'set'
+
     return fields, types
 
 @pudgy.Virtual

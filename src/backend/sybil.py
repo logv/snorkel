@@ -241,6 +241,7 @@ class SybilQuery(object):
 
         int_filters = defaultdict(list)
         str_filters = defaultdict(list)
+        set_filters = defaultdict(list)
 
         for f in filters:
             col, op, val = f
@@ -265,6 +266,8 @@ class SybilQuery(object):
                     str_filters[col].append((op, val))
                 elif tp == "integer":
                     int_filters[col].append((op, val))
+                elif tp == "set":
+                    set_filters[col].append((op, val))
 
 
 
@@ -286,6 +289,14 @@ class SybilQuery(object):
 
         if filter_strs:
             cmd_args.extend(["-str-filter", enquote(FIELD_SEPARATOR.join(map(str, filter_strs)))])
+
+        filter_strs = []
+        for col in set_filters:
+            for f in set_filters[col]:
+                filter_strs.append(FILTER_SEPARATOR.join(map(str, [col, f[0], f[1]])))
+
+        if filter_strs:
+            cmd_args.extend(["-set-filter", enquote(FIELD_SEPARATOR.join(filter_strs))])
 
     def add_limit(self, query_spec, cmd_args):
         # TODO: limit should depend on the view. time series limit defaults to 10 or 20
