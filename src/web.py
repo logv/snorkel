@@ -84,9 +84,12 @@ def get_index():
 
 @app.route('/favicon.ico')
 def get_favicon():
-    with open(os.path.join(app.static_folder, "favicon.png"), "rb") as f:
-        r = flask.Response(f.read())
-        return add_cache_headers(r)
+    try:
+        with open(os.path.join(app.static_folder, "favicon.png"), "rb") as f:
+            r = flask.Response(f.read())
+            return add_cache_headers(r)
+    except:
+        return flask.Response("")
 
 @app.route('/tour')
 def get_tour():

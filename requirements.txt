@@ -11,3 +11,4 @@ python-geoip
 python-geoip-geolite2
 preparable
 pudgy>=0.1.6
+werkzeug==0.16.1
