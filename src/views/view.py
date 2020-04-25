@@ -172,7 +172,7 @@ class ViewBase(pudgy.BackboneComponent):
         controls.append(ControlRow("limit", "Limit", limit_selector))
 
     def add_groupby_selector(self, controls):
-        groups = make_dict(self.context.metadata["columns"]["strs"])
+        groups = make_dict(self.context.metadata["columns"]["strs"] + self.context.metadata["columns"]["ints"])
         groupby = MultiSelect(
             name="groupby[]",
             options=groups,
