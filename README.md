@@ -55,6 +55,15 @@ To develop on snorkel, clone snorkel and get going:
 ```
 git clone git@github.com:logv/snorkel.git
 cd snorkel
+
+# for python2
+make virtualenv2
+source dev2/bin/activate
+
+# for python3
+make virtualenv3
+source dev3/bin/activate
+
 make setup
 make run
 ```
