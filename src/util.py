@@ -17,7 +17,6 @@ def time_to_seconds(timestr):
         return int(time.mktime(ts))
     except:
         raise Exception("Unknown time string: ", timestr)
-    return int(output)
 
 def time_delta_to_seconds(timedelta):
     now = time_to_seconds("now")

@@ -159,11 +159,10 @@ def post_data():
         return return_json({'error' : "No table specified"})
 
     samples = args.get("samples", None)
-    if isinstance(samples, (str, unicode)):
-        try:
-            samples = json.loads(samples)
-        except:
-            samples = None
+    try:
+        samples = json.loads(samples)
+    except:
+        samples = None
 
     if not samples:
         return return_json({'error' : "No samples specified"})
