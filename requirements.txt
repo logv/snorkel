@@ -1,5 +1,6 @@
 addict
 bcrypt
+email_validator
 flask
 flask-admin
 flask_dance

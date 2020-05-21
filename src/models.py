@@ -159,3 +159,7 @@ def create_db_if_not():
             migrate(migration)
         except Exception as e:
             print(e)
+
+if __name__ == "__main__":
+    if os.environ.get("RESET"):
+        create_db_if_not()

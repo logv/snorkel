@@ -12,6 +12,9 @@ from getpass import getpass
 from .web import app
 from .models import User, UserToken
 
+try: input = raw_input
+except NameError: pass
+
 from flask_security.utils import encrypt_password, verify_password
 
 def _add_user(name):
@@ -49,7 +52,7 @@ def _add_superuser(name):
         print("User '%s' already exists" % name)
 
         while True:
-            r = raw_input("Make user a superuser? [y/N]").lower()
+            r = input("Make user a superuser? [y/N]").lower()
             if r == "y":
                 role = user_datastore.find_or_create_role(name='superuser')
                 user_datastore.add_role_to_user(user, role)
@@ -65,7 +68,7 @@ def _add_superuser(name):
         user = User.create(username=name, email=name, password=pw, roles=['superuser'])
         role = user_datastore.find_role('superuser')
         if not role:
-            user_datastore.create_role('superuser')
+            user_datastore.find_or_create_role(name='superuser')
         user.save()
         print("Created user", name)
 
