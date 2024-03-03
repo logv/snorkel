@@ -10,6 +10,6 @@ parsedatetime
 peewee==3.9.2
 python-geoip
 python-geoip-geolite2
-preparable
-pudgy>=0.1.6
+preparable>=0.1.3
+pudgy>=0.2.2
 werkzeug==0.16.1
